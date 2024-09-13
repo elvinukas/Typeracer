@@ -20,3 +20,10 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.fullscreen-container {
+  height: 100vh; /* take 100% of the viewport height */
+  display: flex;
+  justify-content: center; /* center horizontally */
+  align-items: center; /* center vertically */
+}

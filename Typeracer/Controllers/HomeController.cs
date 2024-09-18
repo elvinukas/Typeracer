@@ -32,8 +32,11 @@ public class HomeController : Controller
     {
         // getting the file path
         var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Paragraphs", "paragraph1.txt");
+        Console.Write(filePath);
+        
         // splitting the text into paragraphs
-        var paragraphs = System.IO.File.ReadAllText(filePath).Split("\n");
+        var paragraphs = System.IO.File.ReadAllText(filePath).Split("\n", StringSplitOptions.RemoveEmptyEntries);
+        
 
         var random = new Random();
 

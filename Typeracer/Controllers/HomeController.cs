@@ -28,6 +28,26 @@ public class HomeController : Controller
         return View();
     }
 
+    public string GetRandomParagraph()
+    {
+        // getting the file path
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Paragraphs", "paragraph1.txt");
+        // splitting the text into paragraphs
+        var paragraphs = System.IO.File.ReadAllText(filePath).Split("\n");
+
+        var random = new Random();
+
+        // explanation
+        // return a random paragraph by generating a random number between 0 and the length of the list
+        return paragraphs[random.Next(paragraphs.Length)];
+    }
+
+    public IActionResult GetParagraphText()
+    {
+        var text = GetRandomParagraph();
+        return Json(new {text});
+    }
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {

@@ -28,64 +28,63 @@ document.addEventListener('DOMContentLoaded', async (event) => {
     
     document.addEventListener('keydown', (event) => {
         let inputCharacter = event.key;
-        
+
         // handling delete key
         if (inputCharacter === "Backspace") {
             if (currentIndex > 0) {
                 --currentIndex;
             }
-            
+
             // if the user has come back to the error index
             if (currentIndex <= errorIndex) {
                 errorIndex = -1;
             }
-            
+
             displayColorOverlay();
             return;
-            
+
+        }
+
+        // we must ignore shift and other keys non-character keys, since they should not count
+        if (inputCharacter.length > 1) {
+            return;
         }
         
-        
-        
-        // comparing the character to the text
-        if (currentIndex < typingText.length && inputCharacter === typingText[currentIndex]) {
-            if (errorIndex === -1) {
-                ++currentIndex;
-            }
-        } else {
-            // checking if the error was not made before
-            if (errorIndex === -1) {
+        if (currentIndex < typingText.length) {
+            
+            if (inputCharacter !== typingText[currentIndex] && errorIndex === -1) {
                 errorIndex = currentIndex;
             }
+            
             ++currentIndex;
+            
+            displayColorOverlay();
+
         }
-        
-        displayColorOverlay();
-        
+
+
+        function displayColorOverlay() {
+            let displayedText = "";
+
+            if (errorIndex === -1) {
+                let typedText = typingText.substring(0, currentIndex);
+                let remainingText = typingText.substring(currentIndex);
+                displayedText = `<span style="color: green;">${typedText}</span>${remainingText}`;
+            } else {
+                let correctlyTypedText = typingText.substring(0, errorIndex);
+                let incorrectlyTypedText = typingText.substring(errorIndex, currentIndex);
+                let remainingUntypedText = typingText.substring(currentIndex);
+
+                displayedText = `
+                    <span style="color: green;">${correctlyTypedText}</span>
+                    <span style="color: red;">${incorrectlyTypedText}</span>${remainingUntypedText}`;
+                
+            }
+            typingTextElement.innerHTML = displayedText;
+
+        }
+
     });
-    
-    
-    
-    function displayColorOverlay() {
-        // typed text
-        let typedText = typingText.substring(0, currentIndex);
-        // untyped remaining text
-        let remainingText = typingText.substring(currentIndex);
-        
-        if (errorIndex === -1) {
-            typingTextElement.innerHTML = `<span style="color: green;">${typedText}</span>${remainingText}`;
-        } else {
-            let correctlyTypedText = typingText.substring(0, errorIndex);
-            let incorrectlyTypedText = typingText.substring(errorIndex, currentIndex);
-
-            typingTextElement.innerHTML = `
-                <span style="color: green;">${correctlyTypedText}</span>
-                <span style="color: red;">${incorrectlyTypedText}</span>${remainingText}`;
-        }
-        
-        
-    }
-
 });
     
     

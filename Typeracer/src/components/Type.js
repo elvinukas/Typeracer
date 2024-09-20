@@ -2,8 +2,8 @@
 import '../../wwwroot/css/Type.css';
 
 function Type() {
-    const [typingText, setTypingText] = useState('');  // Atsisiųstas tekstas
-    const [currentIndex, setCurrentIndex] = useState(0);  // Dabartinis simbolių indeksas
+    const [typingText, setTypingText] = useState('');  // Text to type
+    const [currentIndex, setCurrentIndex] = useState(0);  // Current index of the text
 
     useEffect(() => {
         const fetchParagraphText = async () => {
@@ -15,7 +15,7 @@ function Type() {
         fetchParagraphText();
     }, []);
 
-    // Klavišų paspaudimų valdymas
+    // Event listener for keydown
     useEffect(() => {
         const handleKeyDown = (event) => {
             let inputCharacter = event.key;
@@ -32,8 +32,8 @@ function Type() {
         };
     }, [typingText, currentIndex]);
 
-    const typedText = typingText.substring(0, currentIndex);  // Teisingai įvestas tekstas
-    const remainingText = typingText.substring(currentIndex);  // Likęs tekstas
+    const typedText = typingText.substring(0, currentIndex);  // Input text
+    const remainingText = typingText.substring(currentIndex);  // Remaining text
 
     return (
         <div className="type-page-body">

@@ -1,9 +1,10 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import '../../wwwroot/css/Type.css';
 
 function Type() {
-    const [typingText, setTypingText] = useState('');  // Text to type
-    const [currentIndex, setCurrentIndex] = useState(0);  // Current index of the text
+    const [typingText, setTypingText] = useState('');
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const charRefs = useRef([]);
 
     useEffect(() => {
         const fetchParagraphText = async () => {
@@ -15,7 +16,6 @@ function Type() {
         fetchParagraphText();
     }, []);
 
-    // Event listener for keydown
     useEffect(() => {
         const handleKeyDown = (event) => {
             let inputCharacter = event.key;
@@ -32,8 +32,15 @@ function Type() {
         };
     }, [typingText, currentIndex]);
 
-    const typedText = typingText.substring(0, currentIndex);  // Input text
-    const remainingText = typingText.substring(currentIndex);  // Remaining text
+    useEffect(() => {
+        const scrollAhead = 10; // This is the value that determines how many characters ahead to scroll
+        const scrollIndex = Math.min(currentIndex + scrollAhead, typingText.length - 1);
+        const scrollElement = charRefs.current[scrollIndex];
+
+        if (scrollElement) {
+            scrollElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }, [currentIndex, typingText]);
 
     return (
         <div className="type-page-body">
@@ -43,8 +50,15 @@ function Type() {
 
             <div className="typing-container">
                 <p className="typing-text">
-                    <span style={{ color: 'green' }}>{typedText}</span>
-                    {remainingText}
+                    {typingText.split('').map((char, index) => (
+                        <span
+                            key={index}
+                            ref={(el) => (charRefs.current[index] = el)}
+                            style={{ color: index < currentIndex ? 'green' : 'grey' }}
+                        >
+                            {char}
+                        </span>
+                    ))}
                 </p>
             </div>
 

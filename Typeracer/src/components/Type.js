@@ -1,10 +1,13 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
+import { Howl } from 'howler';
 import '../../wwwroot/css/Type.css';
+import wrongSound from '../../wwwroot/sounds/incorrect.mp3';
 
 function Type() {
     const [typingText, setTypingText] = useState('');
     const [currentIndex, setCurrentIndex] = useState(0);
     const charRefs = useRef([]);
+    const wrongSoundRef = useRef(null);
 
     useEffect(() => {
         const fetchParagraphText = async () => {
@@ -14,17 +17,28 @@ function Type() {
         };
 
         fetchParagraphText();
+
+        // Initializing Howler sound
+        wrongSoundRef.current = new Howl({
+            src: [wrongSound],
+            preload: true,
+        });
     }, []);
 
-    useEffect(() => {
-        const handleKeyDown = (event) => {
-            let inputCharacter = event.key;
+    const handleKeyDown = (event) => {
+        const inputCharacter = event.key;
+        const isCharacterKey = inputCharacter.length === 1;
 
-            if (currentIndex < typingText.length && inputCharacter === typingText[currentIndex]) {
-                setCurrentIndex((prevIndex) => prevIndex + 1);
+        if (currentIndex < typingText.length && inputCharacter === typingText[currentIndex]) {
+            setCurrentIndex((prevIndex) => prevIndex + 1);
+        } else if (isCharacterKey) {
+            if (wrongSoundRef.current) {
+                wrongSoundRef.current.play();
             }
-        };
+        }
+    };
 
+    useEffect(() => {
         document.addEventListener('keydown', handleKeyDown);
 
         return () => {
@@ -66,9 +80,7 @@ function Type() {
                 <button className="restart-button" onClick={() => window.location.reload()}>
                     Pradėti iš naujo
                 </button>
-                <button className="next-text-button">
-                    Kitas tekstas
-                </button>
+                <button className="next-text-button">Kitas tekstas</button>
             </div>
         </div>
     );

@@ -7,6 +7,7 @@ function Type() {
     const [typingText, setTypingText] = useState('');
     const [initialText, setInitialText] = useState('');
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [incorrectChars, setIncorrectChars] = useState({});
     const charRefs = useRef([]);
     const wrongSoundRef = useRef(null);
 
@@ -31,9 +32,28 @@ function Type() {
         const inputCharacter = event.key;
         const isCharacterKey = inputCharacter.length === 1;
 
-        if (currentIndex < typingText.length && inputCharacter === typingText[currentIndex]) {
+        if (inputCharacter === 'Backspace') { // deleting characters
+            if (currentIndex > 0) {
+                setCurrentIndex((prevIndex) => prevIndex - 1);
+                setIncorrectChars((prevIncorrectChars) => {
+                    const newIncorrectChars = { ...prevIncorrectChars };
+                    delete newIncorrectChars[currentIndex - 1];
+                    return newIncorrectChars;
+                });
+            }
+        } else if (currentIndex < typingText.length && inputCharacter === typingText[currentIndex]) { // checking if the input character is correct
+            setIncorrectChars((prevIncorrectChars) => {
+                const newIncorrectChars = { ...prevIncorrectChars };
+                delete newIncorrectChars[currentIndex];
+                return newIncorrectChars;
+            });
             setCurrentIndex((prevIndex) => prevIndex + 1);
-        } else if (isCharacterKey) {
+        } else if (isCharacterKey) { // checking if the input character is incorrect
+            setIncorrectChars((prevIncorrectChars) => ({
+                ...prevIncorrectChars,
+                [currentIndex]: inputCharacter,
+            }));
+            setCurrentIndex((prevIndex) => prevIndex + 1);
             if (wrongSoundRef.current) {
                 wrongSoundRef.current.play();
             }
@@ -85,9 +105,15 @@ function Type() {
                         <span
                             key={index}
                             ref={(el) => (charRefs.current[index] = el)}
-                            style={{ color: index < currentIndex ? 'green' : 'grey' }}
+                            style={{
+                                color: index < currentIndex 
+                                    ? incorrectChars[index]
+                                        ? 'red' 
+                                        : 'green'
+                                    :'grey' 
+                            }}
                         >
-                            {char}
+                            {incorrectChars[index] || char}
                         </span>
                     ))}
                 </p>
@@ -97,6 +123,7 @@ function Type() {
                 <button className="restart-button" onClick={() => {
                     setTypingText(initialText);
                     setCurrentIndex(0);
+                    setIncorrectChars({});
                 }}>
                     Pradėti iš naujo
                 </button>
@@ -109,6 +136,7 @@ function Type() {
                         setTypingText(jsonResponse.text);  // Setting the new text
                         setInitialText(jsonResponse.text);  // Updating the initial text
                         setCurrentIndex(0);  // Reseting the current index to the beginning
+                        setIncorrectChars({});  // Clearing incorrect characters
                     }}
                 >
                     Kitas tekstas

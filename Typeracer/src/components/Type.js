@@ -8,6 +8,8 @@ function Type() {
     const [initialText, setInitialText] = useState('');
     const [currentIndex, setCurrentIndex] = useState(0);
     const [incorrectChars, setIncorrectChars] = useState({});
+    const [firstErrorIndex, setFirstErrorIndex] = useState(null);
+    const [consecutiveRedCount, setConsecutiveRedCount] = useState(0);
     const charRefs = useRef([]);
     const wrongSoundRef = useRef(null);
 
@@ -40,22 +42,40 @@ function Type() {
                     delete newIncorrectChars[currentIndex - 1];
                     return newIncorrectChars;
                 });
+                if (firstErrorIndex !== null && currentIndex - 1 === firstErrorIndex) { // fixes the problem when incorrect letters would become green when deleting them
+                    setFirstErrorIndex(null);
+                }
+                setConsecutiveRedCount((prevCount) => Math.max(prevCount - 1, 0));
             }
-        } else if (currentIndex < typingText.length && inputCharacter === typingText[currentIndex]) { // checking if the input character is correct
-            setIncorrectChars((prevIncorrectChars) => {
-                const newIncorrectChars = { ...prevIncorrectChars };
-                delete newIncorrectChars[currentIndex];
-                return newIncorrectChars;
-            });
-            setCurrentIndex((prevIndex) => prevIndex + 1);
-        } else if (isCharacterKey) { // checking if the input character is incorrect
-            setIncorrectChars((prevIncorrectChars) => ({
-                ...prevIncorrectChars,
-                [currentIndex]: inputCharacter,
-            }));
-            setCurrentIndex((prevIndex) => prevIndex + 1);
-            if (wrongSoundRef.current) {
-                wrongSoundRef.current.play();
+        } else if (consecutiveRedCount < 20) { // allow typing only if less than 20 consecutive red characters
+            if (currentIndex < typingText.length && inputCharacter === typingText[currentIndex]) { // checking if the input character is correct
+                setIncorrectChars((prevIncorrectChars) => {
+                    const newIncorrectChars = { ...prevIncorrectChars };
+                    delete newIncorrectChars[currentIndex];
+                    return newIncorrectChars;
+                });
+                setCurrentIndex((prevIndex) => prevIndex + 1);
+                if (firstErrorIndex !== null && currentIndex >= firstErrorIndex) { // plays the sound for correct (but red) letters because there was an error before
+                    setConsecutiveRedCount((prevCount) => prevCount + 1);
+                    if (wrongSoundRef.current) {
+                        wrongSoundRef.current.play();
+                    }
+                } else {
+                    setConsecutiveRedCount(0); // Reset the red count on correct character
+                }
+            } else if (isCharacterKey) { // checking if the input character is incorrect
+                setIncorrectChars((prevIncorrectChars) => ({
+                    ...prevIncorrectChars,
+                    [currentIndex]: inputCharacter,
+                }));
+                setCurrentIndex((prevIndex) => prevIndex + 1);
+                if (firstErrorIndex === null) { // sets the first error index
+                    setFirstErrorIndex(currentIndex);
+                }
+                setConsecutiveRedCount((prevCount) => prevCount + 1);
+                if (wrongSoundRef.current) {
+                    wrongSoundRef.current.play();
+                }
             }
         }
     };
@@ -106,11 +126,11 @@ function Type() {
                             key={index}
                             ref={(el) => (charRefs.current[index] = el)}
                             style={{
-                                color: index < currentIndex 
-                                    ? incorrectChars[index]
-                                        ? 'red' 
+                                color: index < currentIndex
+                                    ? firstErrorIndex !== null && index >= firstErrorIndex
+                                        ? 'red'
                                         : 'green'
-                                    :'grey' 
+                                    : 'grey' 
                             }}
                         >
                             {incorrectChars[index] || char}
@@ -124,6 +144,8 @@ function Type() {
                     setTypingText(initialText);
                     setCurrentIndex(0);
                     setIncorrectChars({});
+                    setFirstErrorIndex(null);
+                    setConsecutiveRedCount(0);
                 }}>
                     Pradėti iš naujo
                 </button>
@@ -137,6 +159,8 @@ function Type() {
                         setInitialText(jsonResponse.text);  // Updating the initial text
                         setCurrentIndex(0);  // Reseting the current index to the beginning
                         setIncorrectChars({});  // Clearing incorrect characters
+                        setFirstErrorIndex(null);
+                        setConsecutiveRedCount(0);
                     }}
                 >
                     Kitas tekstas

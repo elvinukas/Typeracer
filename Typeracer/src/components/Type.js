@@ -1,9 +1,13 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
+import { Howl } from 'howler';
 import '../../wwwroot/css/Type.css';
+import wrongSound from '../../wwwroot/sounds/incorrect.mp3';
 
 function Type() {
-    const [typingText, setTypingText] = useState('');  // Text to type
-    const [currentIndex, setCurrentIndex] = useState(0);  // Current index of the text
+    const [typingText, setTypingText] = useState('');
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const charRefs = useRef([]);
+    const wrongSoundRef = useRef(null);
 
     useEffect(() => {
         const fetchParagraphText = async () => {
@@ -13,18 +17,28 @@ function Type() {
         };
 
         fetchParagraphText();
+
+        // Initializing Howler sound
+        wrongSoundRef.current = new Howl({
+            src: [wrongSound],
+            preload: true,
+        });
     }, []);
 
-    // Event listener for keydown
-    useEffect(() => {
-        const handleKeyDown = (event) => {
-            let inputCharacter = event.key;
+    const handleKeyDown = (event) => {
+        const inputCharacter = event.key;
+        const isCharacterKey = inputCharacter.length === 1;
 
-            if (currentIndex < typingText.length && inputCharacter === typingText[currentIndex]) {
-                setCurrentIndex((prevIndex) => prevIndex + 1);
+        if (currentIndex < typingText.length && inputCharacter === typingText[currentIndex]) {
+            setCurrentIndex((prevIndex) => prevIndex + 1);
+        } else if (isCharacterKey) {
+            if (wrongSoundRef.current) {
+                wrongSoundRef.current.play();
             }
-        };
+        }
+    };
 
+    useEffect(() => {
         document.addEventListener('keydown', handleKeyDown);
 
         return () => {
@@ -32,8 +46,15 @@ function Type() {
         };
     }, [typingText, currentIndex]);
 
-    const typedText = typingText.substring(0, currentIndex);  // Input text
-    const remainingText = typingText.substring(currentIndex);  // Remaining text
+    useEffect(() => {
+        const scrollAhead = 10; // This is the value that determines how many characters ahead to scroll
+        const scrollIndex = Math.min(currentIndex + scrollAhead, typingText.length - 1);
+        const scrollElement = charRefs.current[scrollIndex];
+
+        if (scrollElement) {
+            scrollElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }, [currentIndex, typingText]);
 
     return (
         <div className="type-page-body">
@@ -43,8 +64,15 @@ function Type() {
 
             <div className="typing-container">
                 <p className="typing-text">
-                    <span style={{ color: 'green' }}>{typedText}</span>
-                    {remainingText}
+                    {typingText.split('').map((char, index) => (
+                        <span
+                            key={index}
+                            ref={(el) => (charRefs.current[index] = el)}
+                            style={{ color: index < currentIndex ? 'green' : 'grey' }}
+                        >
+                            {char}
+                        </span>
+                    ))}
                 </p>
             </div>
 
@@ -52,7 +80,16 @@ function Type() {
                 <button className="restart-button" onClick={() => window.location.reload()}>
                     Pradėti iš naujo
                 </button>
-                <button className="next-text-button">
+                <button
+                    className="next-text-button"
+                    onClick={async () => {
+                        // Fetching new paragraph text from the server
+                        let response = await fetch('/Home/GetParagraphText/');
+                        let jsonResponse = await response.json();
+                        setTypingText(jsonResponse.text);  // Setting the new text
+                        setCurrentIndex(0);  // Reseting the current index to the beginning
+                    }}
+                >
                     Kitas tekstas
                 </button>
             </div>

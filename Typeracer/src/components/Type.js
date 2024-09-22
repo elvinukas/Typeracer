@@ -5,17 +5,19 @@ import wrongSound from '../../wwwroot/sounds/incorrect.mp3';
 
 function Type() {
     const [typingText, setTypingText] = useState('');
+    const [initialText, setInitialText] = useState('');
     const [currentIndex, setCurrentIndex] = useState(0);
     const charRefs = useRef([]);
     const wrongSoundRef = useRef(null);
 
+    const fetchParagraphText = async () => {
+        let response = await fetch('/Home/GetParagraphText/');
+        let jsonResponse = await response.json();
+        setTypingText(jsonResponse.text);
+        setInitialText(jsonResponse.text);
+    };
+    
     useEffect(() => {
-        const fetchParagraphText = async () => {
-            let response = await fetch('/Home/GetParagraphText/');
-            let jsonResponse = await response.json();
-            setTypingText(jsonResponse.text);
-        };
-
         fetchParagraphText();
 
         // Initializing Howler sound
@@ -56,6 +58,21 @@ function Type() {
         }
     }, [currentIndex, typingText]);
 
+    useEffect(() => { // fixes the problem when text resets or new text is fetched after spacebar press
+        const preventSpacebarDefault = (event) => {
+            if (event.key === ' ') {
+                event.preventDefault();
+            }
+        };
+
+        const buttons = document.querySelectorAll('.restart-button, .next-text-button');
+        buttons.forEach(button => button.addEventListener('keydown', preventSpacebarDefault));
+
+        return () => {
+            buttons.forEach(button => button.removeEventListener('keydown', preventSpacebarDefault));
+        };
+    }, []);
+
     return (
         <div className="type-page-body">
             <div className="type-page-title">
@@ -77,7 +94,10 @@ function Type() {
             </div>
 
             <div className="button-container">
-                <button className="restart-button" onClick={() => window.location.reload()}>
+                <button className="restart-button" onClick={() => {
+                    setTypingText(initialText);
+                    setCurrentIndex(0);
+                }}>
                     Pradėti iš naujo
                 </button>
                 <button
@@ -87,6 +107,7 @@ function Type() {
                         let response = await fetch('/Home/GetParagraphText/');
                         let jsonResponse = await response.json();
                         setTypingText(jsonResponse.text);  // Setting the new text
+                        setInitialText(jsonResponse.text);  // Updating the initial text
                         setCurrentIndex(0);  // Reseting the current index to the beginning
                     }}
                 >

@@ -80,7 +80,18 @@ function Type() {
                 <button className="restart-button" onClick={() => window.location.reload()}>
                     Pradėti iš naujo
                 </button>
-                <button className="next-text-button">Kitas tekstas</button>
+                <button
+                    className="next-text-button"
+                    onClick={async () => {
+                        // Fetching new paragraph text from the server
+                        let response = await fetch('/Home/GetParagraphText/');
+                        let jsonResponse = await response.json();
+                        setTypingText(jsonResponse.text);  // Setting the new text
+                        setCurrentIndex(0);  // Reseting the current index to the beginning
+                    }}
+                >
+                    Kitas tekstas
+                </button>
             </div>
         </div>
     );

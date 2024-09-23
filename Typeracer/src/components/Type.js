@@ -95,7 +95,7 @@ function Type() {
             }
         }
         
-        if (currentIndex + 1 === typingText.length - 1) { // stops the timer when the text is finished
+        if (currentIndex + 1 === typingText.length - 1 && inputCharacter === typingText[currentIndex]) { // stops the timer when the text is finished and the last character is typed
             clearInterval(intervalRef.current);
         }
     };

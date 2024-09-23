@@ -5,17 +5,22 @@ import wrongSound from '../../wwwroot/sounds/incorrect.mp3';
 
 function Type() {
     const [typingText, setTypingText] = useState('');
+    const [initialText, setInitialText] = useState('');
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [incorrectChars, setIncorrectChars] = useState({});
+    const [firstErrorIndex, setFirstErrorIndex] = useState(null);
+    const [consecutiveRedCount, setConsecutiveRedCount] = useState(0);
     const charRefs = useRef([]);
     const wrongSoundRef = useRef(null);
 
+    const fetchParagraphText = async () => {
+        let response = await fetch('/Home/GetParagraphText/');
+        let jsonResponse = await response.json();
+        setTypingText(jsonResponse.text);
+        setInitialText(jsonResponse.text);
+    };
+    
     useEffect(() => {
-        const fetchParagraphText = async () => {
-            let response = await fetch('/Home/GetParagraphText/');
-            let jsonResponse = await response.json();
-            setTypingText(jsonResponse.text);
-        };
-
         fetchParagraphText();
 
         // Initializing Howler sound
@@ -29,11 +34,48 @@ function Type() {
         const inputCharacter = event.key;
         const isCharacterKey = inputCharacter.length === 1;
 
-        if (currentIndex < typingText.length && inputCharacter === typingText[currentIndex]) {
-            setCurrentIndex((prevIndex) => prevIndex + 1);
-        } else if (isCharacterKey) {
-            if (wrongSoundRef.current) {
-                wrongSoundRef.current.play();
+        if (inputCharacter === 'Backspace') { // deleting characters
+            if (currentIndex > 0) {
+                setCurrentIndex((prevIndex) => prevIndex - 1);
+                setIncorrectChars((prevIncorrectChars) => {
+                    const newIncorrectChars = { ...prevIncorrectChars };
+                    delete newIncorrectChars[currentIndex - 1];
+                    return newIncorrectChars;
+                });
+                if (firstErrorIndex !== null && currentIndex - 1 === firstErrorIndex) { // fixes the problem when incorrect letters would become green when deleting them
+                    setFirstErrorIndex(null);
+                }
+                setConsecutiveRedCount((prevCount) => Math.max(prevCount - 1, 0));
+            }
+        } else if (consecutiveRedCount < 20) { // allow typing only if less than 20 consecutive red characters
+            if (currentIndex < typingText.length && inputCharacter === typingText[currentIndex]) { // checking if the input character is correct
+                setIncorrectChars((prevIncorrectChars) => {
+                    const newIncorrectChars = { ...prevIncorrectChars };
+                    delete newIncorrectChars[currentIndex];
+                    return newIncorrectChars;
+                });
+                setCurrentIndex((prevIndex) => prevIndex + 1);
+                if (firstErrorIndex !== null && currentIndex >= firstErrorIndex) { // plays the sound for correct (but red) letters because there was an error before
+                    setConsecutiveRedCount((prevCount) => prevCount + 1);
+                    if (wrongSoundRef.current) {
+                        wrongSoundRef.current.play();
+                    }
+                } else {
+                    setConsecutiveRedCount(0); // Reset the red count on correct character
+                }
+            } else if (isCharacterKey) { // checking if the input character is incorrect
+                setIncorrectChars((prevIncorrectChars) => ({
+                    ...prevIncorrectChars,
+                    [currentIndex]: inputCharacter,
+                }));
+                setCurrentIndex((prevIndex) => prevIndex + 1);
+                if (firstErrorIndex === null) { // sets the first error index
+                    setFirstErrorIndex(currentIndex);
+                }
+                setConsecutiveRedCount((prevCount) => prevCount + 1);
+                if (wrongSoundRef.current) {
+                    wrongSoundRef.current.play();
+                }
             }
         }
     };
@@ -56,6 +98,21 @@ function Type() {
         }
     }, [currentIndex, typingText]);
 
+    useEffect(() => { // fixes the problem when text resets or new text is fetched after spacebar press
+        const preventSpacebarDefault = (event) => {
+            if (event.key === ' ') {
+                event.preventDefault();
+            }
+        };
+
+        const buttons = document.querySelectorAll('.restart-button, .next-text-button');
+        buttons.forEach(button => button.addEventListener('keydown', preventSpacebarDefault));
+
+        return () => {
+            buttons.forEach(button => button.removeEventListener('keydown', preventSpacebarDefault));
+        };
+    }, []);
+
     return (
         <div className="type-page-body">
             <div className="type-page-title">
@@ -68,16 +125,28 @@ function Type() {
                         <span
                             key={index}
                             ref={(el) => (charRefs.current[index] = el)}
-                            style={{ color: index < currentIndex ? 'green' : 'grey' }}
+                            style={{
+                                color: index < currentIndex
+                                    ? firstErrorIndex !== null && index >= firstErrorIndex
+                                        ? 'red'
+                                        : 'green'
+                                    : 'grey' 
+                            }}
                         >
-                            {char}
+                            {incorrectChars[index] || char}
                         </span>
                     ))}
                 </p>
             </div>
 
             <div className="button-container">
-                <button className="restart-button" onClick={() => window.location.reload()}>
+                <button className="restart-button" onClick={() => {
+                    setTypingText(initialText);
+                    setCurrentIndex(0);
+                    setIncorrectChars({});
+                    setFirstErrorIndex(null);
+                    setConsecutiveRedCount(0);
+                }}>
                     Pradėti iš naujo
                 </button>
                 <button
@@ -87,7 +156,11 @@ function Type() {
                         let response = await fetch('/Home/GetParagraphText/');
                         let jsonResponse = await response.json();
                         setTypingText(jsonResponse.text);  // Setting the new text
+                        setInitialText(jsonResponse.text);  // Updating the initial text
                         setCurrentIndex(0);  // Reseting the current index to the beginning
+                        setIncorrectChars({});  // Clearing incorrect characters
+                        setFirstErrorIndex(null);
+                        setConsecutiveRedCount(0);
                     }}
                 >
                     Kitas tekstas

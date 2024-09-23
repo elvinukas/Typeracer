@@ -10,8 +10,11 @@ function Type() {
     const [incorrectChars, setIncorrectChars] = useState({});
     const [firstErrorIndex, setFirstErrorIndex] = useState(null);
     const [consecutiveRedCount, setConsecutiveRedCount] = useState(0);
+    const [startTime, setStartTime] = useState(null);
+    const [elapsedTime, setElapsedTime] = useState(0);
     const charRefs = useRef([]);
     const wrongSoundRef = useRef(null);
+    const intervalRef = useRef(null);
 
     const fetchParagraphText = async () => {
         let response = await fetch('/Home/GetParagraphText/');
@@ -28,11 +31,24 @@ function Type() {
             src: [wrongSound],
             preload: true,
         });
+
+        return () => {
+            clearInterval(intervalRef.current); // Clear interval on component unmount
+        };
     }, []);
 
     const handleKeyDown = (event) => {
         const inputCharacter = event.key;
         const isCharacterKey = inputCharacter.length === 1;
+
+        if (currentIndex === 0 && !startTime) { // starts the timer when the first character is typed
+            const start = Date.now();
+            setStartTime(start);
+            clearInterval(intervalRef.current); // Clear any existing interval
+            intervalRef.current = setInterval(() => {
+                setElapsedTime(Date.now() - start);
+            }, 1000);
+        }
 
         if (inputCharacter === 'Backspace') { // deleting characters
             if (currentIndex > 0) {
@@ -78,6 +94,10 @@ function Type() {
                 }
             }
         }
+        
+        if (currentIndex + 1 === typingText.length - 1) { // stops the timer when the text is finished
+            clearInterval(intervalRef.current);
+        }
     };
 
     useEffect(() => {
@@ -113,10 +133,26 @@ function Type() {
         };
     }, []);
 
+    const formatTime = (time) => { // formats the time in minutes and seconds
+        const seconds = Math.floor((time / 1000) % 60);
+        const minutes = Math.floor((time / (1000 * 60)) % 60);
+        return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    };
+
+    const resetChronometer = () => {
+        clearInterval(intervalRef.current);
+        setStartTime(null);
+        setElapsedTime(0);
+    };
+
     return (
         <div className="type-page-body">
             <div className="type-page-title">
                 <p>Galima pradėti rašyti</p>
+            </div>
+
+            <div className="chronometer">
+                <p>{formatTime(elapsedTime)}</p>
             </div>
 
             <div className="typing-container">
@@ -130,7 +166,7 @@ function Type() {
                                     ? firstErrorIndex !== null && index >= firstErrorIndex
                                         ? 'red'
                                         : 'green'
-                                    : 'grey' 
+                                    : 'grey'
                             }}
                         >
                             {incorrectChars[index] || char}
@@ -141,6 +177,7 @@ function Type() {
 
             <div className="button-container">
                 <button className="restart-button" onClick={() => {
+                    resetChronometer();
                     setTypingText(initialText);
                     setCurrentIndex(0);
                     setIncorrectChars({});
@@ -152,8 +189,8 @@ function Type() {
                 <button
                     className="next-text-button"
                     onClick={async () => {
-                        // Fetching new paragraph text from the server
-                        let response = await fetch('/Home/GetParagraphText/');
+                        resetChronometer();
+                        let response = await fetch('/Home/GetParagraphText/'); // Fetching new paragraph text from the server
                         let jsonResponse = await response.json();
                         setTypingText(jsonResponse.text);  // Setting the new text
                         setInitialText(jsonResponse.text);  // Updating the initial text

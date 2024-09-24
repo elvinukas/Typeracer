@@ -21,23 +21,26 @@ public class StatisticsController : ControllerBase
         // first completionTime must be converted to minutes
         double completionTimeInMinutes = statisticsInfo.CompletionTime.TotalMinutes;
         statisticsInfo.WordsPerMinute = CalculateWPM(statisticsInfo.TypedAmountOfWords, completionTimeInMinutes);
-        
+        int countedWordsSoFar = 0;
+        double timeTakenSoFar = 0;
         
         // calculating momentary wpm for each typingdata element
         foreach (var typingData in statisticsInfo.TypingData)
         {
             TimeSpan timeTakenForWord = typingData.EndingTimestampWord - typingData.BeginningTimestampWord;
             double timeTakenInMinutes = timeTakenForWord.TotalMinutes;
+            ++countedWordsSoFar;
+            timeTakenSoFar += timeTakenInMinutes;
             
             // calculate and store wpm for each word typed
 
             if (timeTakenInMinutes > 0)
             {
-                typingData.MomentaryWordsPerMinute = CalculateWPM(1, timeTakenInMinutes);
+                typingData.CurrentWordsPerMinute = CalculateWPM(countedWordsSoFar, timeTakenSoFar);
             }
             else
             {
-                typingData.MomentaryWordsPerMinute = -1; // -1 is indicating that the time spent
+                typingData.CurrentWordsPerMinute = -1; // -1 is indicating that the time spent
                                                          // to write a word was instant
             }
         }
@@ -52,10 +55,15 @@ public class StatisticsController : ControllerBase
         
         // calculating momentary accuracy for each typingData element;
 
+        int typedCharsSoFar = 0;
+        int amountOfMistakesSoFar = 0;
+
         foreach (var typingData in statisticsInfo.TypingData)
         {
-            typingData.MomentaryAccuracy = CalculateAccuracy(typingData.Word.Length, 
-                typingData.amountOfMistakesInWord);
+            typedCharsSoFar += typingData.Word.Length;
+            amountOfMistakesSoFar += typingData.AmountOfMistakesInWord;
+            
+            typingData.CurrentAccuracy = CalculateAccuracy(typedCharsSoFar, amountOfMistakesSoFar);
         }
         
         return Ok(new { message = "Statistics received and saved" });

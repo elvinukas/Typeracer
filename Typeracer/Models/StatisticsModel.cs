@@ -1,6 +1,6 @@
 namespace Typeracer.Models;
 
-public class StatisticsInfoModel
+public class StatisticsModel
 {
     public TimeSpan CompletionTime { get; set; } // time that it took to finish the entire paragraph (or finish typing)
     public DateTime LocalStartTime { get; set; } // start date and time of the game
@@ -13,11 +13,22 @@ public class StatisticsInfoModel
     public int NumberOfWrongfulCharacters { get; set; }
     public List<TypingData> TypingData { get; set; } = new List<TypingData>(); // storing all data about the typed characters
     
+    // --------------------------------------
+    // FIELDS BELOW ARE TO BE CALCULATED AND NOT RECEIVED
+    // --------------------------------------
+    
+    public double WordsPerMinute { get; set; }
+    public double Accuracy { get; set; }
+    
 }
 
 public class TypingData
 {
-    public char Character { get; set; }
-    public DateTime Timestamp { get; set; }
-    public bool isCorrect { get; set; }
+    public DateTime BeginningTimeWord { get; set; }
+    public DateTime EndingTimeWord { get; set; }
+    public int amountOfMistakesInWord { get; set;}
+    //public bool isCorrect { get; set; }
+    
+    // data to be calculated
+    public double MomentaryWordsPerMinute { get; set; }
 }

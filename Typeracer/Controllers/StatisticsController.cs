@@ -22,12 +22,13 @@ public class StatisticsController : ControllerBase
         
         // ----------------------------------------
         // CALCULATING WORDS PER MINUTE
+        // its possible this will be changed/used for more advanced calculations of momentary wpm
         // ----------------------------------------
         
-        // first completionTime must be converted to seconds
-        double completionTimeInSeconds = statisticsInfo.CompletionTime.TotalSeconds;
-        statisticsInfo.WordsPerMinute = statisticsInfo.TypedAmountOfWords / completionTimeInSeconds;
-       // statisticsInfo.CorrectWordsPerMinute = statisticsInfo.
+        // first completionTime must be converted to minutes
+        double completionTimeInMinutes = statisticsInfo.CompletionTime.TotalMinutes;
+        statisticsInfo.WordsPerMinute = CalculateWPM(statisticsInfo.TypedAmountOfWords, completionTimeInMinutes);
+        
         
         // ----------------------------------------
         // CALCULATING ACCURACY (as a percentage)
@@ -40,6 +41,11 @@ public class StatisticsController : ControllerBase
         return Ok(new { message = "Statistics received and saved" });
 
 
+    }
+
+    private double CalculateWPM(int typedAmountOfWords, double completionTime)
+    {
+        return typedAmountOfWords / completionTime;
     }
     
     

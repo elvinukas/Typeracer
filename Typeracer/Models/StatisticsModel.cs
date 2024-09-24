@@ -24,11 +24,11 @@ public class StatisticsModel
 
 public class TypingData
 {
-    public DateTime BeginningTimeWord { get; set; }
-    public DateTime EndingTimeWord { get; set; }
-    public int amountOfMistakesInWord { get; set;}
+    public DateTime BeginningTimestampWord { get; set; } // timestamp of when a word was started to be typed
+    public DateTime EndingTimestampWord { get; set; } // timestamp of when a word was completely typed correctly
+    public int amountOfMistakesInWord { get; set;} // amount of mistakes that were made while writing the word
     //public bool isCorrect { get; set; }
     
     // data to be calculated
-    public double MomentaryWordsPerMinute { get; set; }
+    public double MomentaryWordsPerMinute { get; set; } // momentary wpm
 }

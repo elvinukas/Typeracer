@@ -15,7 +15,7 @@ function Type() {
     
     // used for checking when was the last keypress recorded - text cursor blinker
     const [lastKeyPressTime, setLastKeyPressTime] = useState(Date.now());
-    const [isBlinking, setIsBlinking] = useState(false);
+    const [isBlinking, setIsBlinking] = useState(true);
     
     const charRefs = useRef([]);
     const wrongSoundRef = useRef(null);
@@ -56,7 +56,7 @@ function Type() {
         // making the text cursor blink every second
         blinkTimeoutRef.current = setTimeout( () => {
             setIsBlinking(true);
-        }, 1000);
+        }, 530);
         
         
         
@@ -187,7 +187,7 @@ function Type() {
                                         : 'green'
                                     : 'grey',
                                 // adding text cursor animation to the border of a selected character
-                                borderLeft: index === currentIndex ? '1px solid black' : 'none',
+                                borderLeft: index === currentIndex ? '2px solid silver' : 'none',
                                 animation: index === currentIndex && isBlinking ? 'blink 1s step-end infinite' : 'none'
                             }}
                         >

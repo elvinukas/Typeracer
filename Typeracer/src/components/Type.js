@@ -12,9 +12,15 @@ function Type() {
     const [consecutiveRedCount, setConsecutiveRedCount] = useState(0);
     const [startTime, setStartTime] = useState(null);
     const [elapsedTime, setElapsedTime] = useState(0);
+    
+    // used for checking when was the last keypress recorded - text cursor blinker
+    const [lastKeyPressTime, setLastKeyPressTime] = useState(Date.now());
+    const [isBlinking, setIsBlinking] = useState(true);
+    
     const charRefs = useRef([]);
     const wrongSoundRef = useRef(null);
     const intervalRef = useRef(null);
+    const blinkTimeoutRef = useRef(null);
 
     const fetchParagraphText = async () => {
         let response = await fetch('/Home/GetParagraphText/');
@@ -33,14 +39,27 @@ function Type() {
         });
 
         return () => {
-            clearInterval(intervalRef.current); // Clear interval on component unmount
+            // clear out the React variables
+            clearInterval(intervalRef.current);
+            clearTimeout(blinkTimeoutRef.current);
         };
     }, []);
 
     const handleKeyDown = (event) => {
         const inputCharacter = event.key;
         const isCharacterKey = inputCharacter.length === 1;
-
+        
+        setLastKeyPressTime(Date.now());
+        setIsBlinking(false);
+        clearTimeout(blinkTimeoutRef.current);
+        
+        // making the text cursor blink every second
+        blinkTimeoutRef.current = setTimeout( () => {
+            setIsBlinking(true);
+        }, 530);
+        
+        
+        
         if (currentIndex === 0 && !startTime) { // starts the timer when the first character is typed
             const start = Date.now();
             setStartTime(start);
@@ -166,7 +185,10 @@ function Type() {
                                     ? firstErrorIndex !== null && index >= firstErrorIndex
                                         ? 'red'
                                         : 'green'
-                                    : 'grey'
+                                    : 'grey',
+                                // adding text cursor animation to the border of a selected character
+                                borderLeft: index === currentIndex ? '2px solid silver' : 'none',
+                                animation: index === currentIndex && isBlinking ? 'blink 1s step-end infinite' : 'none'
                             }}
                         >
                             {incorrectChars[index] || char}

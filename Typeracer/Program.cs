@@ -2,7 +2,7 @@
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Pridėkite CORS politiką
+// Adding the CORS policy to allow all origins, methods and headers
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",

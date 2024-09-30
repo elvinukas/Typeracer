@@ -10,6 +10,7 @@ namespace Typeracer.Controllers;
 [Route("api/[controller]")]
 public class StatisticsController : ControllerBase
 {
+    
     [HttpPost("save")]
     public IActionResult Save(StatisticsModel statisticsData)
     {
@@ -37,7 +38,7 @@ public class StatisticsController : ControllerBase
         {
             TimeSpan timeTakenForWord = typingData.EndingTimestampWord - typingData.BeginningTimestampWord;
             double timeTakenInMinutes = timeTakenForWord.TotalMinutes;
-            countedWordsSoFar++;
+            ++countedWordsSoFar;
             timeTakenSoFar += timeTakenInMinutes;
 
             if (timeTakenInMinutes > 0)
@@ -46,7 +47,8 @@ public class StatisticsController : ControllerBase
             }
             else
             {
-                typingData.CurrentWordsPerMinute = -1; // If the time taken is 0, set the WPM to -1
+                typingData.CurrentWordsPerMinute = -1; // -1 is indicating that the time spent
+                                                         // to write a word was instant
             }
         }
 
@@ -93,7 +95,14 @@ public class StatisticsController : ControllerBase
 
     private double CalculateWPM(int typedAmountOfWords, double completionTime)
     {
-        return typedAmountOfWords / completionTime;
+        if (completionTime != 0)
+        {
+            return typedAmountOfWords / completionTime;
+        }
+        else
+        {
+            return -1;
+        }
     }
 
     private double CalculateAccuracy(int totalCharacters, int incorrectCharacters)

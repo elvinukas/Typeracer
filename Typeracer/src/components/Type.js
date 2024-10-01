@@ -43,7 +43,7 @@ function Type() {
     const wordsInfoRef = useRef([]);
 
     const fetchParagraphText = async () => {
-        let response = await fetch('https://localhost:7032/Home/GetParagraphText/');
+        let response = await fetch('/Home/GetParagraphText/');
         let jsonResponse = await response.json();
         setTypingText(jsonResponse.text);
         setInitialText(jsonResponse.text);
@@ -103,7 +103,7 @@ function Type() {
             setIsBlinking(true);
         }, 530);
 
-        // Start timer if not already started
+        // starts the timer when the first character is typed
         if (currentIndex === 0 && !startTime) {
             const start = Date.now();
             setStartTime(start);
@@ -166,8 +166,8 @@ function Type() {
                     TypedAmountOfCharacters: Math.max(prevData.TypedAmountOfCharacters - 1, 0)
                 }));
             }
-        } else if (consecutiveRedCount < 20) { // Allow typing
-            if (currentIndex < typingText.length && inputCharacter === typingText[currentIndex]) { // Correct character
+        } else if (consecutiveRedCount < 20) { // allow typing only if less than 20 consecutive red characters
+            if (currentIndex < typingText.length && inputCharacter === typingText[currentIndex]) { // checking if the input character is correct
                 setIncorrectChars((prevIncorrectChars) => {
                     const newIncorrectChars = { ...prevIncorrectChars };
                     delete newIncorrectChars[currentIndex];
@@ -175,7 +175,6 @@ function Type() {
                 });
 
                 newCurrentIndex = currentIndex + 1;
-                console.log('Correct character. The index is:', newCurrentIndex);
                 setCurrentIndex(newCurrentIndex);
 
                 if (firstErrorIndex !== null && currentIndex >= firstErrorIndex) {
@@ -262,7 +261,7 @@ function Type() {
         }
 
         // Using newCurrentIndex for completion check
-        if (!isComplete && newCurrentIndex >= typingText.length) {  // Text completed
+        if (!isComplete && newCurrentIndex >= typingText.length) {  // stops the timer when the text is finished and the last character is typed
             clearInterval(intervalRef.current);
             const finishTime = Date.now();
 
@@ -379,7 +378,7 @@ function Type() {
         }
     }, [currentIndex, typingText]);
 
-    useEffect(() => {
+    useEffect(() => { // fixes the problem when text resets or new text is fetched after spacebar press
         const preventSpacebarDefault = (event) => {
             if (event.key === ' ') {
                 event.preventDefault();
@@ -459,7 +458,7 @@ function Type() {
                         setTypingText(jsonResponse.text);
                         setInitialText(jsonResponse.text);
 
-                        // Apskaičiuojame bendrą žodžių ir simbolių kiekį
+                        // Calculating the total amount of words and characters
                         const totalWords = jsonResponse.text.trim().split(/\s+/).length;
 
                         setStatisticsData({

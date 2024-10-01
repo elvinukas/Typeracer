@@ -135,8 +135,6 @@ function Type() {
             if (!wordInfo.startTime) {
                 wordInfo.startTime = Date.now();
             }
-        } else {
-            console.log('wordInfo is null at currentIndex:', currentIndex);
         }
 
         if (inputCharacter === 'Backspace') {

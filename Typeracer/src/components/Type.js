@@ -471,7 +471,7 @@ function Type() {
                             TypingData: []
                         });
 
-                        // Sukuriame wordsInfoRef
+                        // Creating wordsInfoRef
                         if (jsonResponse.text) {
                             let tempWordsInfo = [];
                             let index = 0;

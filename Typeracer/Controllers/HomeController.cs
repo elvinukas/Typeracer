@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Mvc;
 using Typeracer.Models;
 
@@ -30,14 +31,21 @@ public class HomeController : Controller
 
     public string GetRandomParagraph()
     {
+        string[] paragraphs;
         // getting the file path
-        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Paragraphs", "paragraph1.txt");
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Paragraphs", "paragraph1_short.txt");
         Console.Write(filePath);
         
         // splitting the text into paragraphs
-        var paragraphs = System.IO.File.ReadAllText(filePath).Split("\n", StringSplitOptions.RemoveEmptyEntries);
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            paragraphs = System.IO.File.ReadAllText(filePath).Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
+        }
+        else
+        {
+            paragraphs = System.IO.File.ReadAllText(filePath).Split("\n", StringSplitOptions.RemoveEmptyEntries);
+        }
         
-
         var random = new Random();
 
         // explanation

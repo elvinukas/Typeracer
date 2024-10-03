@@ -33,7 +33,7 @@ public class HomeController : Controller
     {
         string[] paragraphs;
         // getting the file path
-        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Paragraphs", "paragraph1_very_short.txt");
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Paragraphs", "paragraph1_short.txt");
         Console.Write(filePath);
         
         // splitting the text into paragraphs

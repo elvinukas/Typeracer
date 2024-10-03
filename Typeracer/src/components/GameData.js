@@ -1,6 +1,25 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import '../../wwwroot/css/GameData.css';
 function GameData() {
+    const [gameData, setGameData] = useState(null);
+
+    useEffect(() => {
+        fetch('/statistics/game-data.json')
+            .then(response => response.json())
+            .then(data => setGameData(data))
+            .catch(error => console.error('Error fetching game data:', error));
+    }, []);
+
+    if (!gameData) {
+        return <div>...</div>; //loading screen
+    }
+    
+    const completionTimeInSeconds = (gameData.CompletionTime / 1000).toFixed(2);
+    const startTime = new Date(gameData.LocalStartTime);
+    const formattedStartTime = startTime.toLocaleTimeString('en-GB', { hour12: false });
+    const finishTime = new Date(gameData.LocalFinishTime);
+    const formattedFinishTime = finishTime.toLocaleTimeString('en-GB', { hour12: false });
+    
     return (
         <div className="game-data-body">
             <div className="game-data-title">
@@ -15,7 +34,7 @@ function GameData() {
                                 <p className="paragraph">ŽPM</p>
                             </div>
                             <div className="top-number">
-                                62
+                                {gameData.WordsPerMinute.toFixed()}
                             </div>
                         </div>
                         <div className="acc">
@@ -23,7 +42,7 @@ function GameData() {
                                 <p className="paragraph">TIKS.</p>
                             </div>
                             <div className="top-number">
-                                96%
+                                {gameData.Accuracy.toFixed()}%
                             </div>
                         </div>
                     </div>
@@ -37,7 +56,7 @@ function GameData() {
                             <p className="paragraph">LAIKAS</p>
                         </div>
                         <div className="bottom-number">
-                            10s
+                            {completionTimeInSeconds}s
                         </div>
                     </div>
                     <div className="words">
@@ -45,15 +64,15 @@ function GameData() {
                             <p className="paragraph">ŽODŽIAI</p>
                         </div>
                         <div className="bottom-number">
-                            7
+                            {gameData.TotalAmountOfWords}
                         </div>
                     </div>
                     <div className="characters">
                         <div className="bottom-text">
-                            <p className="paragraph">SIMBOLIAI</p>   
+                            <p className="paragraph">IŠ VISO/KLAIDOS</p>   
                         </div>
                         <div className="bottom-number">
-                            35/34/1
+                            {gameData.TotalAmountOfCharacters}/{gameData.NumberOfWrongfulCharacters}
                         </div>
                     </div>
                     <div className="startTime">
@@ -61,7 +80,7 @@ function GameData() {
                             <p className="paragraph">PRADŽIA</p>
                         </div>
                         <div className="bottom-number">
-                            2024-04-20 16:20:00
+                            {formattedStartTime}
                         </div>
                     </div>
                     <div className="endTime">
@@ -69,14 +88,12 @@ function GameData() {
                             <p className="paragraph">PABAIGA</p>
                         </div>
                         <div className="bottom-number">
-                            2024-04-20 16:20:10
+                            {formattedFinishTime}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-
     );
 }
 

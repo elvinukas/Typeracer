@@ -14,6 +14,7 @@ function Type() {
     const [startTime, setStartTime] = useState(null);
     const [elapsedTime, setElapsedTime] = useState(0);
     const [isComplete, setIsComplete] = useState(false);
+    const [showGameData, setShowGameData] = useState(false);
     
     // used for checking when was the last keypress recorded - text cursor blinker
     const [lastKeyPressTime, setLastKeyPressTime] = useState(Date.now());
@@ -402,7 +403,16 @@ function Type() {
         setElapsedTime(0);
     };
 
-    if (isComplete) {
+    useEffect(() => {
+        if (isComplete) {
+            const timer = setTimeout(() => {
+                setShowGameData(true);
+            }, 500); // if data of previous game is loaded in GameData.js, increase the timeout
+            return () => clearTimeout(timer);
+        }
+    }, [isComplete]);
+
+    if (showGameData) { // loads GameData.js page
         return <GameData />;
     }
 

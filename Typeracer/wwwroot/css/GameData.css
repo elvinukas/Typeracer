@@ -1,3 +1,5 @@
+
+
 .game-data-body {
     font-family: "Courier Prime";
 }
@@ -15,12 +17,14 @@
     border-color: rgb(11, 94, 215);
     border-width: 5px;
     border-radius: 10px;
-    padding: 10px;
+    padding-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 .wpm-acc-graph {
     display: grid;
-    grid-template-columns: 110px 1fr;
+    grid-template-columns: 125px 1fr;
     margin-bottom: 20px;
 }
 

@@ -2,6 +2,7 @@
 import { Howl } from 'howler';
 import '../../wwwroot/css/Type.css';
 import wrongSound from '../../wwwroot/sounds/incorrect.mp3';
+import GameData from './GameData';
 
 function Type() {
     const [typingText, setTypingText] = useState('');
@@ -12,19 +13,11 @@ function Type() {
     const [consecutiveRedCount, setConsecutiveRedCount] = useState(0);
     const [startTime, setStartTime] = useState(null);
     const [elapsedTime, setElapsedTime] = useState(0);
-
     const [isComplete, setIsComplete] = useState(false);
-
+    
     // used for checking when was the last keypress recorded - text cursor blinker
     const [lastKeyPressTime, setLastKeyPressTime] = useState(Date.now());
     const [isBlinking, setIsBlinking] = useState(true);
-
-    const charRefs = useRef([]);
-    const wrongSoundRef = useRef(null);
-    const intervalRef = useRef(null);
-    const blinkTimeoutRef = useRef(null);
-    
-    const errorWordInfoRef = useRef(null);
 
     // Statistics data object for sending to the server
     const [statisticsData, setStatisticsData] = useState({
@@ -38,7 +31,13 @@ function Type() {
         NumberOfWrongfulCharacters: 0,
         TypingData: []
     });
-
+    
+    const charRefs = useRef([]);
+    const wrongSoundRef = useRef(null);
+    const intervalRef = useRef(null);
+    const blinkTimeoutRef = useRef(null);
+    const errorWordInfoRef = useRef(null);
+    
     // Used for storing word information
     const wordsInfoRef = useRef([]);
 
@@ -402,6 +401,10 @@ function Type() {
         setStartTime(null);
         setElapsedTime(0);
     };
+
+    if (isComplete) {
+        return <GameData />;
+    }
 
     return (
         <div className="type-page-body">

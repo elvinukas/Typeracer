@@ -1,0 +1,69 @@
+.game-data-body {
+    font-family: "Courier Prime";
+}
+
+.game-data-title {
+    margin-top: 75px;
+    font-size: 40px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.game-data-container {
+    border-style: solid;
+    border-color: rgb(11, 94, 215);
+    border-width: 5px;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.wpm-acc-graph {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    margin-bottom: 20px;
+}
+
+.top-text {
+    font-size: 30px;
+    color: darkgray;
+}
+
+.top-number {
+    font-size: 50px;
+    font-weight: bold;
+    margin-top: -20px;
+}
+
+.graph {
+    background-color: lightgray;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.graph-text {
+    font-size: 50px;
+    font-weight: bold;
+    margin-bottom: 0;
+}
+
+.time-words-characters-startTime-endTime {
+    display: flex;
+    justify-content: space-between;
+}
+
+.bottom-text {
+    font-size: 20px;
+    color: darkgray;
+}
+
+.bottom-number {
+    font-size: 30px;
+    font-weight: bold;
+    margin-top: -10px;
+}
+
+.paragraph {
+    margin: 0;
+}

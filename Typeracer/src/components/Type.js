@@ -90,7 +90,7 @@ function Type() {
         };
     }, []);
 
-    const handleKeyDown = (event) => {
+    const handleKeyDown = async (event) => {
         const inputCharacter = event.key;
         const isCharacterKey = inputCharacter.length === 1 || inputCharacter === ' ';
 
@@ -307,12 +307,12 @@ function Type() {
                 NumberOfWrongfulCharacters: updatedStatisticsData.NumberOfWrongfulCharacters,
                 TypingData: updatedStatisticsData.TypingData
             };
-
+            
+            // Sending the data
+            await sendStatisticsData(dataToSend);
+            
             // Marking as completed to prevent duplicate requests
             setIsComplete(true);
-
-            // Sending the data
-            sendStatisticsData(dataToSend);
         }
     };
 
@@ -405,10 +405,15 @@ function Type() {
 
     useEffect(() => {
         if (isComplete) {
-            const timer = setTimeout(() => {
-                setShowGameData(true);
-            }, 500); // if data of previous game is loaded in GameData.js, increase the timeout
-            return () => clearTimeout(timer);
+            fetch('/api/graph/generate', { // calls the API endpoint to generate the graph
+                method: 'POST'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data.message);
+                    setShowGameData(true);
+                })
+                .catch(error => console.error('Error generating graph:', error));
         }
     }, [isComplete]);
 

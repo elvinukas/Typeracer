@@ -27,33 +27,106 @@ public class GraphController : ControllerBase
 
     private void GenerateGraphInternal()
     {
-        // Read the JSON data
-        var jsonData = System.IO.File.ReadAllText("wwwroot/statistics/game-data.json");
+        var jsonData = System.IO.File.ReadAllText("wwwroot/statistics/game-data.json"); // reads the JSON data
         var gameData = JObject.Parse(jsonData);
-
-        // Extract data for the graph
-        var typingData = gameData["TypingData"];
+        
+        var typingData = gameData["TypingData"]; // extracts data for the graph
         var totalWords = (int)gameData["TotalAmountOfWords"];
         var wpmData = new double[totalWords];
+        var accuracyData = new double[totalWords];
 
         for (int i = 0; i < totalWords; i++)
         {
             wpmData[i] = (double)typingData[i]["CurrentWordsPerMinute"];
+            accuracyData[i] = (double)typingData[i]["CurrentAccuracy"];
         }
-
-        // Create the plot model
-        var plotModel = new PlotModel { Title = "Words Per Minute" };
-        var lineSeries = new LineSeries { Title = "WPM" };
+        
+        double minWpm = wpmData.Min();
+        double maxWpm = wpmData.Max();
+        double padding = 5;
+        double minY = minWpm - padding;
+        double maxY = maxWpm + padding;
+        
+        var plotModel = new PlotModel // creates the plot model
+        {
+            
+        };
+        var wpmLineSeries = new LineSeries 
+        { 
+            Title = "WPM",
+            Color = OxyColor.FromRgb(11, 94, 215),
+            StrokeThickness = 3
+        };
+        var wpmAreaSeries = new AreaSeries
+        {
+            Color = OxyColor.FromArgb(25, 11, 94, 215),
+            Fill = OxyColor.FromArgb(25, 11, 94, 215)
+        };
+        
+        var accuracyLineSeries = new LineSeries 
+        { 
+            Title = "Accuracy",
+            Color = OxyColors.LightGray,
+            StrokeThickness = 3,
+            YAxisKey = "RightAxis"
+        };
+        var accuracyAreaSeries = new AreaSeries
+        {
+            Color = OxyColor.FromArgb(25, 211, 211, 211),
+            Fill = OxyColor.FromArgb(25, 211, 211, 211),
+            YAxisKey = "RightAxis"
+        };
 
         for (int i = 0; i < totalWords; i++)
         {
-            lineSeries.Points.Add(new DataPoint(i + 1, wpmData[i]));
+            wpmLineSeries.Points.Add(new DataPoint(i + 1, wpmData[i]));
+            wpmAreaSeries.Points.Add(new DataPoint(i + 1, wpmData[i]));
+            wpmAreaSeries.Points2.Add(new DataPoint(i + 1, minY));
+            
+            accuracyLineSeries.Points.Add(new DataPoint(i + 1, accuracyData[i]));
+            accuracyAreaSeries.Points.Add(new DataPoint(i + 1, accuracyData[i]));
+            accuracyAreaSeries.Points2.Add(new DataPoint(i + 1, 0));
         }
+        
+        plotModel.Series.Add(wpmAreaSeries);
+        plotModel.Series.Add(wpmLineSeries);
+        plotModel.Series.Add(accuracyAreaSeries);
+        plotModel.Series.Add(accuracyLineSeries);
+        
+        plotModel.Axes.Add(new OxyPlot.Axes.LinearAxis
+        {
+            Position = OxyPlot.Axes.AxisPosition.Bottom,
+            Minimum = 1,
+            Maximum = totalWords,
+            MajorGridlineStyle = LineStyle.Solid,
+            MajorGridlineColor = OxyColors.DarkGray,
+            Layer = OxyPlot.Axes.AxisLayer.AboveSeries
+        });
 
-        plotModel.Series.Add(lineSeries);
-
-        // Save the plot as an image
-        var pngExporter = new PngExporter { Width = 600, Height = 400 };
+        plotModel.Axes.Add(new OxyPlot.Axes.LinearAxis
+        {
+            Position = OxyPlot.Axes.AxisPosition.Left,
+            Title = "ŽPM",
+            Minimum = minY,
+            Maximum = maxY,
+            MajorGridlineStyle = LineStyle.Solid,
+            MajorGridlineColor = OxyColors.DarkGray,
+            Layer = OxyPlot.Axes.AxisLayer.AboveSeries
+        });
+        
+        plotModel.Axes.Add(new OxyPlot.Axes.LinearAxis
+        {
+            Position = OxyPlot.Axes.AxisPosition.Right,
+            Title = "TIKSLUMAS",
+            Minimum = 0,
+            Maximum = 100,
+            MajorGridlineStyle = LineStyle.Solid,
+            MajorGridlineColor = OxyColors.DarkGray,
+            Key = "RightAxis",
+            Layer = OxyPlot.Axes.AxisLayer.AboveSeries
+        });
+        
+        var pngExporter = new PngExporter { Width = 1100, Height = 300 }; // saves the plot as an image
         using (var stream = System.IO.File.Create("wwwroot/images/wpm-graph.png"))
         {
             pngExporter.Export(plotModel, stream);

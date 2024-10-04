@@ -5,7 +5,7 @@
 }
 
 .game-data-title {
-    margin-top: 75px;
+    margin-top: 50px;
     font-size: 40px;
     font-weight: bold;
     text-align: center;
@@ -40,7 +40,6 @@
 }
 
 .graph {
-    background-color: lightgray;
     display: flex;
     align-items: center;
     justify-content: center;

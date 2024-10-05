@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using Newtonsoft.Json.Linq;
 using OxyPlot;
 using OxyPlot.Series;
 using OxyPlot.WindowsForms;
+using OxyPlot.SkiaSharp;
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 
 [ApiController]
@@ -120,11 +122,20 @@ public class GraphController : ControllerBase
             Key = "RightAxis",
             Layer = OxyPlot.Axes.AxisLayer.AboveSeries
         });
-        
-        var pngExporter = new PngExporter { Width = 1100, Height = 300 }; // saves the plot as an image
-        using (var stream = System.IO.File.Create("wwwroot/images/wpm-graph.png"))
+
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            pngExporter.Export(plotModel, stream);
+            var pngExporter = new OxyPlot.WindowsForms.PngExporter { Width = 1100, Height = 300 }; // saves the plot as an image
         }
+        else
+        {
+            var pngExporter = new OxyPlot.SkiaSharp.PngExporter { Width = 1100, Height = 300 }; // saves the plot as an image
+            using (var stream = System.IO.File.Create("wwwroot/images/wpm-graph.png"))
+            {
+                pngExporter.Export(plotModel, stream);
+            }
+        }
+        
     }
 }

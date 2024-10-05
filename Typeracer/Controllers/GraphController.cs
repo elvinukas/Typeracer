@@ -66,14 +66,8 @@ public class GraphController : ControllerBase
         var accuracyLineSeries = new LineSeries 
         { 
             Title = "Accuracy",
-            Color = OxyColors.LightGray,
+            Color = OxyColors.DarkGreen,
             StrokeThickness = 3,
-            YAxisKey = "RightAxis"
-        };
-        var accuracyAreaSeries = new AreaSeries
-        {
-            Color = OxyColor.FromArgb(25, 211, 211, 211),
-            Fill = OxyColor.FromArgb(25, 211, 211, 211),
             YAxisKey = "RightAxis"
         };
 
@@ -84,14 +78,11 @@ public class GraphController : ControllerBase
             wpmAreaSeries.Points2.Add(new DataPoint(i + 1, minY));
             
             accuracyLineSeries.Points.Add(new DataPoint(i + 1, accuracyData[i]));
-            accuracyAreaSeries.Points.Add(new DataPoint(i + 1, accuracyData[i]));
-            accuracyAreaSeries.Points2.Add(new DataPoint(i + 1, 0));
         }
         
+        plotModel.Series.Add(accuracyLineSeries);
         plotModel.Series.Add(wpmAreaSeries);
         plotModel.Series.Add(wpmLineSeries);
-        plotModel.Series.Add(accuracyAreaSeries);
-        plotModel.Series.Add(accuracyLineSeries);
         
         plotModel.Axes.Add(new OxyPlot.Axes.LinearAxis
         {
@@ -107,6 +98,8 @@ public class GraphController : ControllerBase
         {
             Position = OxyPlot.Axes.AxisPosition.Left,
             Title = "ŽPM",
+            TitleColor = OxyColor.FromRgb(11, 94, 215),
+            TitleFontWeight = OxyPlot.FontWeights.Bold,
             Minimum = minY,
             Maximum = maxY,
             MajorGridlineStyle = LineStyle.Solid,
@@ -117,9 +110,11 @@ public class GraphController : ControllerBase
         plotModel.Axes.Add(new OxyPlot.Axes.LinearAxis
         {
             Position = OxyPlot.Axes.AxisPosition.Right,
-            Title = "TIKSLUMAS",
+            Title = "TIKSLUMAS (%)",
+            TitleColor = OxyColors.DarkGreen,
+            TitleFontWeight = OxyPlot.FontWeights.Bold,
             Minimum = 0,
-            Maximum = 100,
+            Maximum = 105,
             MajorGridlineStyle = LineStyle.Solid,
             MajorGridlineColor = OxyColors.DarkGray,
             Key = "RightAxis",

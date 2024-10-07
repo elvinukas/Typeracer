@@ -127,6 +127,10 @@ public class GraphController : ControllerBase
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             var pngExporter = new OxyPlot.WindowsForms.PngExporter { Width = 1100, Height = 300 }; // saves the plot as an image
+            using (var stream = System.IO.File.Create("wwwroot/images/wpm-graph.png"))
+            {
+                pngExporter.Export(plotModel, stream);
+            }
         }
         else
         {

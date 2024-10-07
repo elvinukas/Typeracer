@@ -47,7 +47,7 @@ function GameData() {
                         </div>
                     </div>
                     <div className="graph">
-                        <img src="/images/wpm-graph.png" alt="WPM Graph" />
+                        <img src="/images/wpm-graph.png" alt="WPM Graph"/>
                     </div>
                 </div>
                 <div className="time-words-characters-startTime-endTime">

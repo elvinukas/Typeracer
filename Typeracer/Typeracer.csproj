@@ -7,8 +7,17 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Folder Include="wwwroot\images\" />
       <Folder Include="wwwroot\sounds\" />
       <Folder Include="wwwroot\statistics\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+      <PackageReference Include="OxyPlot.Core" Version="2.2.0" />
+      <PackageReference Include="OxyPlot.SkiaSharp" Version="2.2.0" />
+      <PackageReference Include="OxyPlot.WindowsForms" Version="2.2.0" />
+      <PackageReference Include="System.Drawing.Common" Version="9.0.0-rc.1.24451.1" />
     </ItemGroup>
 
 </Project>

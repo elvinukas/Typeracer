@@ -2,6 +2,7 @@
 import { Howl } from 'howler';
 import '../../wwwroot/css/Type.css';
 import wrongSound from '../../wwwroot/sounds/incorrect.mp3';
+import GameData from './GameData';
 
 function Type() {
     const [typingText, setTypingText] = useState('');
@@ -12,19 +13,12 @@ function Type() {
     const [consecutiveRedCount, setConsecutiveRedCount] = useState(0);
     const [startTime, setStartTime] = useState(null);
     const [elapsedTime, setElapsedTime] = useState(0);
-
     const [isComplete, setIsComplete] = useState(false);
-
+    const [showGameData, setShowGameData] = useState(false);
+    
     // used for checking when was the last keypress recorded - text cursor blinker
     const [lastKeyPressTime, setLastKeyPressTime] = useState(Date.now());
     const [isBlinking, setIsBlinking] = useState(true);
-
-    const charRefs = useRef([]);
-    const wrongSoundRef = useRef(null);
-    const intervalRef = useRef(null);
-    const blinkTimeoutRef = useRef(null);
-    
-    const errorWordInfoRef = useRef(null);
 
     // Statistics data object for sending to the server
     const [statisticsData, setStatisticsData] = useState({
@@ -38,7 +32,13 @@ function Type() {
         NumberOfWrongfulCharacters: 0,
         TypingData: []
     });
-
+    
+    const charRefs = useRef([]);
+    const wrongSoundRef = useRef(null);
+    const intervalRef = useRef(null);
+    const blinkTimeoutRef = useRef(null);
+    const errorWordInfoRef = useRef(null);
+    
     // Used for storing word information
     const wordsInfoRef = useRef([]);
 
@@ -90,7 +90,7 @@ function Type() {
         };
     }, []);
 
-    const handleKeyDown = (event) => {
+    const handleKeyDown = async (event) => {
         const inputCharacter = event.key;
         const isCharacterKey = inputCharacter.length === 1 || inputCharacter === ' ';
 
@@ -259,7 +259,7 @@ function Type() {
         }
 
         // Using newCurrentIndex for completion check
-        if (!isComplete && newCurrentIndex >= typingText.length) {  // stops the timer when the text is finished and the last character is typed
+        if (!isComplete && newCurrentIndex >= typingText.length && consecutiveRedCount === 0 && inputCharacter === typingText[currentIndex]) {  // stops the timer when the text is finished and the last character is typed
             clearInterval(intervalRef.current);
             const finishTime = Date.now();
 
@@ -307,12 +307,12 @@ function Type() {
                 NumberOfWrongfulCharacters: updatedStatisticsData.NumberOfWrongfulCharacters,
                 TypingData: updatedStatisticsData.TypingData
             };
-
+            
+            // Sending the data
+            await sendStatisticsData(dataToSend);
+            
             // Marking as completed to prevent duplicate requests
             setIsComplete(true);
-
-            // Sending the data
-            sendStatisticsData(dataToSend);
         }
     };
 
@@ -402,6 +402,24 @@ function Type() {
         setStartTime(null);
         setElapsedTime(0);
     };
+
+    useEffect(() => {
+        if (isComplete) {
+            fetch('/api/graph/generate', { // calls the API endpoint to generate the graph
+                method: 'POST'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data.message);
+                    setShowGameData(true);
+                })
+                .catch(error => console.error('Error generating graph:', error));
+        }
+    }, [isComplete]);
+
+    if (showGameData) { // loads GameData.js page
+        return <GameData />;
+    }
 
     return (
         <div className="type-page-body">

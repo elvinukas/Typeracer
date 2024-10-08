@@ -47,8 +47,18 @@ public class StatisticsController : ControllerBase
             }
             else
             {
-                typingData.CurrentWordsPerMinute = -1; // -1 is indicating that the time spent
-                                                         // to write a word was instant
+                // if a 1 letter word is the first word, its wpm is 0.
+                if (countedWordsSoFar == 1 && timeTakenInMinutes == 0)
+                {
+                    typingData.CurrentWordsPerMinute = 0;
+                }
+                else
+                {
+                    // returning the previous wpm, since the results do not need to be disturbed by 1 letter word
+                    typingData.CurrentWordsPerMinute =
+                        CalculateWPM(countedWordsSoFar - 1, timeTakenSoFar - timeTakenInMinutes);
+                }
+
             }
         }
 
@@ -76,7 +86,7 @@ public class StatisticsController : ControllerBase
         }
 
         // JSON file name and path
-        var filePath = Path.Combine(statisticsDir, "statistics.json");
+        var filePath = Path.Combine(statisticsDir, "game-data.json");
 
         // Converting the statistics data to JSON
         var json = JsonSerializer.Serialize(statisticsData, new JsonSerializerOptions 

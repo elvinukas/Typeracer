@@ -259,7 +259,7 @@ function Type() {
         }
 
         // Using newCurrentIndex for completion check
-        if (!isComplete && newCurrentIndex >= typingText.length) {  // stops the timer when the text is finished and the last character is typed
+        if (!isComplete && newCurrentIndex >= typingText.length && consecutiveRedCount === 0 && inputCharacter === typingText[currentIndex]) {  // stops the timer when the text is finished and the last character is typed
             clearInterval(intervalRef.current);
             const finishTime = Date.now();
 

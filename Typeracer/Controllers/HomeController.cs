@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Net.Mime;
 using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Mvc;
 using Typeracer.Models;
@@ -29,7 +30,7 @@ public class HomeController : Controller
         return View();
     }
 
-    public string GetRandomParagraph()
+    public List<Paragraph> GetAllParagraphs()
     {
         string[] paragraphs;
         // getting the file path
@@ -46,17 +47,45 @@ public class HomeController : Controller
             paragraphs = System.IO.File.ReadAllText(filePath).Split("\n", StringSplitOptions.RemoveEmptyEntries);
         }
         
-        var random = new Random();
+        List<Gamemode> allowedGamemodes = new List<Gamemode>() { Gamemode.Standard };
+        // lambda expression
+        var paragraphList = paragraphs.Select(
+            text => new Paragraph(text, allowedGamemodes)).ToList();
 
-        // explanation
-        // return a random paragraph by generating a random number between 0 and the length of the list
-        return paragraphs[random.Next(paragraphs.Length)];
+        return paragraphList;
+
     }
 
-    public IActionResult GetParagraphText()
+    public Paragraph GetRandomParagraph(Gamemode gamemode)
     {
-        var text = GetRandomParagraph();
-        return Json(new {text});
+        List<Paragraph> allParagraphs = GetAllParagraphs();
+        
+        // listing the paragraphs that are allowed for a gamemode
+        List<Paragraph> filteredParagraphs = allParagraphs.Where(
+            p => p.AllowedGamemodes.Contains(gamemode)).ToList();
+
+        if (!filteredParagraphs.Any())
+        {
+            Console.WriteLine("Error! No paragraphs found for the specified gamemode.");
+            return null;
+        }
+        
+        var random = new Random();
+        
+        // explanation
+        // return a random paragraph by generating a random number between 0 and the length of the list
+        
+        return filteredParagraphs[random.Next(filteredParagraphs.Count)];
+    }
+
+    public IActionResult GetParagraphText(Gamemode gamemode)
+    {
+        Paragraph paragraph = GetRandomParagraph(gamemode);
+        if (paragraph == null)
+        {
+            return NotFound(new { message = "No paragraphs found for specified gamemode." });
+        }
+        return Json(paragraph);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

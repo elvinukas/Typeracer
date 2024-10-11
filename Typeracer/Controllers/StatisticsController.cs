@@ -43,6 +43,8 @@ public class StatisticsController : ControllerBase
 
         // JSON file name and path
         var filePath = Path.Combine(statisticsDir, "game-data.json");
+        
+        //Console.WriteLine($"Statistics: {JsonSerializer.Serialize(game.Statistics, new JsonSerializerOptions { WriteIndented = true })}");
 
         // Converting the GAME DATA to JSON
         var json = JsonSerializer.Serialize(game, new JsonSerializerOptions 

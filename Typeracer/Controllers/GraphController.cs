@@ -33,9 +33,10 @@ public class GraphController : ControllerBase
     {
         var jsonData = System.IO.File.ReadAllText("wwwroot/statistics/game-data.json"); // reads the JSON data
         var game = JsonConvert.DeserializeObject<Game>(jsonData);
-
+        Console.WriteLine(game);
+        
         var typingData = game.Statistics.TypingData; // extracts data for the graph
-        var totalWords = typingData.Count;
+        var totalWords = game.Statistics.Paragraph.TotalAmountOfWords;
         var wpmData = new double[totalWords];
         var accuracyData = new double[totalWords];
 

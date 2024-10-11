@@ -3,18 +3,20 @@ namespace Typeracer.Models;
 public class Game
 {
     public Guid GameId { get; init; } // unique id for a game session
-    public StatisticsModel Statistics { get; private set; } // statistics of a game session
-    public double CompletionTime { get; private set; }
+    public StatisticsModel Statistics { get; set; } // statistics of a game session
+    public double CompletionTime { get; set; }
     public Gamemode Gamemode { get; set; }
     
-    public double WordsPerMinute { get; private set; }
-    public double Accuracy { get;  private set; }
+    public double WordsPerMinute { get; set; }
+    public double Accuracy { get;  set; }
     
-
+    public Game() {} // for deserialization
+    
     public Game(StatisticsModel statisticsModel)
     {
         GameId = Guid.NewGuid();
         Statistics = statisticsModel;
+        Statistics.UniqueStatisticsID = new Guid();
         Gamemode = Gamemode.Standard; // default gamemode
         CalculateCompletionTime();
         CalculateAdditionalStatistics();

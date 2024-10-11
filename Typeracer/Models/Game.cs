@@ -16,7 +16,6 @@ public class Game
     {
         GameId = Guid.NewGuid();
         Statistics = statisticsModel;
-        Statistics.UniqueStatisticsID = new Guid();
         Gamemode = Gamemode.Standard; // default gamemode
         CalculateCompletionTime();
         CalculateAdditionalStatistics();

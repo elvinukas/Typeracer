@@ -2,7 +2,6 @@ namespace Typeracer.Models;
 
 public record StatisticsModel
 {
-    public Guid UniqueStatisticsID { get; set; }
     //public double CompletionTime { get; set; } // time that it took to finish the entire paragraph (or finish typing)(milliseconds)
     public DateTime? LocalStartTime { get; set; } // start date and time of the game
     public DateTime? LocalFinishTime { get; set; } // end date and time of the game

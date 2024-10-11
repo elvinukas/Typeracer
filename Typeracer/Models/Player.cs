@@ -9,4 +9,5 @@ public struct Player
     public double AverageAccuracy { get; set; }
     public double BestWPM { get; set; }
     
+    
 }

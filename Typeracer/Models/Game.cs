@@ -50,51 +50,62 @@ public class Game
         
         // this data has to be appended to the typingData inside statistics
 
-        int countedWordsSoFar = 0;
-        double timeTakenSoFar = 0;
+        double previousWPM = 0;
+        List<double> wpmList = new List<double>();
+        List<double> accuracyList = new List<double>();
 
         foreach (var typingData in Statistics.TypingData)
         {
-            TimeSpan timeTakenForWord = typingData.EndingTimestampWord - typingData.BeginningTimestampWord;
-            double timeTakenInMinutes = timeTakenForWord.TotalMinutes;
-            ++countedWordsSoFar;
-            timeTakenSoFar += timeTakenInMinutes;
-            
-            if (timeTakenInMinutes > 0)
+            if (typingData.Word.Length >= 4)
             {
-                typingData.CurrentWordsPerMinute = CalculateWPM(countedWordsSoFar, timeTakenSoFar);
+                double completionTime = (typingData.EndingTimestampWord - typingData.BeginningTimestampWord).TotalMinutes;
+                typingData.CurrentWordsPerMinute = CalculateWPM(1, completionTime);
+                previousWPM = typingData.CurrentWordsPerMinute;
             }
-            
             else
             {
-                // if a 1 letter word is the first word, its wpm is 0.
-                if (countedWordsSoFar == 1 && timeTakenInMinutes == 0)
-                {
-                    typingData.CurrentWordsPerMinute = 0;
-                }
-                else
-                {
-                    // returning the previous wpm, since the results do not need to be disturbed by 1 letter word
-                    typingData.CurrentWordsPerMinute =
-                        CalculateWPM(countedWordsSoFar - 1, timeTakenSoFar - timeTakenInMinutes);
-                }
-
+                typingData.CurrentWordsPerMinute = previousWPM;
             }
+            
+            typingData.CurrentAccuracy = CalculateAccuracy(typingData.Word.Length, typingData.AmountOfMistakesInWord);
+            
+            wpmList.Add(typingData.CurrentWordsPerMinute);
+            accuracyList.Add(typingData.CurrentAccuracy);
         }
         
-        int typedCharsSoFar = 0;
-        int amountOfMistakesSoFar = 0;
+       
+        
+        int windowSize = 7; // Example window size
+        double[] smoothedWpmData = CalculateMovingAverage(wpmList.ToArray(), windowSize);
+        double[] smoothedAccuracyData = CalculateMovingAverage(accuracyList.ToArray(), windowSize);
 
-        foreach (var typingData in Statistics.TypingData)
+        for (int i = 0; i < Statistics.TypingData.Count; i++)
         {
-            typedCharsSoFar += typingData.Word.Length;
-            amountOfMistakesSoFar += typingData.AmountOfMistakesInWord;
-
-            typingData.CurrentAccuracy = CalculateAccuracy(typedCharsSoFar, amountOfMistakesSoFar);
+            Statistics.TypingData[i].CurrentWordsPerMinute = smoothedWpmData[i];
+            Statistics.TypingData[i].CurrentAccuracy = smoothedAccuracyData[i];
         }
-        
-        
 
+    }
+    
+    private double[] CalculateMovingAverage(double[] data, int windowSize)
+    {
+        double[] result = new double[data.Length];
+        double sum = 0;
+        int count = 0;
+        for (int i = 0; i < data.Length; i++)
+        {
+            sum += data[i];
+            ++count;
+
+            if (count > windowSize)
+            {
+                sum -= data[i - windowSize];
+                --count;
+            }
+            
+            result[i] = sum / count;
+        }
+        return result;
     }
     
     

@@ -3,6 +3,8 @@ using System.Net.Mime;
 using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Mvc;
 using Typeracer.Models;
+using System.Text;
+
 
 namespace Typeracer.Controllers;
 
@@ -31,29 +33,33 @@ public class HomeController : Controller
     }
 
     public List<Paragraph> GetAllParagraphs()
-    {
-        string[] paragraphs;
+    {   
+        // creating empty list of paragraphs
+        List<Paragraph> paragraphList = new List<Paragraph>();
+        
+        // creating empty list of allowed gamemodes
+        List<Gamemode> allowedGamemodes = new List<Gamemode>() { Gamemode.Standard };
+        
         // getting the file path
         var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Paragraphs", "paragraph1_short.txt");
-        Console.Write(filePath);
         
-        // splitting the text into paragraphs
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            paragraphs = System.IO.File.ReadAllText(filePath).Split("\r\n", StringSplitOptions.RemoveEmptyEntries);
-        }
-        else
-        {
-            paragraphs = System.IO.File.ReadAllText(filePath).Split("\n", StringSplitOptions.RemoveEmptyEntries);
-        }
-        
-        List<Gamemode> allowedGamemodes = new List<Gamemode>() { Gamemode.Standard };
-        // lambda expression
-        var paragraphList = paragraphs.Select(
-            text => new Paragraph(text, allowedGamemodes)).ToList();
+        // using Filestream to open file as a stream
+        using (FileStream filestream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+            // using StreamReader to read the file
+            using (StreamReader reader = new StreamReader(filestream, Encoding.UTF8))
+            {
+                string line;
+                // reading the file line by line
+                while ((line = reader.ReadLine()) != null)
+                {
+                    if(!string.IsNullOrWhiteSpace(line))
+                    {
+                        paragraphList.Add(new Paragraph(line, allowedGamemodes));
+                    }
+                }
+            }
 
         return paragraphList;
-
     }
 
     public Paragraph GetRandomParagraph(Gamemode gamemode)

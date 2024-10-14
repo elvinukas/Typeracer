@@ -22,11 +22,9 @@ function Type() {
 
     // Statistics data object for sending to the server
     const [statisticsData, setStatisticsData] = useState({
-        CompletionTime: 0,
         LocalStartTime: null,
         LocalFinishTime: null,
-        TotalAmountOfWords: 0,
-        TotalAmountOfCharacters: 0,
+        Paragraph: null,
         TypedAmountOfWords: 0,
         TypedAmountOfCharacters: 0,
         NumberOfWrongfulCharacters: 0,
@@ -45,22 +43,24 @@ function Type() {
     const fetchParagraphText = async () => {
         let response = await fetch('/Home/GetParagraphText/');
         let jsonResponse = await response.json();
-        setTypingText(jsonResponse.text);
-        setInitialText(jsonResponse.text);
+        console.log(jsonResponse);
+        
+        const paragraphText = jsonResponse.text;
+        setTypingText(paragraphText);
+        setInitialText(paragraphText);
 
         // Calculating the total amount of words and characters
-        const totalWords = jsonResponse.text.trim().split(/\s+/).length;
+        const totalWords = paragraphText.trim().split(/\s+/).length;
         setStatisticsData(prevData => ({
             ...prevData,
-            TotalAmountOfWords: totalWords,
-            TotalAmountOfCharacters: jsonResponse.text.length
+            Paragraph: jsonResponse
         }));
 
         // Creating wordsInfoRef
-        if (jsonResponse.text) {
+        if (paragraphText) {
             let tempWordsInfo = [];
             let index = 0;
-            jsonResponse.text.split(' ').forEach((word) => {
+            paragraphText.split(' ').forEach((word) => {
                 tempWordsInfo.push({
                     word: word,
                     startIndex: index,
@@ -265,7 +265,6 @@ function Type() {
 
             // Collecting updated values
             const newLocalFinishTime = new Date(finishTime);
-            const newCompletionTime = finishTime - startTime;
 
             // Preparing the typingData array
             const typingData = wordsInfoRef.current.map(wordInfo => ({
@@ -285,7 +284,6 @@ function Type() {
             const updatedStatisticsData = {
                 ...statisticsData,
                 LocalFinishTime: newLocalFinishTime,
-                CompletionTime: newCompletionTime,
                 TypedAmountOfWords: newTypedAmountOfWords,
                 TypedAmountOfCharacters: currentIndex, // Using currentIndex as the total typed characters
                 NumberOfWrongfulCharacters: totalMistakes,
@@ -297,11 +295,9 @@ function Type() {
 
             // Assembling the data to send
             const dataToSend = {
-                CompletionTime: updatedStatisticsData.CompletionTime,
                 LocalStartTime: updatedStatisticsData.LocalStartTime ? formatDateTime(updatedStatisticsData.LocalStartTime) : null,
                 LocalFinishTime: updatedStatisticsData.LocalFinishTime ? formatDateTime(updatedStatisticsData.LocalFinishTime) : null,
-                TotalAmountOfWords: updatedStatisticsData.TotalAmountOfWords,
-                TotalAmountOfCharacters: updatedStatisticsData.TotalAmountOfCharacters,
+                Paragraph: updatedStatisticsData.Paragraph,
                 TypedAmountOfWords: updatedStatisticsData.TypedAmountOfWords,
                 TypedAmountOfCharacters: updatedStatisticsData.TypedAmountOfCharacters,
                 NumberOfWrongfulCharacters: updatedStatisticsData.NumberOfWrongfulCharacters,
@@ -345,11 +341,9 @@ function Type() {
 
     const resetStatisticsData = () => {
         setStatisticsData({
-            CompletionTime: 0,
             LocalStartTime: null,
             LocalFinishTime: null,
-            TotalAmountOfWords: statisticsData.TotalAmountOfWords,
-            TotalAmountOfCharacters: statisticsData.TotalAmountOfCharacters,
+            Paragraph: statisticsData.Paragraph,
             TypedAmountOfWords: 0,
             TypedAmountOfCharacters: 0,
             NumberOfWrongfulCharacters: 0,
@@ -471,18 +465,17 @@ function Type() {
                         resetChronometer();
                         let response = await fetch('/Home/GetParagraphText/');
                         let jsonResponse = await response.json();
-                        setTypingText(jsonResponse.text);
-                        setInitialText(jsonResponse.text);
+                        var paragraphText = jsonResponse.text;
+                        setTypingText(paragraphText);
+                        setInitialText(paragraphText);
 
                         // Calculating the total amount of words and characters
                         const totalWords = jsonResponse.text.trim().split(/\s+/).length;
 
                         setStatisticsData({
-                            CompletionTime: 0,
                             LocalStartTime: null,
                             LocalFinishTime: null,
-                            TotalAmountOfWords: totalWords,
-                            TotalAmountOfCharacters: jsonResponse.text.length,
+                            Paragraph: null,
                             TypedAmountOfWords: 0,
                             TypedAmountOfCharacters: 0,
                             NumberOfWrongfulCharacters: 0,

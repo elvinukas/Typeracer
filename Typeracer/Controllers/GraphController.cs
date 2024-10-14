@@ -2,11 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OxyPlot;
 using OxyPlot.Series;
 using OxyPlot.WindowsForms;
 using OxyPlot.SkiaSharp;
+using Typeracer.Models;
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 
 [ApiController]
@@ -30,17 +32,18 @@ public class GraphController : ControllerBase
     private void GenerateGraphInternal()
     {
         var jsonData = System.IO.File.ReadAllText("wwwroot/statistics/game-data.json"); // reads the JSON data
-        var gameData = JObject.Parse(jsonData);
+        var game = JsonConvert.DeserializeObject<Game>(jsonData);
+        Console.WriteLine(game);
         
-        var typingData = gameData["TypingData"]; // extracts data for the graph
-        var totalWords = (int)gameData["TotalAmountOfWords"];
+        var typingData = game.Statistics.TypingData; // extracts data for the graph
+        var totalWords = game.Statistics.Paragraph.TotalAmountOfWords;
         var wpmData = new double[totalWords];
         var accuracyData = new double[totalWords];
 
         for (int i = 0; i < totalWords; i++)
         {
-            wpmData[i] = (double)typingData[i]["CurrentWordsPerMinute"];
-            accuracyData[i] = (double)typingData[i]["CurrentAccuracy"];
+            wpmData[i] = (double)typingData[i].CurrentWordsPerMinute;
+            accuracyData[i] = (double)typingData[i].CurrentAccuracy;
         }
         
         double minWpm = wpmData.Min();

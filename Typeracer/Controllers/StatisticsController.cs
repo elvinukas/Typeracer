@@ -27,55 +27,11 @@ public class StatisticsController : ControllerBase
             return BadRequest("Invalid data: statisticsData is null.");
         }
 
-        // Calculating the WPM and accuracy for the entire paragraph
-        TimeSpan completionTimeSpan = TimeSpan.FromMilliseconds(statisticsData.CompletionTime);
-        double completionTimeInMinutes = completionTimeSpan.TotalMinutes;
-        statisticsData.WordsPerMinute = CalculateWPM(statisticsData.TypedAmountOfWords, completionTimeInMinutes);
-        int countedWordsSoFar = 0;
-        double timeTakenSoFar = 0;
-
-        foreach (var typingData in statisticsData.TypingData)
-        {
-            TimeSpan timeTakenForWord = typingData.EndingTimestampWord - typingData.BeginningTimestampWord;
-            double timeTakenInMinutes = timeTakenForWord.TotalMinutes;
-            ++countedWordsSoFar;
-            timeTakenSoFar += timeTakenInMinutes;
-
-            if (timeTakenInMinutes > 0)
-            {
-                typingData.CurrentWordsPerMinute = CalculateWPM(countedWordsSoFar, timeTakenSoFar);
-            }
-            else
-            {
-                // if a 1 letter word is the first word, its wpm is 0.
-                if (countedWordsSoFar == 1 && timeTakenInMinutes == 0)
-                {
-                    typingData.CurrentWordsPerMinute = 0;
-                }
-                else
-                {
-                    // returning the previous wpm, since the results do not need to be disturbed by 1 letter word
-                    typingData.CurrentWordsPerMinute =
-                        CalculateWPM(countedWordsSoFar - 1, timeTakenSoFar - timeTakenInMinutes);
-                }
-
-            }
-        }
-
-        statisticsData.Accuracy = CalculateAccuracy(statisticsData.TotalAmountOfCharacters,
-            statisticsData.NumberOfWrongfulCharacters);
-
-        int typedCharsSoFar = 0;
-        int amountOfMistakesSoFar = 0;
-
-        foreach (var typingData in statisticsData.TypingData)
-        {
-            typedCharsSoFar += typingData.Word.Length;
-            amountOfMistakesSoFar += typingData.AmountOfMistakesInWord;
-
-            typingData.CurrentAccuracy = CalculateAccuracy(typedCharsSoFar, amountOfMistakesSoFar);
-        }
-
+        // initiating a game object with all the statistics data
+        Game game = new Game(statisticsData);
+        
+        // saving received statisticsData to a file
+        
         // Path to the statistics directory
         var statisticsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "statistics");
 
@@ -87,9 +43,11 @@ public class StatisticsController : ControllerBase
 
         // JSON file name and path
         var filePath = Path.Combine(statisticsDir, "game-data.json");
+        
+        //Console.WriteLine($"Statistics: {JsonSerializer.Serialize(game.Statistics, new JsonSerializerOptions { WriteIndented = true })}");
 
-        // Converting the statistics data to JSON
-        var json = JsonSerializer.Serialize(statisticsData, new JsonSerializerOptions 
+        // Converting the GAME DATA to JSON
+        var json = JsonSerializer.Serialize(game, new JsonSerializerOptions 
         { 
             WriteIndented = true, 
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping // Special encoding option to prevent UTF-8 characters from being encoded
@@ -98,33 +56,9 @@ public class StatisticsController : ControllerBase
         // Saving the JSON to a file
         System.IO.File.WriteAllText(filePath, json);
 
-        Console.WriteLine($"Statistics saved to file: {filePath}");
+        Console.WriteLine($"Game information saved to file: {filePath}");
 
-        return Ok(new { message = "Statistics received and saved" });
+        return Ok(new { message = "Statistics received and game information saved" });
     }
-
-    private double CalculateWPM(int typedAmountOfWords, double completionTime)
-    {
-        if (completionTime != 0)
-        {
-            return typedAmountOfWords / completionTime;
-        }
-        else
-        {
-            return -1;
-        }
-    }
-
-    private double CalculateAccuracy(int totalCharacters, int incorrectCharacters)
-    {
-        int correctCharacters = totalCharacters - incorrectCharacters;
-        if (totalCharacters != 0)
-        {
-            return (double)correctCharacters / totalCharacters * 100;
-        }
-        else
-        {
-            return 0;
-        }
-    }
+    
 }

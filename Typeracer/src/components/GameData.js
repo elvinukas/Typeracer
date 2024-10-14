@@ -14,10 +14,10 @@ function GameData() {
         return <div>...</div>; //loading screen
     }
     
-    const completionTimeInSeconds = (gameData.CompletionTime / 1000).toFixed(2);
-    const startTime = new Date(gameData.LocalStartTime);
+    const completionTimeInSeconds = (gameData.CompletionTime).toFixed(2);
+    const startTime = new Date(gameData.Statistics.LocalStartTime);
     const formattedStartTime = startTime.toLocaleTimeString('en-GB', { hour12: false });
-    const finishTime = new Date(gameData.LocalFinishTime);
+    const finishTime = new Date(gameData.Statistics.LocalFinishTime);
     const formattedFinishTime = finishTime.toLocaleTimeString('en-GB', { hour12: false });
     
     return (
@@ -64,7 +64,7 @@ function GameData() {
                             <p className="paragraph">ŽODŽIAI</p>
                         </div>
                         <div className="bottom-number">
-                            {gameData.TotalAmountOfWords}
+                            {gameData.Statistics.Paragraph.TotalAmountOfWords}
                         </div>
                     </div>
                     <div className="characters">
@@ -72,7 +72,7 @@ function GameData() {
                             <p className="paragraph">IŠ VISO/KLAIDOS</p>   
                         </div>
                         <div className="bottom-number">
-                            {gameData.TotalAmountOfCharacters}/{gameData.NumberOfWrongfulCharacters}
+                            {gameData.Statistics.Paragraph.TotalAmountOfCharacters}/{gameData.Statistics.NumberOfWrongfulCharacters}
                         </div>
                     </div>
                     <div className="startTime">

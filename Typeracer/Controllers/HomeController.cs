@@ -41,7 +41,7 @@ public class HomeController : Controller
         List<Gamemode> allowedGamemodes = new List<Gamemode>() { Gamemode.Standard };
         
         // getting the file path
-        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Paragraphs", "paragraph1_short.txt");
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Paragraphs", "paragraph1.txt");
         
         // using Filestream to open file as a stream
         using (FileStream filestream = new FileStream(filePath, FileMode.Open, FileAccess.Read))

@@ -38,7 +38,7 @@ public class HomeController : Controller
         List<Paragraph> paragraphList = new List<Paragraph>();
         
         // creating empty list of allowed gamemodes
-        List<Gamemode> allowedGamemodes = new List<Gamemode>() { Gamemode.Standard };
+        List<Gamemode> allowedGamemodes = new List<Gamemode>() { new Gamemode { Mode = GamemodeOption.Standard } };
         
         // getting the file path
         var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Paragraphs", "paragraph1_short.txt");
@@ -68,7 +68,7 @@ public class HomeController : Controller
         
         // listing the paragraphs that are allowed for a gamemode
         List<Paragraph> filteredParagraphs = allParagraphs.Where(
-            p => p.AllowedGamemodes.Contains(gamemode)).ToList();
+            p => p.AllowedGamemodes.Any(g => g.Mode == gamemode.Mode)).ToList();
 
         if (!filteredParagraphs.Any())
         {

@@ -20,6 +20,9 @@ function GameData() {
     const finishTime = new Date(gameData.Statistics.LocalFinishTime);
     const formattedFinishTime = finishTime.toLocaleTimeString('en-GB', { hour12: false });
     
+    const wordsPerMinute = gameData.CalculativeStatistics.WordsPerMinute;
+    const accuracy = gameData.CalculativeStatistics.Accuracy;
+    
     return (
         <div className="game-data-body">
             <div className="game-data-title">
@@ -34,7 +37,7 @@ function GameData() {
                                 <p className="paragraph">ŽPM</p>
                             </div>
                             <div className="top-number">
-                                {gameData.WordsPerMinute.toFixed()}
+                                {wordsPerMinute.toFixed()}
                             </div>
                         </div>
                         <div className="acc">
@@ -42,7 +45,7 @@ function GameData() {
                                 <p className="paragraph">TIKS.</p>
                             </div>
                             <div className="top-number">
-                                {gameData.Accuracy.toFixed()}%
+                                {accuracy.toFixed()}%
                             </div>
                         </div>
                     </div>

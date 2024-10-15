@@ -6,9 +6,12 @@ public class Game
     public StatisticsModel Statistics { get; set; } // statistics of a game session
     public double CompletionTime { get; set; }
     public Gamemode Gamemode { get; set; }
+
+    public Dictionary<string, object> CalculativeStatistics { get; private set; } = new Dictionary<string, object>();
     
+    /*
     public double WordsPerMinute { get; set; }
-    public double Accuracy { get;  set; }
+    public double Accuracy { get;  set; }*/
     
     public Game() {} // for deserialization
     
@@ -16,7 +19,7 @@ public class Game
     {
         GameId = Guid.NewGuid();
         Statistics = statisticsModel;
-        Gamemode = Gamemode.Standard; // default gamemode
+        Gamemode = new Gamemode{ Mode = GamemodeOption.Standard }; // default gamemode
         CalculateCompletionTime();
         CalculateAdditionalStatistics();
         
@@ -35,17 +38,19 @@ public class Game
 
     private void CalculateAdditionalStatistics()
     {
+        double WordsPerMinute = 0;
+        double Accuracy = 0;
+        
         if (CompletionTime > 0)
         {
             WordsPerMinute = CalculateWPM(Statistics.TypedAmountOfWords, (CompletionTime / 60.0));
             Accuracy = CalculateAccuracy(Statistics.TypedAmountOfCharacters, Statistics.NumberOfWrongfulCharacters);
         }
-        else
-        {
-            WordsPerMinute = 0;
-            Accuracy = 0;
-        }
         
+        // Boxing the calculated statistics
+        CalculativeStatistics["WordsPerMinute"] = WordsPerMinute;
+        CalculativeStatistics["Accuracy"] = Accuracy;
+
         // | Calculating CurrentWordsPerMinute and CurrentAccuracy for each word
         
         // this data has to be appended to the typingData inside statistics

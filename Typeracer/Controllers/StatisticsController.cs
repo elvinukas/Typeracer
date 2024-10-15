@@ -16,9 +16,9 @@ public class StatisticsController : ControllerBase
     {
         if (!ModelState.IsValid)
         {
-            var errors = ModelState.Values.SelectMany(v => v.Errors)
-                .Select(e => e.ErrorMessage)
-                .ToList();
+            var errors = ModelState.Values.SelectMany(v => v.Errors) // LINQ
+                .Select(e => e.ErrorMessage) // LINQ
+                .ToList(); // LINQ
             return BadRequest(new { message = "Invalid data.", errors });
         }
 

@@ -20,7 +20,7 @@ public class GraphController : ControllerBase
     {
         try
         {
-            GenerateGraphInternal();
+            GenerateGraphInternal("red");
             return Ok(new { message = "Graph generated successfully" });
         }
         catch (Exception ex)
@@ -29,7 +29,7 @@ public class GraphController : ControllerBase
         }
     }
 
-    private void GenerateGraphInternal()
+    private void GenerateGraphInternal(string WPMColor = "blue") // optional arguments
     {
         var jsonData = System.IO.File.ReadAllText("wwwroot/statistics/game-data.json"); // reads the JSON data
         var game = JsonConvert.DeserializeObject<Game>(jsonData);
@@ -46,8 +46,8 @@ public class GraphController : ControllerBase
             accuracyData[i] = (double)typingData[i].CurrentAccuracy;
         }
         
-        double minWpm = wpmData.Min();
-        double maxWpm = wpmData.Max();
+        double minWpm = wpmData.Min() / 2; // LINQ
+        double maxWpm = wpmData.Max(); // LINQ
         double padding = 5;
         double minY = minWpm - padding;
         double maxY = maxWpm + padding;
@@ -59,13 +59,13 @@ public class GraphController : ControllerBase
         var wpmLineSeries = new LineSeries 
         { 
             Title = "WPM",
-            Color = OxyColor.FromRgb(11, 94, 215),
+            Color = WPMColor == "red" ? OxyColor.FromRgb(206, 0, 0) : OxyColor.FromRgb(11, 94, 215),
             StrokeThickness = 3
         };
         var wpmAreaSeries = new AreaSeries
         {
-            Color = OxyColor.FromArgb(25, 11, 94, 215),
-            Fill = OxyColor.FromArgb(25, 11, 94, 215)
+            Color = WPMColor == "red" ? OxyColor.FromArgb(25, 206, 0, 0) : OxyColor.FromArgb(25, 11, 94, 215),
+            Fill = WPMColor == "red" ? OxyColor.FromArgb(25, 206, 0, 0) : OxyColor.FromArgb(25, 11, 94, 215)
         };
         
         var accuracyLineSeries = new LineSeries 
@@ -103,7 +103,7 @@ public class GraphController : ControllerBase
         {
             Position = OxyPlot.Axes.AxisPosition.Left,
             Title = "ŽPM",
-            TitleColor = OxyColor.FromRgb(11, 94, 215),
+            TitleColor = WPMColor == "red" ? OxyColor.FromRgb(206, 0, 0) : OxyColor.FromRgb(11, 94, 215),
             TitleFontWeight = OxyPlot.FontWeights.Bold,
             Minimum = minY,
             Maximum = maxY,

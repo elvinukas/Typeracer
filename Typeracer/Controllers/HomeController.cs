@@ -32,7 +32,7 @@ public class HomeController : Controller
         return View();
     }
 
-    public List<Paragraph> GetAllParagraphs()
+    public List<Paragraph> GetAllParagraphs(string paragraphName = "paragraph1.txt") // optional arguments
     {   
         // creating empty list of paragraphs
         List<Paragraph> paragraphList = new List<Paragraph>();
@@ -41,7 +41,7 @@ public class HomeController : Controller
         List<Gamemode> allowedGamemodes = new List<Gamemode>() { new Gamemode { Mode = GamemodeOption.Standard } };
         
         // getting the file path
-        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Paragraphs", "paragraph1_short.txt");
+        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Paragraphs", paragraphName);
         
         // using Filestream to open file as a stream
         using (FileStream filestream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
@@ -67,10 +67,10 @@ public class HomeController : Controller
         List<Paragraph> allParagraphs = GetAllParagraphs();
         
         // listing the paragraphs that are allowed for a gamemode
-        List<Paragraph> filteredParagraphs = allParagraphs.Where(
-            p => p.AllowedGamemodes.Any(g => g.Mode == gamemode.Mode)).ToList();
+        List<Paragraph> filteredParagraphs = allParagraphs.Where( // LINQ
+            p => p.AllowedGamemodes.Any(g => g.Mode == gamemode.Mode)).ToList(); // LINQ
 
-        if (!filteredParagraphs.Any())
+        if (!filteredParagraphs.Any()) // LINQ
         {
             Console.WriteLine("Error! No paragraphs found for the specified gamemode.");
             return null;
@@ -86,7 +86,7 @@ public class HomeController : Controller
 
     public IActionResult GetParagraphText(Gamemode gamemode)
     {
-        Paragraph paragraph = GetRandomParagraph(gamemode);
+        Paragraph paragraph = GetRandomParagraph(gamemode: gamemode); // named arguments
         if (paragraph == null)
         {
             return NotFound(new { message = "No paragraphs found for specified gamemode." });

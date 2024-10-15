@@ -64,7 +64,7 @@ public class Game
             if (typingData.Word.Length >= 4)
             {
                 double completionTime = (typingData.EndingTimestampWord - typingData.BeginningTimestampWord).TotalMinutes;
-                typingData.CurrentWordsPerMinute = CalculateWPM(1, completionTime);
+                typingData.CurrentWordsPerMinute = CalculateWPM(typedAmountOfWords: 1, completionTime: completionTime); // named arguments
                 previousWPM = typingData.CurrentWordsPerMinute;
             }
             else
@@ -72,17 +72,14 @@ public class Game
                 typingData.CurrentWordsPerMinute = previousWPM;
             }
             
-            typingData.CurrentAccuracy = CalculateAccuracy(typingData.Word.Length, typingData.AmountOfMistakesInWord);
+            typingData.CurrentAccuracy = CalculateAccuracy(totalCharacters: typingData.Word.Length, incorrectCharacters: typingData.AmountOfMistakesInWord); // named arguments
             
             wpmList.Add(typingData.CurrentWordsPerMinute);
             accuracyList.Add(typingData.CurrentAccuracy);
         }
         
-       
-        
-        int windowSize = 7; // Example window size
-        double[] smoothedWpmData = CalculateMovingAverage(wpmList.ToArray(), windowSize);
-        double[] smoothedAccuracyData = CalculateMovingAverage(accuracyList.ToArray(), windowSize);
+        double[] smoothedWpmData = CalculateMovingAverage(data: wpmList.ToArray()); // LINQ // named and optional arguments
+        double[] smoothedAccuracyData = CalculateMovingAverage(data: accuracyList.ToArray()); // LINQ // named and optional arguments
 
         for (int i = 0; i < Statistics.TypingData.Count; i++)
         {
@@ -92,7 +89,7 @@ public class Game
 
     }
     
-    private double[] CalculateMovingAverage(double[] data, int windowSize)
+    private double[] CalculateMovingAverage(double[] data, int windowSize = 7)
     {
         double[] result = new double[data.Length];
         double sum = 0;

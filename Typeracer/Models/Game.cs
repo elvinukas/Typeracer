@@ -124,7 +124,7 @@ public class Game
     private double CalculateAccuracy(int totalCharacters, int incorrectCharacters)
     {
         int correctCharacters = totalCharacters - incorrectCharacters;
-        if (totalCharacters != 0)
+        if (totalCharacters != 0 && correctCharacters > 0)
         {
             return (double)correctCharacters / totalCharacters * 100;
         }

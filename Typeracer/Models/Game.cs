@@ -76,8 +76,8 @@ public class Game
        
         
         int windowSize = 7; // Example window size
-        double[] smoothedWpmData = CalculateMovingAverage(wpmList.ToArray(), windowSize);
-        double[] smoothedAccuracyData = CalculateMovingAverage(accuracyList.ToArray(), windowSize);
+        double[] smoothedWpmData = CalculateMovingAverage(wpmList.ToArray(), windowSize); // LINQ
+        double[] smoothedAccuracyData = CalculateMovingAverage(accuracyList.ToArray(), windowSize); // LINQ
 
         for (int i = 0; i < Statistics.TypingData.Count; i++)
         {

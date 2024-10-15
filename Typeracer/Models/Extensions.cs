@@ -13,7 +13,7 @@ public static class Extensions
             return -1;
         }
         
-        averageWPM = player.WPMs.Average();
+        averageWPM = player.WPMs.Average(); // LINQ
         return averageWPM;
     }
 
@@ -24,7 +24,7 @@ public static class Extensions
             return -1;
         }
         
-        averageAccuracy = player.Accuracies.Average();
+        averageAccuracy = player.Accuracies.Average(); // LINQ
         return averageAccuracy;
     }
 
@@ -35,7 +35,7 @@ public static class Extensions
             return -1;
         }
         
-        bestWPM = player.WPMs.Max();
+        bestWPM = player.WPMs.Max(); // LINQ
         return bestWPM;
     }
 
@@ -48,12 +48,12 @@ public static class Extensions
 
         if (averageWPM == 0)
         {
-            averageWPM = player.WPMs.Average();
+            averageWPM = player.WPMs.Average(); // LINQ
         }
 
         if (averageAccuracy == 0)
         {
-            averageAccuracy = player.Accuracies.Average();
+            averageAccuracy = player.Accuracies.Average(); // LINQ
         }
         
         return (averageWPM * averageAccuracy) / 100;

@@ -67,10 +67,10 @@ public class HomeController : Controller
         List<Paragraph> allParagraphs = GetAllParagraphs();
         
         // listing the paragraphs that are allowed for a gamemode
-        List<Paragraph> filteredParagraphs = allParagraphs.Where(
-            p => p.AllowedGamemodes.Contains(gamemode)).ToList();
+        List<Paragraph> filteredParagraphs = allParagraphs.Where( // LINQ
+            p => p.AllowedGamemodes.Contains(gamemode)).ToList(); // LINQ
 
-        if (!filteredParagraphs.Any())
+        if (!filteredParagraphs.Any()) // LINQ
         {
             Console.WriteLine("Error! No paragraphs found for the specified gamemode.");
             return null;

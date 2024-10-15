@@ -46,8 +46,8 @@ public class GraphController : ControllerBase
             accuracyData[i] = (double)typingData[i].CurrentAccuracy;
         }
         
-        double minWpm = wpmData.Min();
-        double maxWpm = wpmData.Max();
+        double minWpm = wpmData.Min(); // LINQ
+        double maxWpm = wpmData.Max(); // LINQ
         double padding = 5;
         double minY = minWpm - padding;
         double maxY = maxWpm + padding;

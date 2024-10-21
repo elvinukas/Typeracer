@@ -19,7 +19,7 @@ public class Game
     {
         GameId = Guid.NewGuid();
         Statistics = statisticsModel;
-        Gamemode = new Gamemode{ Mode = GamemodeOption.Standard }; // default gamemode
+        Gamemode = Gamemode.Standard;
         CalculateCompletionTime();
         CalculateAdditionalStatistics();
         

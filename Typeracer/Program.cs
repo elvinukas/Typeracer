@@ -1,6 +1,15 @@
 // Program.cs
 
+using Typeracer.Models;
+using Microsoft.AspNetCore.Mvc;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Generate an application ID (used for the leaderboard)
+var applicationID = Guid.NewGuid().ToString();
+
+// Make the application ID available via dependency injection
+builder.Services.AddSingleton<string>(applicationID);
 
 // Adding the CORS policy to allow all origins, methods and headers
 builder.Services.AddCors(options =>
@@ -13,10 +22,17 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddControllersWithViews();
 
+
+
+// Register the Leaderboard as a singleton
+builder.Services.AddSingleton<Leaderboard>();
+
 var app = builder.Build();
 
 app.UseCors("AllowAll");
 
+// Expose the application ID via an API endpoint
+app.MapGet("/api/application-id", ([FromServices] string applicationID) => applicationID);
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

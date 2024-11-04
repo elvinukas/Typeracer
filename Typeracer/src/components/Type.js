@@ -39,6 +39,26 @@ function Type() {
     
     // Used for storing word information
     const wordsInfoRef = useRef([]);
+    
+    // used for creating info about words from the text
+    const buildWordsInfo = (text) => {
+        if (text) {
+            let tempWordsInfo = [];
+            let index = 0;
+            text.split(' ').forEach((word) => {
+                tempWordsInfo.push({
+                    word: word,
+                    startIndex: index,
+                    endIndex: index + word.length - 1,
+                    mistakes: 0,
+                    startTime: null,
+                    endTime: null,
+                });
+                index += word.length + 1; // +1 for the space
+            });
+            wordsInfoRef.current = tempWordsInfo;
+        }
+    };
 
     const fetchParagraphText = async () => {
         let response = await fetch('/Home/GetParagraphText/');
@@ -48,6 +68,7 @@ function Type() {
         const paragraphText = jsonResponse.text;
         setTypingText(paragraphText);
         setInitialText(paragraphText);
+        buildWordsInfo(paragraphText);
 
         // Calculating the total amount of words and characters
         const totalWords = paragraphText.trim().split(/\s+/).length;
@@ -349,7 +370,6 @@ function Type() {
             NumberOfWrongfulCharacters: 0,
             TypingData: []
         });
-        wordsInfoRef.current = [];
     };
 
     useEffect(() => {
@@ -456,6 +476,7 @@ function Type() {
                     setIncorrectChars({});
                     setFirstErrorIndex(null);
                     setConsecutiveRedCount(0);
+                    buildWordsInfo(initialText);
                 }}>
                     Pradėti iš naujo
                 </button>

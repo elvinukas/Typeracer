@@ -43,7 +43,7 @@ function Type() {
     const fetchParagraphText = async () => {
         let response = await fetch('/Home/GetParagraphText/');
         let jsonResponse = await response.json();
-        console.log(jsonResponse);
+        console.log("Json response: " + jsonResponse);
         
         const paragraphText = jsonResponse.text;
         setTypingText(paragraphText);
@@ -55,29 +55,33 @@ function Type() {
             ...prevData,
             Paragraph: jsonResponse
         }));
-
+        
         // Creating wordsInfoRef
         if (paragraphText) {
-            let tempWordsInfo = [];
-            let index = 0;
-            paragraphText.split(' ').forEach((word) => {
-                tempWordsInfo.push({
-                    word: word,
-                    startIndex: index,
-                    endIndex: index + word.length - 1,
-                    mistakes: 0,
-                    startTime: null,
-                    endTime: null,
-                });
-                index += word.length + 1; // +1 for the space
-            });
-            wordsInfoRef.current = tempWordsInfo;
-        }
+            createWordsInfoRef(paragraphText);
+       }
     };
+    
+    const createWordsInfoRef = (paragraphText) => {
+        let tempWordsInfo = [];
+        let index = 0;
+        paragraphText.split(' ').forEach((word) => {
+            tempWordsInfo.push({
+                word: word,
+                startIndex: index,
+                endIndex: index + word.length - 1,
+                mistakes: 0,
+                startTime: null,
+                endTime: null,
+            });
+            index += word.length + 1; // +1 for the space
+        });
+        wordsInfoRef.current = tempWordsInfo;
+    }
 
     useEffect(() => {
         fetchParagraphText();
-
+        
         // Initializing Howler sound
         wrongSoundRef.current = new Howl({
             src: [wrongSound],
@@ -349,7 +353,8 @@ function Type() {
             NumberOfWrongfulCharacters: 0,
             TypingData: []
         });
-        wordsInfoRef.current = [];
+        
+        createWordsInfoRef(initialText);
     };
 
     useEffect(() => {

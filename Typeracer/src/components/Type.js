@@ -79,21 +79,6 @@ function Type() {
         wordsInfoRef.current = tempWordsInfo;
     }
 
-    useEffect(() => {
-        fetchParagraphText();
-        
-        // Initializing Howler sound
-        wrongSoundRef.current = new Howl({
-            src: [wrongSound],
-            preload: true,
-        });
-
-        return () => {
-            clearInterval(intervalRef.current);
-            clearTimeout(blinkTimeoutRef.current);
-        };
-    }, []);
-
     const handleKeyDown = async (event) => {
         const inputCharacter = event.key;
         const isCharacterKey = inputCharacter.length === 1 || inputCharacter === ' ';
@@ -319,8 +304,7 @@ function Type() {
     const formatDateTime = (date) => {
         return date.toISOString().replace('Z', '');
     };
-
-
+    
     const sendStatisticsData = async (dataToSend) => {
         // Logging the data being sent
         console.log('Data being sent:', JSON.stringify(dataToSend, null, 2));
@@ -342,6 +326,72 @@ function Type() {
             console.error('Error sending statistics data:', error);
         }
     };
+
+    const formatTime = (time) => {
+        const seconds = Math.floor((time / 1000) % 60);
+        const minutes = Math.floor((time / (1000 * 60)) % 60);
+        return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    };
+
+    const resetChronometer = () => {
+        clearInterval(intervalRef.current);
+        setStartTime(null);
+        setElapsedTime(0);
+    };
+
+    const resetStateForRestartButton = () => {
+        setStatisticsData({
+            LocalStartTime: null,
+            LocalFinishTime: null,
+            Paragraph: statisticsData.Paragraph,
+            TypedAmountOfWords: 0,
+            TypedAmountOfCharacters: 0,
+            NumberOfWrongfulCharacters: 0,
+            TypingData: []
+        });
+        createWordsInfoRef(initialText);
+
+        resetChronometer();
+        setTypingText(initialText);
+        setCurrentIndex(0);
+        setIncorrectChars({});
+        setFirstErrorIndex(null);
+        setConsecutiveRedCount(0);
+    }
+
+    const resetStateForNextTextButton = () => {
+        setStatisticsData({
+            LocalStartTime: null,
+            LocalFinishTime: null,
+            Paragraph: null,
+            TypedAmountOfWords: 0,
+            TypedAmountOfCharacters: 0,
+            NumberOfWrongfulCharacters: 0,
+            TypingData: []
+        });
+
+        resetChronometer();
+        setCurrentIndex(0);
+        setIncorrectChars({});
+        setFirstErrorIndex(null);
+        setConsecutiveRedCount(0);
+        fetchParagraphText();
+    }
+
+    useEffect(() => {
+        fetchParagraphText();
+
+        // Initializing Howler sound
+        wrongSoundRef.current = new Howl({
+            src: [wrongSound],
+            preload: true,
+        });
+
+        return () => {
+            clearInterval(intervalRef.current);
+            clearTimeout(blinkTimeoutRef.current);
+        };
+    }, []);
 
     useEffect(() => {
         document.addEventListener('keydown', handleKeyDown);
@@ -375,18 +425,6 @@ function Type() {
             buttons.forEach(button => button.removeEventListener('keydown', preventSpacebarDefault));
         };
     }, []);
-
-    const formatTime = (time) => {
-        const seconds = Math.floor((time / 1000) % 60);
-        const minutes = Math.floor((time / (1000 * 60)) % 60);
-        return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-    };
-
-    const resetChronometer = () => {
-        clearInterval(intervalRef.current);
-        setStartTime(null);
-        setElapsedTime(0);
-    };
 
     useEffect(() => {
         if (isComplete) {
@@ -440,45 +478,14 @@ function Type() {
 
             <div className="button-container">
                 <button className="restart-button" onClick={() => {
-                    setStatisticsData({
-                        LocalStartTime: null,
-                        LocalFinishTime: null,
-                        Paragraph: statisticsData.Paragraph,
-                        TypedAmountOfWords: 0,
-                        TypedAmountOfCharacters: 0,
-                        NumberOfWrongfulCharacters: 0,
-                        TypingData: []
-                    });
-                    createWordsInfoRef(initialText);
-                    
-                    resetChronometer();
-                    setTypingText(initialText);
-                    setCurrentIndex(0);
-                    setIncorrectChars({});
-                    setFirstErrorIndex(null);
-                    setConsecutiveRedCount(0);
+                    resetStateForRestartButton();
                 }}>
                     Pradėti iš naujo
                 </button>
                 <button
                     className="next-text-button"
                     onClick={() => {
-                        setStatisticsData({
-                            LocalStartTime: null,
-                            LocalFinishTime: null,
-                            Paragraph: null,
-                            TypedAmountOfWords: 0,
-                            TypedAmountOfCharacters: 0,
-                            NumberOfWrongfulCharacters: 0,
-                            TypingData: []
-                        });
-                        
-                        resetChronometer();
-                        setCurrentIndex(0);
-                        setIncorrectChars({});
-                        setFirstErrorIndex(null);
-                        setConsecutiveRedCount(0);
-                        fetchParagraphText();
+                        resetStateForNextTextButton();
                     }}
                 >
                     Kitas tekstas

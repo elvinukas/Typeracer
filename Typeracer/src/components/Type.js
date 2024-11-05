@@ -343,20 +343,6 @@ function Type() {
         }
     };
 
-    const resetStatisticsData = () => {
-        setStatisticsData({
-            LocalStartTime: null,
-            LocalFinishTime: null,
-            Paragraph: statisticsData.Paragraph,
-            TypedAmountOfWords: 0,
-            TypedAmountOfCharacters: 0,
-            NumberOfWrongfulCharacters: 0,
-            TypingData: []
-        });
-        
-        createWordsInfoRef(initialText);
-    };
-
     useEffect(() => {
         document.addEventListener('keydown', handleKeyDown);
 
@@ -454,8 +440,18 @@ function Type() {
 
             <div className="button-container">
                 <button className="restart-button" onClick={() => {
+                    setStatisticsData({
+                        LocalStartTime: null,
+                        LocalFinishTime: null,
+                        Paragraph: statisticsData.Paragraph,
+                        TypedAmountOfWords: 0,
+                        TypedAmountOfCharacters: 0,
+                        NumberOfWrongfulCharacters: 0,
+                        TypingData: []
+                    });
+                    createWordsInfoRef(initialText);
+                    
                     resetChronometer();
-                    resetStatisticsData();
                     setTypingText(initialText);
                     setCurrentIndex(0);
                     setIncorrectChars({});
@@ -466,17 +462,7 @@ function Type() {
                 </button>
                 <button
                     className="next-text-button"
-                    onClick={async () => {
-                        resetChronometer();
-                        let response = await fetch('/Home/GetParagraphText/');
-                        let jsonResponse = await response.json();
-                        var paragraphText = jsonResponse.text;
-                        setTypingText(paragraphText);
-                        setInitialText(paragraphText);
-
-                        // Calculating the total amount of words and characters
-                        const totalWords = jsonResponse.text.trim().split(/\s+/).length;
-
+                    onClick={() => {
                         setStatisticsData({
                             LocalStartTime: null,
                             LocalFinishTime: null,
@@ -486,29 +472,13 @@ function Type() {
                             NumberOfWrongfulCharacters: 0,
                             TypingData: []
                         });
-
-                        // Creating wordsInfoRef
-                        if (jsonResponse.text) {
-                            let tempWordsInfo = [];
-                            let index = 0;
-                            jsonResponse.text.split(' ').forEach((word) => {
-                                tempWordsInfo.push({
-                                    word: word,
-                                    startIndex: index,
-                                    endIndex: index + word.length - 1,
-                                    mistakes: 0,
-                                    startTime: null,
-                                    endTime: null,
-                                });
-                                index += word.length + 1;
-                            });
-                            wordsInfoRef.current = tempWordsInfo;
-                        }
-
+                        
+                        resetChronometer();
                         setCurrentIndex(0);
                         setIncorrectChars({});
                         setFirstErrorIndex(null);
                         setConsecutiveRedCount(0);
+                        fetchParagraphText();
                     }}
                 >
                     Kitas tekstas

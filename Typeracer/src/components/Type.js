@@ -269,8 +269,8 @@ function Type() {
             // Preparing the typingData array
             const typingData = wordsInfoRef.current.map(wordInfo => ({
                 Word: wordInfo.word,
-                BeginningTimestampWord: wordInfo.startTime ? formatDateTime(new Date(wordInfo.startTime)) : null,
-                EndingTimestampWord: wordInfo.endTime ? formatDateTime(new Date(wordInfo.endTime)) : null,
+                BeginningTimestampWord: wordInfo.startTime ? new Date(wordInfo.startTime).toISOString() : null,
+                EndingTimestampWord: wordInfo.endTime ? new Date(wordInfo.endTime).toISOString() : null,
                 AmountOfMistakesInWord: wordInfo.mistakes
             }));
 
@@ -295,8 +295,8 @@ function Type() {
 
             // Assembling the data to send
             const dataToSend = {
-                LocalStartTime: updatedStatisticsData.LocalStartTime ? formatDateTime(updatedStatisticsData.LocalStartTime) : null,
-                LocalFinishTime: updatedStatisticsData.LocalFinishTime ? formatDateTime(updatedStatisticsData.LocalFinishTime) : null,
+                LocalStartTime: updatedStatisticsData.LocalStartTime ? new Date(updatedStatisticsData.LocalStartTime).toISOString() : null,
+                LocalFinishTime: updatedStatisticsData.LocalFinishTime ? new Date(updatedStatisticsData.LocalFinishTime).toISOString() : null,
                 Paragraph: updatedStatisticsData.Paragraph,
                 TypedAmountOfWords: updatedStatisticsData.TypedAmountOfWords,
                 TypedAmountOfCharacters: updatedStatisticsData.TypedAmountOfCharacters,

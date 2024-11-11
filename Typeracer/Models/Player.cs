@@ -22,7 +22,7 @@ public class Player : IComparable<Player>
     [ForeignKey("BestWPMID")]
     public WPM BestWPM { get; set; }
     
-    [ForeignKey("BestAccuracy")]
+    [ForeignKey("BestAccuracyID")]
     public Accuracy BestAccuracy { get; set; }
     
     // parameterless constructor for deserialization

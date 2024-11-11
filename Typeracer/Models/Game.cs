@@ -1,8 +1,19 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace Typeracer.Models;
 
 public class Game
 {
+    [Key]
     public Guid GameId { get; init; } // unique id for a game session
+    
+    [ForeignKey("PlayerId")]
+    public Guid PlayerId { get; set; }
+    public Player Player { get; set; }
+    
+    [ForeignKey("StatisticsId")]
+    public Guid StatisticsId { get; set; }
     public StatisticsModel Statistics { get; set; } // statistics of a game session
     public double CompletionTime { get; set; }
     public Gamemode Gamemode { get; set; }
@@ -28,6 +39,7 @@ public class Game
     private void CalculateCompletionTime()
     {
         this.CompletionTime = 0;
+        
         
         if (Statistics.LocalFinishTime.HasValue && Statistics.LocalStartTime.HasValue)
         {

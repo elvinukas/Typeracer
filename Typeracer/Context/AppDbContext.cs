@@ -11,33 +11,65 @@ public class AppDbContext : DbContext
     public DbSet<Player> Players { get; set; }
     public DbSet<WPM> Wpms { get; set; }
     public DbSet<Accuracy> Accuracies { get; set; }
+    public DbSet<Game> Games { get; set; }
+    public DbSet<StatisticsModel> Statistics { get; set; }
     
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        
         modelBuilder.Entity<WPM>()
             .HasOne(w => w.Player)
             .WithMany(p => p.WPMs)
             .HasForeignKey(w => w.PlayerId)
-            .OnDelete(DeleteBehavior.Cascade); 
+            .OnDelete(DeleteBehavior.Cascade);
 
-      
         modelBuilder.Entity<Accuracy>()
             .HasOne(a => a.Player)
             .WithMany(p => p.Accuracies)
             .HasForeignKey(a => a.PlayerId)
             .OnDelete(DeleteBehavior.Cascade); 
-
-        
-        modelBuilder.Entity<Paragraph>()
-            .HasKey(p => p.Id); 
-
         
         modelBuilder.Entity<Player>()
-            .HasKey(p => p.PlayerID); 
+            .HasKey(p => p.PlayerID);
+
+        modelBuilder.Entity<Player>()
+            .HasOne(p => p.BestWPM)
+            .WithOne()
+            .HasForeignKey<Player>(p => p.BestWPMID);
+
+        modelBuilder.Entity<Player>()
+            .HasOne(p => p.BestAccuracy)
+            .WithOne()
+            .HasForeignKey<Player>(p => p.BestAccuracyID);
+
+        modelBuilder.Entity<Game>()
+            .HasKey(g => g.GameId);
+
+        modelBuilder.Entity<Game>()
+            .Ignore(g => g.CalculativeStatistics);
+
+        modelBuilder.Entity<Game>()
+            .HasOne(g => g.Player)
+            .WithMany() 
+            .HasForeignKey(g => g.PlayerId);
+
+        modelBuilder.Entity<Game>()
+            .HasOne(g => g.Statistics)
+            .WithOne()
+            .HasForeignKey<Game>(g => g.StatisticsId);
+
+        modelBuilder.Entity<StatisticsModel>()
+            .HasKey(s => s.StatisticsId);
+
+        modelBuilder.Entity<StatisticsModel>()
+            .HasOne(s => s.Paragraph)
+            .WithMany()
+            .HasForeignKey(s => s.ParagraphId);
+        
+        modelBuilder.Entity<Paragraph>()
+            .HasKey(p => p.Id);
 
        
     }

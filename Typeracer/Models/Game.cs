@@ -9,8 +9,8 @@ public class Game
     public Guid GameId { get; init; } // unique id for a game session
     
     [ForeignKey("PlayerId")]
-    public Guid PlayerId { get; set; }
-    public Player Player { get; set; }
+    public Guid? PlayerId { get; set; }
+    public Player? Player { get; set; }
     
     [ForeignKey("StatisticsId")]
     public Guid StatisticsId { get; set; }
@@ -30,6 +30,7 @@ public class Game
     {
         GameId = Guid.NewGuid();
         Statistics = statisticsModel;
+        Player = null;
         Gamemode = Gamemode.Standard;   // default gamemode
         CalculateCompletionTime();
         CalculateAdditionalStatistics();

@@ -23,26 +23,30 @@ public class AppDbContext : DbContext
             .HasOne(w => w.Player)
             .WithMany(p => p.WPMs)
             .HasForeignKey(w => w.PlayerId)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Accuracy>()
             .HasOne(a => a.Player)
             .WithMany(p => p.Accuracies)
             .HasForeignKey(a => a.PlayerId)
-            .OnDelete(DeleteBehavior.Cascade); 
-        
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.Cascade);
+
         modelBuilder.Entity<Player>()
             .HasKey(p => p.PlayerID);
 
         modelBuilder.Entity<Player>()
             .HasOne(p => p.BestWPM)
             .WithOne()
-            .HasForeignKey<Player>(p => p.BestWPMID);
+            .HasForeignKey<Player>(p => p.BestWPMID)
+            .IsRequired(false);
 
         modelBuilder.Entity<Player>()
             .HasOne(p => p.BestAccuracy)
             .WithOne()
-            .HasForeignKey<Player>(p => p.BestAccuracyID);
+            .HasForeignKey<Player>(p => p.BestAccuracyID)
+            .IsRequired(false);
 
         modelBuilder.Entity<Game>()
             .HasKey(g => g.GameId);
@@ -52,8 +56,9 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<Game>()
             .HasOne(g => g.Player)
-            .WithMany() 
-            .HasForeignKey(g => g.PlayerId);
+            .WithMany()
+            .HasForeignKey(g => g.PlayerId)
+            .IsRequired(false);
 
         modelBuilder.Entity<Game>()
             .HasOne(g => g.Statistics)

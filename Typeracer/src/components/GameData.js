@@ -54,11 +54,11 @@ function GameData( { gameId }) {
         return <div>Loading...</div>; //loading screen
     }
     
-    console.log(gameData.statistics.LocalStartTime);
+    console.log("This is the localStartTime: ", gameData.statistics.localStartTime);
     
     
-    const startTime = new Date(gameData.statistics.LocalStartTime);
-    const finishTime = new Date(gameData.statistics.LocalFinishTime);
+    const startTime = new Date(gameData.statistics.localStartTime);
+    const finishTime = new Date(gameData.statistics.localFinishTime);
     const completionTimeInSeconds = ((finishTime - startTime) / 1000).toFixed(2);
 
     const formattedStartTime = startTime.toLocaleTimeString('en-GB', { hour12: false });

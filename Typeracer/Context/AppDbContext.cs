@@ -20,14 +20,14 @@ public class AppDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<WPM>()
-            .HasOne(w => w.Player)
+            .HasOne<Player>()
             .WithMany(p => p.WPMs)
             .HasForeignKey(w => w.PlayerId)
             .IsRequired(false)
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Accuracy>()
-            .HasOne(a => a.Player)
+            .HasOne<Player>()
             .WithMany(p => p.Accuracies)
             .HasForeignKey(a => a.PlayerId)
             .IsRequired(false)

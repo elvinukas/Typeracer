@@ -77,10 +77,9 @@ function GameData( { gameId }) {
         //console.log("Generated or retrieved PlayerID: ", playerID);
 
         const playerData = {
-            PlayerID: null,
             Username: username,
-            BestWPM: gameData.CalculativeStatistics.WordsPerMinute,
-            BestAccuracy: gameData.CalculativeStatistics.Accuracy,
+            BestWPM: gameData.statistics.wordsPerMinute,
+            BestAccuracy: gameData.statistics.accuracy,
             GameId: gameId
         };
 

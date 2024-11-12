@@ -58,7 +58,7 @@ namespace Typeracer.Controllers
                     }
                     
 
-                    Game? game = context.Games.FirstOrDefault(g => g.GameId == playerData.GameId);
+                    Game? game = context.Games.FirstOrDefault(g => g.GameId == Guid.Parse(playerData.GameId));
                     if (game == null)
                     {
                         return NotFound("Specified game not found.");

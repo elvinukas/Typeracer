@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import '../../wwwroot/css/GameData.css';
 import Leaderboard from './Leaderboard';
-function GameData() {
+function GameData( { gameId }) {
     const [gameData, setGameData] = useState(null);
     
     const [showLeaderboard, setShowLeaderboard] = useState(false);
@@ -55,14 +55,14 @@ function GameData() {
     const wordsPerMinute = gameData.CalculativeStatistics.WordsPerMinute;
     const accuracy = gameData.CalculativeStatistics.Accuracy;
 
-    function generateUUID() {
-        // generating a random playerID
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-            const r = Math.random() * 16 | 0;
-            const v = c === 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
-        });
-    }
+    // function generateUUID() {
+    //     // generating a random playerID
+    //     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    //         const r = Math.random() * 16 | 0;
+    //         const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    //         return v.toString(16);
+    //     });
+    // }
 
     const saveStatistics = async () => {
         const username = prompt("Įveskite savo vartotojo vardą:");
@@ -70,22 +70,18 @@ function GameData() {
             alert("Vartotojo vardas būtinas!");
             return;
         }
-
-        let playerID = localStorage.getItem('playerID');
-        if (!playerID) {
-            playerID = generateUUID();
-            localStorage.setItem('playerID', playerID);
-        }
-        console.log("Generated or retrieved PlayerID: ", playerID);
+        
+        //console.log("Generated or retrieved PlayerID: ", playerID);
 
         const playerData = {
-            PlayerID: playerID,
+            PlayerID: null,
             Username: username,
             BestWPM: gameData.CalculativeStatistics.WordsPerMinute,
-            BestAccuracy: gameData.CalculativeStatistics.Accuracy
+            BestAccuracy: gameData.CalculativeStatistics.Accuracy,
+            GameId: gameId
         };
 
-        console.log('Sending player data:', playerData);
+        console.log('Sending player and associated gameID data:', playerData);
 
         try {
             const response = await fetch('/api/leaderboard/save', {

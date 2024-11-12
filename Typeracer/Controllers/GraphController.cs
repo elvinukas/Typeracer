@@ -2,12 +2,14 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OxyPlot;
 using OxyPlot.Series;
 using OxyPlot.WindowsForms;
 using OxyPlot.SkiaSharp;
+using Typeracer.Context;
 using Typeracer.Models;
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 
@@ -16,11 +18,26 @@ using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 public class GraphController : ControllerBase
 {
     [HttpPost("generate")]
-    public IActionResult GenerateGraph()
+    public IActionResult GenerateGraph([FromBody] string gameId, AppDbContext context)
     {
         try
         {
-            GenerateGraphInternal("red");
+            Game? game = context.Games
+                .Include(g => g.Statistics)
+                    .ThenInclude(s => s.TypingData)
+                .Include(g => g.Statistics)
+                    .ThenInclude(s => s.Paragraph)
+                .FirstOrDefault(g => g.GameId == Guid.Parse(gameId));
+            
+            if (game == null)
+            {
+                return NotFound(new { message = "Game not found" });
+            }
+            
+            
+            
+            Console.WriteLine("Graph controller received gameId: ", gameId);
+            GenerateGraphInternal(game, "red");
             return Ok(new { message = "Graph generated successfully" });
         }
         catch (Exception ex)
@@ -29,13 +46,10 @@ public class GraphController : ControllerBase
         }
     }
 
-    private void GenerateGraphInternal(string WPMColor = "blue") // optional arguments
+    private void GenerateGraphInternal (Game game, string WPMColor = "blue") // optional arguments
     {
-        var jsonData = System.IO.File.ReadAllText("wwwroot/statistics/game-data.json"); // reads the JSON data
-        var game = JsonConvert.DeserializeObject<Game>(jsonData);
-        Console.WriteLine(game);
         
-        var typingData = game.Statistics.TypingData; // extracts data for the graph
+        var typingData = game.Statistics.TypingData;
         var totalWords = game.Statistics.Paragraph.TotalAmountOfWords;
         var wpmData = new double[totalWords];
         var accuracyData = new double[totalWords];

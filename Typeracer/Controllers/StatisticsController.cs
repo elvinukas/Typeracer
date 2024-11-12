@@ -47,36 +47,7 @@ public class StatisticsController : ControllerBase
             context.SaveChanges();
         }
         
-        // saving received statisticsData to a file
-        
-        // Path to the statistics directory
-        // var statisticsDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "statistics");
-        //
-        // // If the directory does not exist, creating it
-        // if (!Directory.Exists(statisticsDir))
-        // {
-        //     Directory.CreateDirectory(statisticsDir);
-        // }
-        
-
-        // JSON file name and path
-        //var filePath = Path.Combine(statisticsDir, "game-data.json");
-        
-        //Console.WriteLine($"Statistics: {JsonSerializer.Serialize(game.Statistics, new JsonSerializerOptions { WriteIndented = true })}");
-
-        // Converting the GAME DATA to JSON
-        // var json = JsonSerializer.Serialize(game, new JsonSerializerOptions 
-        // { 
-        //     WriteIndented = true, 
-        //     Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping // Special encoding option to prevent UTF-8 characters from being encoded
-        // });
-        //
-        // // Saving the JSON to a file
-        // System.IO.File.WriteAllText(filePath, json);
-        //
-        // Console.WriteLine($"Game information saved to file: {filePath}");
-
-        return Ok(new { message = "Statistics received and game information saved to database" });
+        return Ok(new { message = "Statistics received and game information saved to database", gameId = game.GameId });
     }
     
 }

@@ -15,6 +15,7 @@ function Type() {
     const [elapsedTime, setElapsedTime] = useState(0);
     const [isComplete, setIsComplete] = useState(false);
     const [showGameData, setShowGameData] = useState(false);
+    const [gameId, setGameId] = useState(null);
     
     // used for checking when was the last keypress recorded - text cursor blinker
     const [lastKeyPressTime, setLastKeyPressTime] = useState(Date.now());
@@ -334,6 +335,9 @@ function Type() {
                 console.error('Error response:', errorResponse);
                 throw new Error('Network response was not ok');
             }
+            const responseData = await response.json();
+            console.log("Received gameID: ", responseData.gameId);
+            setGameId(responseData.gameId);
         } catch (error) {
             console.error('Error sending statistics data:', error);
         }
@@ -400,7 +404,11 @@ function Type() {
     useEffect(() => {
         if (isComplete) {
             fetch('/api/graph/generate', { // calls the API endpoint to generate the graph
-                method: 'POST'
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(gameId)
             })
                 .then(response => response.json())
                 .then(data => {
@@ -409,10 +417,10 @@ function Type() {
                 })
                 .catch(error => console.error('Error generating graph:', error));
         }
-    }, [isComplete]);
+    }, [isComplete, gameId]);
 
     if (showGameData) { // loads GameData.js page
-        return <GameData />;
+        return <GameData gameId={gameId}/>;
     }
 
     return (

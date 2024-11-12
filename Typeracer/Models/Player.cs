@@ -33,9 +33,9 @@ public class Player : IComparable<Player>
     }
 
 
-    public Player(string username, Guid playerID, double initialWPM, double initialAccuracy)
+    public Player(string username, double initialWPM, double initialAccuracy)
     {
-        PlayerID = playerID;
+        PlayerID = Guid.NewGuid();
         Username = username;
         WPMs = new List<WPM>();
         Accuracies = new List<Accuracy>();

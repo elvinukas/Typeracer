@@ -51,18 +51,21 @@ function GameData( { gameId }) {
     }
 
     if (!gameData) {
-        return <div>...</div>; //loading screen
+        return <div>Loading...</div>; //loading screen
     }
     
-    const startTime = new Date(gameData.Statistics.LocalStartTime);
-    const finishTime = new Date(gameData.Statistics.LocalFinishTime);
+    console.log(gameData.statistics.LocalStartTime);
+    
+    
+    const startTime = new Date(gameData.statistics.LocalStartTime);
+    const finishTime = new Date(gameData.statistics.LocalFinishTime);
     const completionTimeInSeconds = ((finishTime - startTime) / 1000).toFixed(2);
 
     const formattedStartTime = startTime.toLocaleTimeString('en-GB', { hour12: false });
     const formattedFinishTime = finishTime.toLocaleTimeString('en-GB', { hour12: false });
     
-    const wordsPerMinute = gameData.Calcu|| "N/A";
-    const accuracy = gameData.Accuracy || "N/A";
+    const wordsPerMinute = gameData.statistics.wordsPerMinute|| "N/A";
+    const accuracy = gameData.statistics.accuracy || "N/A";
     
     const saveStatistics = async () => {
         const username = prompt("Įveskite savo vartotojo vardą:");
@@ -146,7 +149,7 @@ function GameData( { gameId }) {
                             <p className="paragraph">ŽODŽIAI</p>
                         </div>
                         <div className="bottom-number">
-                            {gameData.Statistics.Paragraph.TotalAmountOfWords}
+                            {gameData.statistics.paragraph.totalAmountOfWords}
                         </div>
                     </div>
                     <div className="characters">
@@ -154,7 +157,7 @@ function GameData( { gameId }) {
                             <p className="paragraph">IŠ VISO/KLAIDOS</p>
                         </div>
                         <div className="bottom-number">
-                            {gameData.Statistics.Paragraph.TotalAmountOfCharacters}/{gameData.Statistics.NumberOfWrongfulCharacters}
+                            {gameData.statistics.paragraph.totalAmountOfCharacters}/{gameData.statistics.numberOfWrongfulCharacters}
                         </div>
                     </div>
                     <div className="startTime">

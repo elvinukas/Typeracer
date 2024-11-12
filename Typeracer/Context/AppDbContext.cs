@@ -50,10 +50,7 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<Game>()
             .HasKey(g => g.GameId);
-
-        modelBuilder.Entity<Game>()
-            .HasOne(g => g.CalculativeStatistics);
-
+        
         modelBuilder.Entity<Game>()
             .HasOne(g => g.Player)
             .WithMany()

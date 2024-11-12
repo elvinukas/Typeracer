@@ -25,7 +25,6 @@ namespace Typeracer.Controllers
                     .ThenInclude(s => s.TypingData)
                 .Include(g => g.Statistics)
                     .ThenInclude(s => s.Paragraph)
-                .Include(g => g.CalculativeStatistics)
                 .FirstOrDefault(g => g.GameId == Guid.Parse(gameId));
             if (game == null)
             {

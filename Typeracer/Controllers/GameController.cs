@@ -20,17 +20,26 @@ namespace Typeracer.Controllers
         [HttpGet("{gameId}")]
         public IActionResult GetGameById(string gameId)
         {
-            Game? game = _context.Games
-                .Include(g => g.Statistics)
-                    .ThenInclude(s => s.TypingData)
-                .Include(g => g.Statistics)
-                    .ThenInclude(s => s.Paragraph)
-                .FirstOrDefault(g => g.GameId == Guid.Parse(gameId));
+            Guid gameIdGuid = Guid.Parse(gameId);
+            Game? game = GetGameById(gameIdGuid);
             if (game == null)
             {
                 return NotFound(new { message = "Game not found" });
             }
             return Ok(game);
+        }
+
+
+        public Game? GetGameById(Guid gameId)
+        {
+            Game? game = _context.Games
+                .Include(g => g.Statistics)
+                .ThenInclude(s => s.TypingData)
+                .Include(g => g.Statistics)
+                .ThenInclude(s => s.Paragraph)
+                .FirstOrDefault(g => g.GameId == gameId);
+
+            return game;
         }
     }
 }

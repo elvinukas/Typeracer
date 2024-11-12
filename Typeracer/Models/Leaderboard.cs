@@ -39,7 +39,10 @@ namespace Typeracer.Models
         
         public List<Player> GetLeaderboard()
         {
-            return players.OrderByDescending(p => p.BestWPM).ToList();
+            return players
+                .OrderByDescending(p => 
+                    p.WPMs.FirstOrDefault(w => w.WPMId == p.BestWPMID)?.Value ?? 0)
+                .ToList();
         }
         
         private void SaveLeaderboard()

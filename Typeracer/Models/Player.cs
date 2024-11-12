@@ -15,15 +15,9 @@ public class Player : IComparable<Player>
     public List<WPM> WPMs { get; set; } // each game average WPM should be added here
     public List<Accuracy> Accuracies { get; set; } // each game average accuracy should be added here
     
-    
     public Guid? BestWPMID { get; set; }
     public Guid? BestAccuracyID { get; set; }
     
-    [ForeignKey("BestWPMID")]
-    public WPM BestWPM { get; set; }
-    
-    [ForeignKey("BestAccuracyID")]
-    public Accuracy BestAccuracy { get; set; }
     
     // parameterless constructor for deserialization
     public Player()
@@ -39,55 +33,43 @@ public class Player : IComparable<Player>
         Username = username;
         WPMs = new List<WPM>();
         Accuracies = new List<Accuracy>();
-        BestWPMID = null;
-        BestAccuracyID = null;
         AddGameResult(initialWPM, initialAccuracy);
         Console.WriteLine($"Player created: {PlayerID} - {username}");
     }
     
     public void AddGameResult(double wpm, double accuracy)
     {
-        WPMs.Add(new WPM
+        WPM newWPM = new WPM
         {
             Value = wpm, PlayerId = PlayerID
-        });
+        };
         
-        Accuracies.Add(new Accuracy
+        Accuracy newAccuracy = new Accuracy
         {
             Value = accuracy, PlayerId = PlayerID
-        });
+        };
+        
+        WPMs.Add(newWPM);
+        Accuracies.Add(newAccuracy);
 
-        if (BestWPMID == null)
+        if (BestWPMID == null || wpm > WPMs.Find(w => w.WPMId == BestWPMID)?.Value)
         {
-            BestWPM = WPMs[0];
-            BestWPMID = WPMs[0].WPMId;
-            
+            BestWPMID = newWPM.WPMId;
         }
 
-        if (BestAccuracyID == null)
+        if (BestAccuracyID == null || accuracy > Accuracies.Find(a => a.AccuracyId == BestAccuracyID)?.Value)
         {
-            BestAccuracy = Accuracies[0];
-            BestAccuracyID = Accuracies[0].AccuracyId;
+            BestAccuracyID = newAccuracy.AccuracyId;
         }
         
-        if (wpm > BestWPM.Value)
-        {
-            BestWPM = WPMs[^1];
-            BestWPMID = WPMs[^1].WPMId; // if new wpm is larger than the existing best one, use the latest indexed/
-                                        // /(most recent) wpm entry as the best result
-        }
-
-        if (accuracy > BestAccuracy.Value)
-        {
-            BestAccuracy = Accuracies[^1];
-            BestAccuracyID = Accuracies[^1].AccuracyId;
-        }
+        
     }
 
     // comparing players by their best WPM
     public int CompareTo(Player otherPlayer)
     {
-        return BestWPM?.Value.CompareTo(otherPlayer.BestWPM?.Value) ?? 0;
+        return (WPMs.Find(w => w.WPMId == BestWPMID)?.Value ?? 0)
+            .CompareTo(otherPlayer.WPMs.Find(w => w.WPMId == otherPlayer.BestWPMID)?.Value ?? 0);
     }
 }
 

@@ -36,18 +36,6 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Player>()
             .HasKey(p => p.PlayerID);
 
-        modelBuilder.Entity<Player>()
-            .HasOne(p => p.BestWPM)
-            .WithOne()
-            .HasForeignKey<Player>(p => p.BestWPMID)
-            .IsRequired(false);
-
-        modelBuilder.Entity<Player>()
-            .HasOne(p => p.BestAccuracy)
-            .WithOne()
-            .HasForeignKey<Player>(p => p.BestAccuracyID)
-            .IsRequired(false);
-
         modelBuilder.Entity<Game>()
             .HasKey(g => g.GameId);
         

@@ -32,11 +32,19 @@ function GameData( { gameId }) {
     
 
     useEffect(() => {
-        fetch('/statistics/game-data.json')
-            .then(response => response.json())
-            .then(data => setGameData(data))
-            .catch(error => console.error('Error fetching game data:', error));
-    }, []);
+        fetch(`api/Game/${gameId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Game data not found");
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Fetched game data:", data);
+                setGameData(data);
+            })
+            .catch(error => console.error("Error fetching game data:", error));
+    }, [gameId]);
 
     if (showLeaderboard) {
         return <Leaderboard />;
@@ -46,24 +54,16 @@ function GameData( { gameId }) {
         return <div>...</div>; //loading screen
     }
     
-    const completionTimeInSeconds = (gameData.CompletionTime).toFixed(2);
     const startTime = new Date(gameData.Statistics.LocalStartTime);
-    const formattedStartTime = startTime.toLocaleTimeString('en-GB', { hour12: false });
     const finishTime = new Date(gameData.Statistics.LocalFinishTime);
+    const completionTimeInSeconds = ((finishTime - startTime) / 1000).toFixed(2);
+
+    const formattedStartTime = startTime.toLocaleTimeString('en-GB', { hour12: false });
     const formattedFinishTime = finishTime.toLocaleTimeString('en-GB', { hour12: false });
     
-    const wordsPerMinute = gameData.CalculativeStatistics.WordsPerMinute;
-    const accuracy = gameData.CalculativeStatistics.Accuracy;
-
-    // function generateUUID() {
-    //     // generating a random playerID
-    //     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    //         const r = Math.random() * 16 | 0;
-    //         const v = c === 'x' ? r : (r & 0x3 | 0x8);
-    //         return v.toString(16);
-    //     });
-    // }
-
+    const wordsPerMinute = gameData.Calcu|| "N/A";
+    const accuracy = gameData.Accuracy || "N/A";
+    
     const saveStatistics = async () => {
         const username = prompt("Įveskite savo vartotojo vardą:");
         if (!username) {

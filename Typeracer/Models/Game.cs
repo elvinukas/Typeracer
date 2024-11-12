@@ -17,7 +17,6 @@ public class Game
     public StatisticsModel Statistics { get; set; } // statistics of a game session
     public double CompletionTime { get; set; }
     public Gamemode Gamemode { get; set; }
-
     public Dictionary<string, object> CalculativeStatistics { get; private set; } = new Dictionary<string, object>();
     
     /*

@@ -52,7 +52,7 @@ public class AppDbContext : DbContext
             .HasKey(g => g.GameId);
 
         modelBuilder.Entity<Game>()
-            .Ignore(g => g.CalculativeStatistics);
+            .HasOne(g => g.CalculativeStatistics);
 
         modelBuilder.Entity<Game>()
             .HasOne(g => g.Player)

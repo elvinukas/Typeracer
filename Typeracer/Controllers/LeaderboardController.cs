@@ -10,17 +10,23 @@ namespace Typeracer.Controllers
     [ApiController]
     public class LeaderboardController : ControllerBase
     {
-        private readonly Leaderboard _leaderboard;
+        private readonly AppDbContext _context;
 
-        public LeaderboardController(Leaderboard leaderboard)
+        public LeaderboardController(AppDbContext context)
         {
-            _leaderboard = leaderboard;
+            _context = context;
         }
 
         [HttpGet]
         public IActionResult GetLeaderboard()
         {
-            return Ok(_leaderboard.GetLeaderboard());
+            List<Player> leaderboard = _context.Players
+                .Include(p => p.WPMs)
+                .Include(p => p.Accuracies)
+                .OrderByDescending(p => p.WPMs.Max(w => w.Value))
+                .ToList();
+
+            return Ok(leaderboard);
         }
 
         [HttpPost("save")]
@@ -80,12 +86,12 @@ namespace Typeracer.Controllers
                     transaction.Rollback();
                     throw;
                 }
-}
+            }
             
-
-            _leaderboard.AddOrUpdatePlayer(player);
-
             return Ok("Player added to game successfully!");
         }
+        
+        
+        
     }
 }

@@ -14,7 +14,20 @@ function Leaderboard() {
             })
             .then(data => {
                 console.log("Got data from server:", data);
-                setLeaderboardData(data);
+
+                const transformedData = data.map(player => {
+                    const bestWPMEntry = player.wpMs.find(w => w.wpmId === player.bestWPMID);
+                    const bestAccuracyEntry = player.accuracies.find(a => a.accuracyId === player.bestAccuracyID);
+                    return {
+                        ...player,
+                        bestWPM: bestWPMEntry ? bestWPMEntry.value : 0,
+                        bestAccuracy: bestAccuracyEntry ? bestAccuracyEntry.value : 0
+                    };
+                });
+                
+                console.log(transformedData);
+                
+                setLeaderboardData(transformedData);
             })
             .catch(error => console.error('Error when trying to get leaderboard:', error));
     }, []);

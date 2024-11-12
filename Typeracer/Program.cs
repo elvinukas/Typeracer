@@ -28,7 +28,7 @@ builder.Services.AddControllersWithViews();
 
 
 // Register the Leaderboard as a singleton
-builder.Services.AddSingleton<Leaderboard>();
+//builder.Services.AddSingleton<Leaderboard>();
 builder.Services.AddDbContext<AppDbContext>( options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 

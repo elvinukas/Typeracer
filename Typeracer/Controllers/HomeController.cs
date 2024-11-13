@@ -4,6 +4,8 @@ using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Mvc;
 using Typeracer.Models;
 using System.Text;
+using Typeracer.Context;
+using Typeracer.Exceptions;
 
 
 namespace Typeracer.Controllers;
@@ -11,10 +13,32 @@ namespace Typeracer.Controllers;
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
+    private AppDbContext _dbContext;
 
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController(ILogger<HomeController> logger, AppDbContext appDbContext)
     {
         _logger = logger;
+        _dbContext = appDbContext;
+
+        List<Gamemode> simpleGamemodes = new List<Gamemode>();
+        simpleGamemodes.Add(Gamemode.Standard);
+        simpleGamemodes.Add(Gamemode.Hardcore);
+
+        List<Gamemode> shortGamemode = new List<Gamemode>();
+        shortGamemode.Add(Gamemode.Short);
+        
+        try
+        {
+            InsertParagraphFileToDb("paragraph1.txt", simpleGamemodes);
+
+            InsertParagraphFileToDb("paragraph2.txt", shortGamemode);
+            
+        }
+        catch (NoAddToDBException e)
+        {
+            Console.WriteLine(e.Message, "Intentional? - " + e.Intentional);
+        }
+        
     }
 
     public IActionResult Index()
@@ -32,13 +56,10 @@ public class HomeController : Controller
         return View();
     }
 
-    public List<Paragraph> GetAllParagraphs(string paragraphName = "paragraph2.txt") // optional arguments
+    public List<Paragraph> GetAllParagraphs(string paragraphName, List<Gamemode> allowedGamemodes) // optional arguments
     {   
         // creating empty list of paragraphs
         List<Paragraph> paragraphList = new List<Paragraph>();
-        
-        // creating empty list of allowed gamemodes
-        List<Gamemode> allowedGamemodes = new List<Gamemode>() { Gamemode.Standard };
         
         // getting the file path
         var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Paragraphs", paragraphName);
@@ -64,10 +85,8 @@ public class HomeController : Controller
 
     public Paragraph GetRandomParagraph(Gamemode gamemode)
     {
-        List<Paragraph> allParagraphs = GetAllParagraphs();
-        
         // listing the paragraphs that are allowed for a gamemode
-        List<Paragraph> filteredParagraphs = allParagraphs.Where( // LINQ
+        List<Paragraph> filteredParagraphs = _dbContext.Paragraphs.Where( // LINQ
             p => p.AllowedGamemodes.Contains(gamemode)).ToList();
 
         if (!filteredParagraphs.Any()) // LINQ
@@ -84,9 +103,38 @@ public class HomeController : Controller
         return filteredParagraphs[random.Next(filteredParagraphs.Count)];
     }
 
+    public void InsertParagraphFileToDb(string filename, List<Gamemode> gamemodes)
+    {
+        List<Paragraph> paragraphs = GetAllParagraphs(filename, gamemodes);
+
+        using (var transaction = _dbContext.Database.BeginTransaction())
+        {
+            int i = 0;
+            foreach (Paragraph paragraph in paragraphs)
+            {
+                if (!_dbContext.Paragraphs.Any(p => p.Text == paragraph.Text))
+                {
+                    _dbContext.Paragraphs.Add(paragraph);
+                    ++i;
+                    Console.WriteLine("Added a new " + i + " paragraph!");
+                }
+            }
+
+            if (i == 0)
+            {
+                throw new NoAddToDBException("No new paragraphs found.", intentional: true);
+            }
+            
+            _dbContext.SaveChanges();
+            transaction.Commit();
+        }
+    }
+    
+
     public IActionResult GetParagraphText(Gamemode gamemode)
     {
-        Paragraph paragraph = GetRandomParagraph(gamemode: gamemode); // named arguments
+        //Paragraph paragraph = GetRandomParagraph(gamemode: gamemode); // named arguments
+        Paragraph paragraph = GetRandomParagraph(gamemode: Gamemode.Short); 
         if (paragraph == null)
         {
             return NotFound(new { message = "No paragraphs found for specified gamemode." });

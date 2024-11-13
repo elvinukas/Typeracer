@@ -3,6 +3,7 @@ import '../../wwwroot/css/GameData.css';
 import Leaderboard from './Leaderboard';
 function GameData( { gameId }) {
     const [gameData, setGameData] = useState(null);
+    const [paragraphData, setParagraphData] = useState(null);
     
     const [showLeaderboard, setShowLeaderboard] = useState(false);
 
@@ -42,9 +43,31 @@ function GameData( { gameId }) {
             .then(data => {
                 console.log("Fetched game data:", data);
                 setGameData(data);
+
+                if (data.statistics.paragraphId) {
+                    fetchParagraphData(data.statistics.paragraphId);
+                }
+                
             })
             .catch(error => console.error("Error fetching game data:", error));
     }, [gameId]);
+    
+    
+    function fetchParagraphData(paragraphId) {
+        fetch(`/api/paragraphs/${paragraphId}`)
+        .then(response => {
+            if (!response.ok) {
+                console.log("Failed to retrieve paragraph data");
+                throw new Error("Paragraph data not found");
+            }
+            return response.json();
+        })
+            .then(data => {
+                console.log("Fetched paragraph data:", data);
+                setParagraphData(data); // Save the paragraph data
+            })
+            .catch(error => console.error("Error fetching paragraph data:", error));
+    }
 
     if (showLeaderboard) {
         return <Leaderboard />;
@@ -53,8 +76,17 @@ function GameData( { gameId }) {
     if (!gameData) {
         return <div>Loading...</div>; //loading screen
     }
+
+    if (!gameData) {
+        return <div>Loading game data...</div>; // loading screen for game data
+    }
+
+    if (!paragraphData) {
+        return <div>Loading paragraph data...</div>; // loading screen for paragraph data
+    }
     
     console.log("This is the localStartTime: ", gameData.statistics.localStartTime);
+    console.log("This is totalAmountOfWords: ", paragraphData.totalAmountOfWords);
     
     
     const startTime = new Date(gameData.statistics.localStartTime);
@@ -148,7 +180,7 @@ function GameData( { gameId }) {
                             <p className="paragraph">ŽODŽIAI</p>
                         </div>
                         <div className="bottom-number">
-                            {gameData.statistics.paragraph.totalAmountOfWords}
+                            {paragraphData.totalAmountOfWords}
                         </div>
                     </div>
                     <div className="characters">
@@ -156,7 +188,7 @@ function GameData( { gameId }) {
                             <p className="paragraph">IŠ VISO/KLAIDOS</p>
                         </div>
                         <div className="bottom-number">
-                            {gameData.statistics.paragraph.totalAmountOfCharacters}/{gameData.statistics.numberOfWrongfulCharacters}
+                            {paragraphData.totalAmountOfCharacters}/{gameData.statistics.numberOfWrongfulCharacters}
                         </div>
                     </div>
                     <div className="startTime">

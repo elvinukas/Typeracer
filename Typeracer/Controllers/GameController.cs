@@ -35,8 +35,6 @@ namespace Typeracer.Controllers
             Game? game = _context.Games
                 .Include(g => g.Statistics)
                 .ThenInclude(s => s.TypingData)
-                .Include(g => g.Statistics)
-                .ThenInclude(s => s.Paragraph)
                 .FirstOrDefault(g => g.GameId == gameId);
 
             return game;

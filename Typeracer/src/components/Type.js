@@ -64,7 +64,7 @@ function Type() {
     const fetchParagraphText = async () => {
         let response = await fetch('/Home/GetParagraphText/');
         let jsonResponse = await response.json();
-        console.log(jsonResponse);
+        console.log("Json response: " + jsonResponse);
         
         const paragraphText = jsonResponse.text;
         setTypingText(paragraphText);
@@ -77,40 +77,29 @@ function Type() {
             ...prevData,
             Paragraph: jsonResponse
         }));
-
+        
         // Creating wordsInfoRef
         if (paragraphText) {
-            let tempWordsInfo = [];
-            let index = 0;
-            paragraphText.split(' ').forEach((word) => {
-                tempWordsInfo.push({
-                    word: word,
-                    startIndex: index,
-                    endIndex: index + word.length - 1,
-                    mistakes: 0,
-                    startTime: null,
-                    endTime: null,
-                });
-                index += word.length + 1; // +1 for the space
-            });
-            wordsInfoRef.current = tempWordsInfo;
-        }
+            createWordsInfoRef(paragraphText);
+       }
     };
-
-    useEffect(() => {
-        fetchParagraphText();
-
-        // Initializing Howler sound
-        wrongSoundRef.current = new Howl({
-            src: [wrongSound],
-            preload: true,
+    
+    const createWordsInfoRef = (paragraphText) => {
+        let tempWordsInfo = [];
+        let index = 0;
+        paragraphText.split(' ').forEach((word) => {
+            tempWordsInfo.push({
+                word: word,
+                startIndex: index,
+                endIndex: index + word.length - 1,
+                mistakes: 0,
+                startTime: null,
+                endTime: null,
+            });
+            index += word.length + 1; // +1 for the space
         });
-
-        return () => {
-            clearInterval(intervalRef.current);
-            clearTimeout(blinkTimeoutRef.current);
-        };
-    }, []);
+        wordsInfoRef.current = tempWordsInfo;
+    }
 
     const handleKeyDown = async (event) => {
         const inputCharacter = event.key;
@@ -337,8 +326,7 @@ function Type() {
     const formatDateTime = (date) => {
         return date.toISOString().replace('Z', '');
     };
-
-
+    
     const sendStatisticsData = async (dataToSend) => {
         // Logging the data being sent
         console.log('Data being sent:', JSON.stringify(dataToSend, null, 2));
@@ -364,7 +352,19 @@ function Type() {
         }
     };
 
-    const resetStatisticsData = () => {
+    const formatTime = (time) => {
+        const seconds = Math.floor((time / 1000) % 60);
+        const minutes = Math.floor((time / (1000 * 60)) % 60);
+        return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    };
+
+    const resetChronometer = () => {
+        clearInterval(intervalRef.current);
+        setStartTime(null);
+        setElapsedTime(0);
+    };
+
+    const resetStateForRestartButton = () => {
         setStatisticsData({
             LocalStartTime: null,
             LocalFinishTime: null,
@@ -374,7 +374,49 @@ function Type() {
             NumberOfWrongfulCharacters: 0,
             TypingData: []
         });
-    };
+        createWordsInfoRef(initialText);
+
+        resetChronometer();
+        setTypingText(initialText);
+        setCurrentIndex(0);
+        setIncorrectChars({});
+        setFirstErrorIndex(null);
+        setConsecutiveRedCount(0);
+    }
+
+    const resetStateForNextTextButton = () => {
+        setStatisticsData({
+            LocalStartTime: null,
+            LocalFinishTime: null,
+            Paragraph: null,
+            TypedAmountOfWords: 0,
+            TypedAmountOfCharacters: 0,
+            NumberOfWrongfulCharacters: 0,
+            TypingData: []
+        });
+
+        resetChronometer();
+        setCurrentIndex(0);
+        setIncorrectChars({});
+        setFirstErrorIndex(null);
+        setConsecutiveRedCount(0);
+        fetchParagraphText();
+    }
+
+    useEffect(() => {
+        fetchParagraphText();
+
+        // Initializing Howler sound
+        wrongSoundRef.current = new Howl({
+            src: [wrongSound],
+            preload: true,
+        });
+
+        return () => {
+            clearInterval(intervalRef.current);
+            clearTimeout(blinkTimeoutRef.current);
+        };
+    }, []);
 
     useEffect(() => {
         document.addEventListener('keydown', handleKeyDown);
@@ -408,18 +450,6 @@ function Type() {
             buttons.forEach(button => button.removeEventListener('keydown', preventSpacebarDefault));
         };
     }, []);
-
-    const formatTime = (time) => {
-        const seconds = Math.floor((time / 1000) % 60);
-        const minutes = Math.floor((time / (1000 * 60)) % 60);
-        return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-    };
-
-    const resetChronometer = () => {
-        clearInterval(intervalRef.current);
-        setStartTime(null);
-        setElapsedTime(0);
-    };
 
     useEffect(() => {
         if (isComplete) {
@@ -477,62 +507,14 @@ function Type() {
 
             <div className="button-container">
                 <button className="restart-button" onClick={() => {
-                    resetChronometer();
-                    resetStatisticsData();
-                    setTypingText(initialText);
-                    setCurrentIndex(0);
-                    setIncorrectChars({});
-                    setFirstErrorIndex(null);
-                    setConsecutiveRedCount(0);
-                    buildWordsInfo(initialText);
+                    resetStateForRestartButton();
                 }}>
                     Pradėti iš naujo
                 </button>
                 <button
                     className="next-text-button"
-                    onClick={async () => {
-                        resetChronometer();
-                        let response = await fetch('/Home/GetParagraphText/');
-                        let jsonResponse = await response.json();
-                        var paragraphText = jsonResponse.text;
-                        setTypingText(paragraphText);
-                        setInitialText(paragraphText);
-
-                        // Calculating the total amount of words and characters
-                        const totalWords = jsonResponse.text.trim().split(/\s+/).length;
-
-                        setStatisticsData({
-                            LocalStartTime: null,
-                            LocalFinishTime: null,
-                            Paragraph: null,
-                            TypedAmountOfWords: 0,
-                            TypedAmountOfCharacters: 0,
-                            NumberOfWrongfulCharacters: 0,
-                            TypingData: []
-                        });
-
-                        // Creating wordsInfoRef
-                        if (jsonResponse.text) {
-                            let tempWordsInfo = [];
-                            let index = 0;
-                            jsonResponse.text.split(' ').forEach((word) => {
-                                tempWordsInfo.push({
-                                    word: word,
-                                    startIndex: index,
-                                    endIndex: index + word.length - 1,
-                                    mistakes: 0,
-                                    startTime: null,
-                                    endTime: null,
-                                });
-                                index += word.length + 1;
-                            });
-                            wordsInfoRef.current = tempWordsInfo;
-                        }
-
-                        setCurrentIndex(0);
-                        setIncorrectChars({});
-                        setFirstErrorIndex(null);
-                        setConsecutiveRedCount(0);
+                    onClick={() => {
+                        resetStateForNextTextButton();
                     }}
                 >
                     Kitas tekstas

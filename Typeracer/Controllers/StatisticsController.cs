@@ -12,21 +12,28 @@ namespace Typeracer.Controllers;
 [Route("api/[controller]")]
 public class StatisticsController : ControllerBase
 {
+    private readonly AppDbContext _context;
+    
+    public StatisticsController(AppDbContext context)
+    {
+        _context = context;
+    }
+    
     
     [HttpPost("save")]
-    public IActionResult Save(StatisticsModel statisticsData, AppDbContext context)
+    public async Task<IActionResult> Save([FromBody] StatisticsModel statisticsData)
     {
+        if (statisticsData == null)
+        {
+            return BadRequest("Invalid data: statisticsData is null.");
+        }
+        
         if (!ModelState.IsValid)
         {
             var errors = ModelState.Values.SelectMany(v => v.Errors) // LINQ
                 .Select(e => e.ErrorMessage) // LINQ
                 .ToList(); // LINQ
             return BadRequest(new { message = "Invalid data.", errors });
-        }
-
-        if (statisticsData == null)
-        {
-            return BadRequest("Invalid data: statisticsData is null.");
         }
 
         statisticsData.LocalStartTime = DateTime.SpecifyKind(statisticsData.LocalStartTime.Value, DateTimeKind.Utc);
@@ -41,10 +48,15 @@ public class StatisticsController : ControllerBase
         
         // initiating a game object with all the statistics data
         Game game = new Game(statisticsData);
-        using (context)
+        _context.Games.Add(game);
+
+        try
         {
-            context.Games.Add(game);
-            context.SaveChanges();
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex)
+        {
+            return StatusCode(500, new { message = "An error occurred while saving the game data.", error = ex.Message });
         }
         
         return Ok(new { message = "Statistics received and game information saved to database", gameId = game.GameId });

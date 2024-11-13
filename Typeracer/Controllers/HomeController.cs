@@ -32,7 +32,7 @@ public class HomeController : Controller
         return View();
     }
 
-    public List<Paragraph> GetAllParagraphs(string paragraphName = "paragraph1.txt") // optional arguments
+    public List<Paragraph> GetAllParagraphs(string paragraphName = "paragraph2.txt") // optional arguments
     {   
         // creating empty list of paragraphs
         List<Paragraph> paragraphList = new List<Paragraph>();

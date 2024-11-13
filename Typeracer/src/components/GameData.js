@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import '../../wwwroot/css/GameData.css';
 import Leaderboard from './Leaderboard';
-function GameData() {
+function GameData( { gameId }) {
     const [gameData, setGameData] = useState(null);
     
     const [showLeaderboard, setShowLeaderboard] = useState(false);
@@ -32,60 +32,58 @@ function GameData() {
     
 
     useEffect(() => {
-        fetch('/statistics/game-data.json')
-            .then(response => response.json())
-            .then(data => setGameData(data))
-            .catch(error => console.error('Error fetching game data:', error));
-    }, []);
+        fetch(`api/Game/${gameId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Game data not found");
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Fetched game data:", data);
+                setGameData(data);
+            })
+            .catch(error => console.error("Error fetching game data:", error));
+    }, [gameId]);
 
     if (showLeaderboard) {
         return <Leaderboard />;
     }
 
     if (!gameData) {
-        return <div>...</div>; //loading screen
+        return <div>Loading...</div>; //loading screen
     }
     
-    const completionTimeInSeconds = (gameData.CompletionTime).toFixed(2);
-    const startTime = new Date(gameData.Statistics.LocalStartTime);
+    console.log("This is the localStartTime: ", gameData.statistics.localStartTime);
+    
+    
+    const startTime = new Date(gameData.statistics.localStartTime);
+    const finishTime = new Date(gameData.statistics.localFinishTime);
+    const completionTimeInSeconds = ((finishTime - startTime) / 1000).toFixed(2);
+
     const formattedStartTime = startTime.toLocaleTimeString('en-GB', { hour12: false });
-    const finishTime = new Date(gameData.Statistics.LocalFinishTime);
     const formattedFinishTime = finishTime.toLocaleTimeString('en-GB', { hour12: false });
     
-    const wordsPerMinute = gameData.CalculativeStatistics.WordsPerMinute;
-    const accuracy = gameData.CalculativeStatistics.Accuracy;
-
-    function generateUUID() {
-        // generating a random playerID
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-            const r = Math.random() * 16 | 0;
-            const v = c === 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
-        });
-    }
-
+    const wordsPerMinute = gameData.statistics.wordsPerMinute|| "N/A";
+    const accuracy = gameData.statistics.accuracy || "N/A";
+    
     const saveStatistics = async () => {
         const username = prompt("Įveskite savo vartotojo vardą:");
         if (!username) {
             alert("Vartotojo vardas būtinas!");
             return;
         }
-
-        let playerID = localStorage.getItem('playerID');
-        if (!playerID) {
-            playerID = generateUUID();
-            localStorage.setItem('playerID', playerID);
-        }
-        console.log("Generated or retrieved PlayerID: ", playerID);
+        
+        //console.log("Generated or retrieved PlayerID: ", playerID);
 
         const playerData = {
-            PlayerID: playerID,
             Username: username,
-            BestWPM: gameData.CalculativeStatistics.WordsPerMinute,
-            BestAccuracy: gameData.CalculativeStatistics.Accuracy
+            BestWPM: gameData.statistics.wordsPerMinute,
+            BestAccuracy: gameData.statistics.accuracy,
+            GameId: gameId
         };
 
-        console.log('Sending player data:', playerData);
+        console.log('Sending player and associated gameID data:', playerData);
 
         try {
             const response = await fetch('/api/leaderboard/save', {
@@ -150,7 +148,7 @@ function GameData() {
                             <p className="paragraph">ŽODŽIAI</p>
                         </div>
                         <div className="bottom-number">
-                            {gameData.Statistics.Paragraph.TotalAmountOfWords}
+                            {gameData.statistics.paragraph.totalAmountOfWords}
                         </div>
                     </div>
                     <div className="characters">
@@ -158,7 +156,7 @@ function GameData() {
                             <p className="paragraph">IŠ VISO/KLAIDOS</p>
                         </div>
                         <div className="bottom-number">
-                            {gameData.Statistics.Paragraph.TotalAmountOfCharacters}/{gameData.Statistics.NumberOfWrongfulCharacters}
+                            {gameData.statistics.paragraph.totalAmountOfCharacters}/{gameData.statistics.numberOfWrongfulCharacters}
                         </div>
                     </div>
                     <div className="startTime">

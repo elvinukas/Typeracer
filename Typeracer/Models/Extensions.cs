@@ -1,3 +1,5 @@
+using Typeracer.Context;
+
 namespace Typeracer.Models;
 
 public static class Extensions
@@ -6,25 +8,29 @@ public static class Extensions
     private static double averageAccuracy;
     private static double bestWPM;
     
-    public static double CalculateAverageWPM(this Player player)
+    public static double CalculateAverageWPM(this Player player, AppDbContext context)
     {
-        if (player.WPMs == null || player.WPMs.Count == 0)
+        List<WPM> wpms = context.Wpms.Where(
+            w => w.PlayerId == player.PlayerID).ToList();
+        if (wpms.Count == 0)
         {
             return -1;
         }
         
-        averageWPM = player.WPMs.Average(); // LINQ
+        averageWPM = wpms.Average(w => w.Value); // LINQ
         return averageWPM;
     }
 
-    public static double CalculateAverageAccuracy(this Player player)
+    public static double CalculateAverageAccuracy(this Player player, AppDbContext context)
     {
-        if (player.Accuracies == null || player.Accuracies.Count == 0)
+        List<Accuracy> accuracies = context.Accuracies.Where(
+            a => a.PlayerId == player.PlayerID).ToList();
+        if (accuracies.Count == 0)
         {
             return -1;
         }
         
-        averageAccuracy = player.Accuracies.Average(); // LINQ
+        averageAccuracy = accuracies.Average(a => a.Value); // LINQ
         return averageAccuracy;
     }
 
@@ -35,7 +41,7 @@ public static class Extensions
             return -1;
         }
         
-        bestWPM = player.WPMs.Max(); // LINQ
+        //bestWPM = player.WPMs.Max(); // LINQ
         return bestWPM;
     }
 
@@ -48,12 +54,12 @@ public static class Extensions
 
         if (averageWPM == 0)
         {
-            averageWPM = player.WPMs.Average(); // LINQ
+            //averageWPM = player.WPMs.Average(); // LINQ
         }
 
         if (averageAccuracy == 0)
         {
-            averageAccuracy = player.Accuracies.Average(); // LINQ
+            //averageAccuracy = player.Accuracies.Average(); // LINQ
         }
         
         return (averageWPM * averageAccuracy) / 100;

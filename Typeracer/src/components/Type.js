@@ -15,6 +15,7 @@ function Type() {
     const [elapsedTime, setElapsedTime] = useState(0);
     const [isComplete, setIsComplete] = useState(false);
     const [showGameData, setShowGameData] = useState(false);
+    const [gameId, setGameId] = useState(null);
     
     // used for checking when was the last keypress recorded - text cursor blinker
     const [lastKeyPressTime, setLastKeyPressTime] = useState(Date.now());
@@ -39,6 +40,26 @@ function Type() {
     
     // Used for storing word information
     const wordsInfoRef = useRef([]);
+    
+    // used for creating info about words from the text
+    const buildWordsInfo = (text) => {
+        if (text) {
+            let tempWordsInfo = [];
+            let index = 0;
+            text.split(' ').forEach((word) => {
+                tempWordsInfo.push({
+                    word: word,
+                    startIndex: index,
+                    endIndex: index + word.length - 1,
+                    mistakes: 0,
+                    startTime: null,
+                    endTime: null,
+                });
+                index += word.length + 1; // +1 for the space
+            });
+            wordsInfoRef.current = tempWordsInfo;
+        }
+    };
 
     const fetchParagraphText = async () => {
         let response = await fetch('/Home/GetParagraphText/');
@@ -48,6 +69,7 @@ function Type() {
         const paragraphText = jsonResponse.text;
         setTypingText(paragraphText);
         setInitialText(paragraphText);
+        buildWordsInfo(paragraphText);
 
         // Calculating the total amount of words and characters
         const totalWords = paragraphText.trim().split(/\s+/).length;
@@ -258,8 +280,8 @@ function Type() {
             // Preparing the typingData array
             const typingData = wordsInfoRef.current.map(wordInfo => ({
                 Word: wordInfo.word,
-                BeginningTimestampWord: wordInfo.startTime ? formatDateTime(new Date(wordInfo.startTime)) : null,
-                EndingTimestampWord: wordInfo.endTime ? formatDateTime(new Date(wordInfo.endTime)) : null,
+                BeginningTimestampWord: wordInfo.startTime ? new Date(wordInfo.startTime).toISOString() : null,
+                EndingTimestampWord: wordInfo.endTime ? new Date(wordInfo.endTime).toISOString() : null,
                 AmountOfMistakesInWord: wordInfo.mistakes
             }));
 
@@ -284,8 +306,8 @@ function Type() {
 
             // Assembling the data to send
             const dataToSend = {
-                LocalStartTime: updatedStatisticsData.LocalStartTime ? formatDateTime(updatedStatisticsData.LocalStartTime) : null,
-                LocalFinishTime: updatedStatisticsData.LocalFinishTime ? formatDateTime(updatedStatisticsData.LocalFinishTime) : null,
+                LocalStartTime: updatedStatisticsData.LocalStartTime ? new Date(updatedStatisticsData.LocalStartTime).toISOString() : null,
+                LocalFinishTime: updatedStatisticsData.LocalFinishTime ? new Date(updatedStatisticsData.LocalFinishTime).toISOString() : null,
                 Paragraph: updatedStatisticsData.Paragraph,
                 TypedAmountOfWords: updatedStatisticsData.TypedAmountOfWords,
                 TypedAmountOfCharacters: updatedStatisticsData.TypedAmountOfCharacters,
@@ -322,6 +344,9 @@ function Type() {
                 console.error('Error response:', errorResponse);
                 throw new Error('Network response was not ok');
             }
+            const responseData = await response.json();
+            console.log("Received gameID: ", responseData.gameId);
+            setGameId(responseData.gameId);
         } catch (error) {
             console.error('Error sending statistics data:', error);
         }
@@ -429,7 +454,11 @@ function Type() {
     useEffect(() => {
         if (isComplete) {
             fetch('/api/graph/generate', { // calls the API endpoint to generate the graph
-                method: 'POST'
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(gameId)
             })
                 .then(response => response.json())
                 .then(data => {
@@ -438,10 +467,10 @@ function Type() {
                 })
                 .catch(error => console.error('Error generating graph:', error));
         }
-    }, [isComplete]);
+    }, [isComplete, gameId]);
 
     if (showGameData) { // loads GameData.js page
-        return <GameData />;
+        return <GameData gameId={gameId}/>;
     }
 
     return (

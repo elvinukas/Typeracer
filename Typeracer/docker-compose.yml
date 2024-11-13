@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:17 
+    environment:
+      POSTGRES_USER: dbadmin
+      POSTGRES_PASSWORD: adminpass
+      POSTGRES_DB: typeracer_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data   # naming of volume
+    ports:
+      - "5432:5432"   # maps the container's port 5432 to host port 5432
+
+volumes:
+  postgres_data:  # defining a volume

@@ -58,6 +58,9 @@ public class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey(s => s.ParagraphId);
         
+        //  .HasIndex(s => s.ParagraphId)
+        //            .IsUnique(false);
+        //        
         modelBuilder.Entity<Paragraph>()
             .HasKey(p => p.Id);
 

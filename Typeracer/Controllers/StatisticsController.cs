@@ -37,7 +37,15 @@ public class StatisticsController : ControllerBase
             data.BeginningTimestampWord = DateTime.SpecifyKind(data.BeginningTimestampWord, DateTimeKind.Utc);
             data.EndingTimestampWord = DateTime.SpecifyKind(data.EndingTimestampWord, DateTimeKind.Utc);
         }
+        
+        var existingParagraph = context.Paragraphs
+            .FirstOrDefault(p => p.Id == statisticsData.ParagraphId);
 
+        if (existingParagraph != null)
+        {
+            // Attach the existing paragraph to the statisticsData
+            statisticsData.Paragraph = existingParagraph;
+        }
         
         // initiating a game object with all the statistics data
         Game game = new Game(statisticsData);

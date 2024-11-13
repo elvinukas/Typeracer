@@ -4,7 +4,7 @@ using Typeracer.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Typeracer.Context;
-
+using Typeracer.Serivces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +31,9 @@ builder.Services.AddControllersWithViews();
 //builder.Services.AddSingleton<Leaderboard>();
 builder.Services.AddDbContext<AppDbContext>( options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Add the GraphService
+builder.Services.AddScoped<IGraphService, GraphService>();
 
 var app = builder.Build();
 

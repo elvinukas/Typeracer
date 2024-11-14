@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Typeracer.Context;
 using Typeracer.Models;
-using System.Transactions;
 
 namespace Typeracer.Controllers
 {

@@ -1,10 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using OxyPlot;
 using OxyPlot.Series;
 using OxyPlot.WindowsForms;
@@ -19,14 +15,20 @@ public class GraphController : ControllerBase
 {
     public Game? Game { get; set; }
     public Paragraph? Paragraph { get; set; }
+    private readonly AppDbContext _dbContext;
+
+    public GraphController(AppDbContext context)
+    {
+        _dbContext = context;
+    }
     
     
     [HttpPost("generate")]
-    public IActionResult GenerateGraph([FromBody] string gameId, AppDbContext context)
+    public IActionResult GenerateGraph([FromBody] string gameId)
     {
         try
         {
-            Game = context.Games
+            Game = _dbContext.Games
                 .Include(g => g.Statistics)
                     .ThenInclude(s => s.TypingData)
                 .FirstOrDefault(g => g.GameId == Guid.Parse(gameId));
@@ -37,7 +39,7 @@ public class GraphController : ControllerBase
             }
             
             StatisticsModel statistics = Game.Statistics;
-            Paragraph = context.Paragraphs
+            Paragraph = _dbContext.Paragraphs
                 .FirstOrDefault(p => p.Id == statistics.ParagraphId); 
 
             if (Paragraph == null)

@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Typeracer.Context;
 using Typeracer.Models;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
 
 namespace Typeracer.Controllers

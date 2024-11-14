@@ -1,6 +1,4 @@
 using System.Diagnostics;
-using System.Net.Mime;
-using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Mvc;
 using Typeracer.Models;
 using System.Text;
@@ -13,7 +11,7 @@ namespace Typeracer.Controllers;
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
-    private AppDbContext _dbContext;
+    private readonly AppDbContext _dbContext;
 
     public HomeController(ILogger<HomeController> logger, AppDbContext appDbContext)
     {

@@ -1,10 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using OxyPlot;
 using OxyPlot.Series;
 using OxyPlot.WindowsForms;
@@ -17,27 +13,44 @@ using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 [Route("api/[controller]")]
 public class GraphController : ControllerBase
 {
+    public Game? Game { get; set; }
+    public Paragraph? Paragraph { get; set; }
+    private readonly AppDbContext _dbContext;
+
+    public GraphController(AppDbContext context)
+    {
+        _dbContext = context;
+    }
+    
+    
     [HttpPost("generate")]
-    public IActionResult GenerateGraph([FromBody] string gameId, AppDbContext context)
+    public IActionResult GenerateGraph([FromBody] string gameId)
     {
         try
         {
-            Game? game = context.Games
+            Game = _dbContext.Games
                 .Include(g => g.Statistics)
                     .ThenInclude(s => s.TypingData)
-                .Include(g => g.Statistics)
-                    .ThenInclude(s => s.Paragraph)
                 .FirstOrDefault(g => g.GameId == Guid.Parse(gameId));
             
-            if (game == null)
+            if (Game == null)
             {
                 return NotFound(new { message = "Game not found" });
+            }
+            
+            StatisticsModel statistics = Game.Statistics;
+            Paragraph = _dbContext.Paragraphs
+                .FirstOrDefault(p => p.Id == statistics.ParagraphId); 
+
+            if (Paragraph == null)
+            {
+                return NotFound(new { message = "Paragraph not found" });
             }
             
             
             
             Console.WriteLine("Graph controller received gameId: ", gameId);
-            GenerateGraphInternal(game, "red");
+            GenerateGraphInternal(Game, "red");
             return Ok(new { message = "Graph generated successfully" });
         }
         catch (Exception ex)
@@ -50,7 +63,7 @@ public class GraphController : ControllerBase
     {
         
         var typingData = game.Statistics.TypingData;
-        var totalWords = game.Statistics.Paragraph.TotalAmountOfWords;
+        var totalWords = Paragraph.TotalAmountOfWords;
         var wpmData = new double[totalWords];
         var accuracyData = new double[totalWords];
 

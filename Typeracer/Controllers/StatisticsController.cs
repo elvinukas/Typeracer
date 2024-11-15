@@ -1,9 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Typeracer.Models;
-using System.IO;
-using System.Text.Encodings.Web;
-using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
 using Typeracer.Context;
 
 namespace Typeracer.Controllers;
@@ -12,9 +8,30 @@ namespace Typeracer.Controllers;
 [Route("api/[controller]")]
 public class StatisticsController : ControllerBase
 {
+    public readonly AppDbContext _DbContext;
+
+    public StatisticsController(AppDbContext context)
+    {
+        _DbContext = context;
+    }
+
+    [HttpGet("{statisticsId}")]
+    public IActionResult GetStatistics(string statisticsId)
+    {
+        StatisticsModel? statisticsModel = _DbContext.Statistics
+            .FirstOrDefault(s => s.StatisticsId == Guid.Parse(statisticsId));
+
+        if (statisticsModel == null)
+        {
+            return NotFound("Such statistics don't exist.");
+        }
+
+        return Ok(statisticsModel);
+    }
+    
     
     [HttpPost("save")]
-    public IActionResult Save(StatisticsModel statisticsData, AppDbContext context)
+    public IActionResult Save(StatisticsModel statisticsData)
     {
         if (!ModelState.IsValid)
         {
@@ -37,14 +54,13 @@ public class StatisticsController : ControllerBase
             data.BeginningTimestampWord = DateTime.SpecifyKind(data.BeginningTimestampWord, DateTimeKind.Utc);
             data.EndingTimestampWord = DateTime.SpecifyKind(data.EndingTimestampWord, DateTimeKind.Utc);
         }
-
         
         // initiating a game object with all the statistics data
         Game game = new Game(statisticsData);
-        using (context)
+        using (_DbContext)
         {
-            context.Games.Add(game);
-            context.SaveChanges();
+            _DbContext.Games.Add(game);
+            _DbContext.SaveChanges();
         }
         
         return Ok(new { message = "Statistics received and game information saved to database", gameId = game.GameId });

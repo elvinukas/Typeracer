@@ -54,10 +54,14 @@ public class AppDbContext : DbContext
             .HasKey(s => s.StatisticsId);
 
         modelBuilder.Entity<StatisticsModel>()
-            .HasOne(s => s.Paragraph)
-            .WithMany()
-            .HasForeignKey(s => s.ParagraphId);
+            .HasOne<Paragraph>()                     // Specifies a relationship to the Paragraph entity
+            .WithMany()                               // A Paragraph can be associated with many StatisticsModel records
+            .HasForeignKey(s => s.ParagraphId)        // Points to the ParagraphId as the foreign key
+            .OnDelete(DeleteBehavior.SetNull);  
         
+        //  .HasIndex(s => s.ParagraphId)
+        //            .IsUnique(false);
+        //        
         modelBuilder.Entity<Paragraph>()
             .HasKey(p => p.Id);
 

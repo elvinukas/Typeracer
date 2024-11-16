@@ -4,7 +4,7 @@ using Typeracer.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Typeracer.Context;
-using Typeracer.Serivces;
+using Typeracer.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

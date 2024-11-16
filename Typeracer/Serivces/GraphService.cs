@@ -11,11 +11,9 @@ using System.Runtime.InteropServices;
 
 public class GraphService : IGraphService
 {
-    public async Task GenerateGraphAsync (Game game, string WPMColor = "blue") // optional arguments
+    public async Task GenerateGraphAsync (Game game, int totalWords, string WPMColor = "blue") // optional arguments
     {
-        
         var typingData = game.Statistics.TypingData;
-        var totalWords = game.Statistics.Paragraph.TotalAmountOfWords;
         var wpmData = new double[totalWords];
         var accuracyData = new double[totalWords];
 

@@ -8,37 +8,41 @@ using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 [Route("api/[controller]")]
 public class GraphController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly AppDbContext _dbContext;
     private readonly IGraphService _graphService;
-    
-    public GraphController(AppDbContext context, IGraphService graphService)
+
+    public GraphController(AppDbContext dbContext, IGraphService graphService)
     {
-        _context = context;
+        _dbContext = dbContext;
         _graphService = graphService;
     }
-    
-    
+
     [HttpPost("generate")]
     public async Task<IActionResult> GenerateGraph([FromBody] string gameId)
     {
         try
         {
-            Game? game = await _context.Games
+            var game = await _dbContext.Games
                 .Include(g => g.Statistics)
-                    .ThenInclude(s => s.TypingData)
-                .Include(g => g.Statistics)
-                    .ThenInclude(s => s.Paragraph)
+                .ThenInclude(s => s.TypingData)
                 .FirstOrDefaultAsync(g => g.GameId == Guid.Parse(gameId));
-            
+
             if (game == null)
             {
                 return NotFound(new { message = "Game not found" });
             }
-            
-            
-            
-            Console.WriteLine("Graph controller received gameId: ", gameId);
-            await _graphService.GenerateGraphAsync(game, "red");
+
+            var paragraph = await _dbContext.Paragraphs
+                .FirstOrDefaultAsync(p => p.Id == game.Statistics.ParagraphId);
+
+            if (paragraph == null)
+            {
+                return NotFound(new { message = "Paragraph not found" });
+            }
+
+            // generate graph with paragraph which is received through the database
+            await _graphService.GenerateGraphAsync(game, paragraph.TotalAmountOfWords, "red");
+
             return Ok(new { message = "Graph generated successfully" });
         }
         catch (Exception ex)

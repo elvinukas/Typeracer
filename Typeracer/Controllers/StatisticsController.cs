@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Typeracer.Models;
 using Typeracer.Context;
 
@@ -54,7 +55,7 @@ public class StatisticsController : ControllerBase
             data.EndingTimestampWord = DateTime.SpecifyKind(data.EndingTimestampWord, DateTimeKind.Utc);
         }
 
-        // Initiating a game object with all the statistics data
+        // initiating a game object with all the statistics data
         Game game = new Game(statisticsData);
         _context.Games.Add(game);
 

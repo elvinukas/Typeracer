@@ -3,5 +3,5 @@ using System.Threading.Tasks;
 
 public interface IGraphService
 {
-    Task GenerateGraphAsync(Game game, string WPMColor = "blue");
+    Task GenerateGraphAsync(Game game, int totalWords, string WPMColor = "blue");
 }

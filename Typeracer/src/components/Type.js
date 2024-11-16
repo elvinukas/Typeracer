@@ -26,6 +26,7 @@ function Type() {
         LocalStartTime: null,
         LocalFinishTime: null,
         Paragraph: null,
+        ParagraphId: null,
         TypedAmountOfWords: 0,
         TypedAmountOfCharacters: 0,
         NumberOfWrongfulCharacters: 0,
@@ -67,6 +68,7 @@ function Type() {
         console.log("Json response: " + jsonResponse);
         
         const paragraphText = jsonResponse.text;
+        const paragraphId = jsonResponse.id;
         setTypingText(paragraphText);
         setInitialText(paragraphText);
         buildWordsInfo(paragraphText);
@@ -75,6 +77,7 @@ function Type() {
         const totalWords = paragraphText.trim().split(/\s+/).length;
         setStatisticsData(prevData => ({
             ...prevData,
+            ParagraphId: paragraphId,
             Paragraph: jsonResponse
         }));
         
@@ -308,7 +311,7 @@ function Type() {
             const dataToSend = {
                 LocalStartTime: updatedStatisticsData.LocalStartTime ? new Date(updatedStatisticsData.LocalStartTime).toISOString() : null,
                 LocalFinishTime: updatedStatisticsData.LocalFinishTime ? new Date(updatedStatisticsData.LocalFinishTime).toISOString() : null,
-                Paragraph: updatedStatisticsData.Paragraph,
+                ParagraphId: updatedStatisticsData.ParagraphId,
                 TypedAmountOfWords: updatedStatisticsData.TypedAmountOfWords,
                 TypedAmountOfCharacters: updatedStatisticsData.TypedAmountOfCharacters,
                 NumberOfWrongfulCharacters: updatedStatisticsData.NumberOfWrongfulCharacters,

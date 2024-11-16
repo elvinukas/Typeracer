@@ -1,6 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Data;
 
 namespace Typeracer.Models;
 
@@ -13,9 +11,7 @@ public record StatisticsModel
     public DateTime? LocalStartTime { get; set; } // start date and time of the game
     public DateTime? LocalFinishTime { get; set; } // end date and time of the game
     
-    [ForeignKey("ParagraphId")]
     public Guid ParagraphId { get; set; }
-    public Paragraph Paragraph { get; set; }
     public int TypedAmountOfWords { get; set; }
     public int TypedAmountOfCharacters { get; set; }
     public int NumberOfWrongfulCharacters { get; set; }

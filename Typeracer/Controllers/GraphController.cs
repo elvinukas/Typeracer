@@ -1,18 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.IO;
-using System.Runtime.InteropServices;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using OxyPlot;
-using OxyPlot.Series;
-using OxyPlot.WindowsForms;
-using OxyPlot.SkiaSharp;
 using Typeracer.Context;
 using Typeracer.Models;
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
-using Typeracer.Serivces;
 
 [ApiController]
 [Route("api/[controller]")]

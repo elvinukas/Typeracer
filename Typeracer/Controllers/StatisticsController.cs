@@ -1,9 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Typeracer.Models;
-using System.IO;
-using System.Text.Encodings.Web;
-using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
 using Typeracer.Context;
 
 namespace Typeracer.Controllers;
@@ -13,13 +9,26 @@ namespace Typeracer.Controllers;
 public class StatisticsController : ControllerBase
 {
     private readonly AppDbContext _context;
-    
+
     public StatisticsController(AppDbContext context)
     {
         _context = context;
     }
-    
-    
+
+    [HttpGet("{statisticsId}")]
+    public IActionResult GetStatistics(string statisticsId)
+    {
+        StatisticsModel? statisticsModel = _context.Statistics
+            .FirstOrDefault(s => s.StatisticsId == Guid.Parse(statisticsId));
+
+        if (statisticsModel == null)
+        {
+            return NotFound("Such statistics don't exist.");
+        }
+
+        return Ok(statisticsModel);
+    }
+
     [HttpPost("save")]
     public async Task<IActionResult> Save([FromBody] StatisticsModel statisticsData)
     {
@@ -27,7 +36,7 @@ public class StatisticsController : ControllerBase
         {
             return BadRequest("Invalid data: statisticsData is null.");
         }
-        
+
         if (!ModelState.IsValid)
         {
             var errors = ModelState.Values.SelectMany(v => v.Errors) // LINQ
@@ -45,8 +54,7 @@ public class StatisticsController : ControllerBase
             data.EndingTimestampWord = DateTime.SpecifyKind(data.EndingTimestampWord, DateTimeKind.Utc);
         }
 
-        
-        // initiating a game object with all the statistics data
+        // Initiating a game object with all the statistics data
         Game game = new Game(statisticsData);
         _context.Games.Add(game);
 
@@ -58,8 +66,7 @@ public class StatisticsController : ControllerBase
         {
             return StatusCode(500, new { message = "An error occurred while saving the game data.", error = ex.Message });
         }
-        
+
         return Ok(new { message = "Statistics received and game information saved to database", gameId = game.GameId });
     }
-    
 }

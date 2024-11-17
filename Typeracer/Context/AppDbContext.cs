@@ -35,6 +35,16 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<Player>()
             .HasKey(p => p.PlayerID);
+        
+        modelBuilder.Entity<Player>()
+            .HasMany(p => p.WPMs)
+            .WithOne()
+            .HasForeignKey(w => w.PlayerId);
+
+        modelBuilder.Entity<Player>()
+            .HasMany(p => p.Accuracies)
+            .WithOne()
+            .HasForeignKey(a => a.PlayerId);
 
         modelBuilder.Entity<Game>()
             .HasKey(g => g.GameId);

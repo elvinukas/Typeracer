@@ -94,10 +94,32 @@ namespace Typeracer.Controllers
             {
                 try
                 {
-                    Player? existingPlayer = context.Players.Find(player.PlayerID);
+                    //Player? existingPlayer = context.Players.Find(player.PlayerID);
+                    Player? existingPlayer = context.Players
+                        .Include(p => p.WPMs)
+                        .Include(p => p.Accuracies)
+                        .FirstOrDefault(p => p.Username == player.Username);
                     if (existingPlayer == null)
                     {
                         context.Players.Add(player);
+                        context.SaveChanges();
+                    }
+                    else
+                    {
+                        player = existingPlayer;
+                        WPM newWPM = new WPM
+                        {
+                            Value = playerData.BestWPM, PlayerId = existingPlayer.PlayerID
+                        };
+        
+                        Accuracy newAccuracy = new Accuracy
+                        {
+                            Value = playerData.BestAccuracy, PlayerId = existingPlayer.PlayerID
+                        };
+
+
+                        context.Wpms.Add(newWPM);
+                        context.Accuracies.Add(newAccuracy);
                         context.SaveChanges();
                     }
 

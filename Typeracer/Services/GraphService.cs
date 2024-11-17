@@ -1,6 +1,6 @@
 using Typeracer.Models;
 
-namespace Typeracer.Serivces;
+namespace Typeracer.Services;
 using System.Threading.Tasks;
 using System.IO;
 using OxyPlot;

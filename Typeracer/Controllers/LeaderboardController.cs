@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Typeracer.Context;
 using Typeracer.Models;
+using Typeracer.Services;
 
 namespace Typeracer.Controllers
 {
@@ -19,10 +20,48 @@ namespace Typeracer.Controllers
         [HttpGet]
         public IActionResult GetLeaderboard()
         {
-            List<Player> leaderboard = _context.Players
+            // fetch players along with their WPMs and Accuracies
+            List<Player> players = _context.Players
                 .Include(p => p.WPMs)
                 .Include(p => p.Accuracies)
-                .OrderByDescending(p => p.WPMs.Max(w => w.Value))
+                .ToList();
+
+            // initialize StatisticsAnalyzer instances (use of generic class)
+            var wpmAnalyzer = new StatisticsAnalyzer<WPM>();
+            var accuracyAnalyzer = new StatisticsAnalyzer<Accuracy>();
+
+            // prepare the leaderboard data
+            var leaderboard = players.Select(player =>
+                {
+                    double averageWPM = 0;
+                    double averageAccuracy = 0;
+
+                    if (player.WPMs != null && player.WPMs.Count > 0)
+                    {
+                        averageWPM = wpmAnalyzer.CalculateAverage(player.WPMs, wpm => wpm.Value);
+                    }
+
+                    if (player.Accuracies != null && player.Accuracies.Count > 0)
+                    {
+                        averageAccuracy = accuracyAnalyzer.CalculateAverage(player.Accuracies, acc => acc.Value);
+                    }
+
+                    // find the best WPM and accuracy
+                    double bestWPM = player.WPMs.Any() ? player.WPMs.Max(w => w.Value) : 0;
+                    double bestAccuracy = player.Accuracies.Any() ? player.Accuracies.Max(a => a.Value) : 0;
+
+                    return new
+                    {
+                        player.PlayerID,
+                        player.Username,
+                        BestWPM = bestWPM,
+                        BestAccuracy = bestAccuracy,
+                        AverageWPM = averageWPM,
+                        AverageAccuracy = averageAccuracy
+                    };
+                })
+                .OrderByDescending(p => p.BestWPM)
+                .Take(10)
                 .ToList();
 
             return Ok(leaderboard);

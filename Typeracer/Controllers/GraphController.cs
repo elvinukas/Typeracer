@@ -1,10 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Runtime.InteropServices;
 using Microsoft.EntityFrameworkCore;
-using OxyPlot;
-using OxyPlot.Series;
-using OxyPlot.WindowsForms;
-using OxyPlot.SkiaSharp;
 using Typeracer.Context;
 using Typeracer.Models;
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
@@ -13,163 +8,46 @@ using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 [Route("api/[controller]")]
 public class GraphController : ControllerBase
 {
-    public Game? Game { get; set; }
-    public Paragraph? Paragraph { get; set; }
     private readonly AppDbContext _dbContext;
+    private readonly IGraphService _graphService;
 
-    public GraphController(AppDbContext context)
+    public GraphController(AppDbContext dbContext, IGraphService graphService)
     {
-        _dbContext = context;
+        _dbContext = dbContext;
+        _graphService = graphService;
     }
-    
-    
+
     [HttpPost("generate")]
-    public IActionResult GenerateGraph([FromBody] string gameId)
+    public async Task<IActionResult> GenerateGraph([FromBody] string gameId)
     {
         try
         {
-            Game = _dbContext.Games
+            var game = await _dbContext.Games
                 .Include(g => g.Statistics)
-                    .ThenInclude(s => s.TypingData)
-                .FirstOrDefault(g => g.GameId == Guid.Parse(gameId));
-            
-            if (Game == null)
+                .ThenInclude(s => s.TypingData)
+                .FirstOrDefaultAsync(g => g.GameId == Guid.Parse(gameId));
+
+            if (game == null)
             {
                 return NotFound(new { message = "Game not found" });
             }
-            
-            StatisticsModel statistics = Game.Statistics;
-            Paragraph = _dbContext.Paragraphs
-                .FirstOrDefault(p => p.Id == statistics.ParagraphId); 
 
-            if (Paragraph == null)
+            var paragraph = await _dbContext.Paragraphs
+                .FirstOrDefaultAsync(p => p.Id == game.Statistics.ParagraphId);
+
+            if (paragraph == null)
             {
                 return NotFound(new { message = "Paragraph not found" });
             }
-            
-            
-            
-            Console.WriteLine("Graph controller received gameId: ", gameId);
-            GenerateGraphInternal(Game, "red");
+
+            // generate graph with paragraph which is received through the database
+            await _graphService.GenerateGraphAsync(game, paragraph.TotalAmountOfWords, "red");
+
             return Ok(new { message = "Graph generated successfully" });
         }
         catch (Exception ex)
         {
             return StatusCode(500, new { message = ex.Message });
         }
-    }
-
-    private void GenerateGraphInternal (Game game, string WPMColor = "blue") // optional arguments
-    {
-        
-        var typingData = game.Statistics.TypingData;
-        var totalWords = Paragraph.TotalAmountOfWords;
-        var wpmData = new double[totalWords];
-        var accuracyData = new double[totalWords];
-
-        for (int i = 0; i < totalWords; i++)
-        {
-            wpmData[i] = (double)typingData[i].CurrentWordsPerMinute;
-            accuracyData[i] = (double)typingData[i].CurrentAccuracy;
-        }
-        
-        double minWpm = wpmData.Min() / 2; // LINQ
-        double maxWpm = wpmData.Max(); // LINQ
-        double padding = 5;
-        double minY = minWpm - padding;
-        double maxY = maxWpm + padding;
-        
-        var plotModel = new PlotModel // creates the plot model
-        {
-            
-        };
-        var wpmLineSeries = new LineSeries 
-        { 
-            Title = "WPM",
-            Color = WPMColor == "red" ? OxyColor.FromRgb(206, 0, 0) : OxyColor.FromRgb(11, 94, 215),
-            StrokeThickness = 3
-        };
-        var wpmAreaSeries = new AreaSeries
-        {
-            Color = WPMColor == "red" ? OxyColor.FromArgb(25, 206, 0, 0) : OxyColor.FromArgb(25, 11, 94, 215),
-            Fill = WPMColor == "red" ? OxyColor.FromArgb(25, 206, 0, 0) : OxyColor.FromArgb(25, 11, 94, 215)
-        };
-        
-        var accuracyLineSeries = new LineSeries 
-        { 
-            Title = "Accuracy",
-            Color = OxyColors.DarkGreen,
-            StrokeThickness = 3,
-            YAxisKey = "RightAxis"
-        };
-
-        for (int i = 0; i < totalWords; i++)
-        {
-            wpmLineSeries.Points.Add(new DataPoint(i + 1, wpmData[i]));
-            wpmAreaSeries.Points.Add(new DataPoint(i + 1, wpmData[i]));
-            wpmAreaSeries.Points2.Add(new DataPoint(i + 1, minY));
-            
-            accuracyLineSeries.Points.Add(new DataPoint(i + 1, accuracyData[i]));
-        }
-        
-        plotModel.Series.Add(accuracyLineSeries);
-        plotModel.Series.Add(wpmAreaSeries);
-        plotModel.Series.Add(wpmLineSeries);
-        
-        plotModel.Axes.Add(new OxyPlot.Axes.LinearAxis
-        {
-            Position = OxyPlot.Axes.AxisPosition.Bottom,
-            Minimum = 1,
-            Maximum = totalWords,
-            MajorGridlineStyle = LineStyle.Solid,
-            MajorGridlineColor = OxyColors.DarkGray,
-            Layer = OxyPlot.Axes.AxisLayer.AboveSeries
-        });
-
-        plotModel.Axes.Add(new OxyPlot.Axes.LinearAxis
-        {
-            Position = OxyPlot.Axes.AxisPosition.Left,
-            Title = "ŽPM",
-            TitleColor = WPMColor == "red" ? OxyColor.FromRgb(206, 0, 0) : OxyColor.FromRgb(11, 94, 215),
-            TitleFontWeight = OxyPlot.FontWeights.Bold,
-            Minimum = minY,
-            Maximum = maxY,
-            MajorGridlineStyle = LineStyle.Solid,
-            MajorGridlineColor = OxyColors.DarkGray,
-            Layer = OxyPlot.Axes.AxisLayer.AboveSeries
-        });
-        
-        plotModel.Axes.Add(new OxyPlot.Axes.LinearAxis
-        {
-            Position = OxyPlot.Axes.AxisPosition.Right,
-            Title = "TIKSLUMAS (%)",
-            TitleColor = OxyColors.DarkGreen,
-            TitleFontWeight = OxyPlot.FontWeights.Bold,
-            Minimum = 0,
-            Maximum = 105,
-            MajorGridlineStyle = LineStyle.Solid,
-            MajorGridlineColor = OxyColors.DarkGray,
-            Key = "RightAxis",
-            Layer = OxyPlot.Axes.AxisLayer.AboveSeries
-        });
-
-
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            var pngExporter = new OxyPlot.WindowsForms.PngExporter { Width = 1100, Height = 300 }; // saves the plot as an image
-            using (var stream = System.IO.File.Create("wwwroot/images/wpm-graph.png"))
-            {
-                pngExporter.Export(plotModel, stream);
-            }
-        }
-        else
-        {
-            var pngExporter = new OxyPlot.SkiaSharp.PngExporter { Width = 1100, Height = 300 }; // saves the plot as an image
-            using (var stream = System.IO.File.Create("wwwroot/images/wpm-graph.png"))
-            {
-                pngExporter.Export(plotModel, stream);
-            }
-        }
-        
     }
 }

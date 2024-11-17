@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Typeracer.Models;
 using Typeracer.Context;
 
@@ -8,17 +9,17 @@ namespace Typeracer.Controllers;
 [Route("api/[controller]")]
 public class StatisticsController : ControllerBase
 {
-    public readonly AppDbContext _DbContext;
+    private readonly AppDbContext _context;
 
     public StatisticsController(AppDbContext context)
     {
-        _DbContext = context;
+        _context = context;
     }
 
     [HttpGet("{statisticsId}")]
     public IActionResult GetStatistics(string statisticsId)
     {
-        StatisticsModel? statisticsModel = _DbContext.Statistics
+        StatisticsModel? statisticsModel = _context.Statistics
             .FirstOrDefault(s => s.StatisticsId == Guid.Parse(statisticsId));
 
         if (statisticsModel == null)
@@ -28,22 +29,21 @@ public class StatisticsController : ControllerBase
 
         return Ok(statisticsModel);
     }
-    
-    
+
     [HttpPost("save")]
-    public IActionResult Save(StatisticsModel statisticsData)
+    public async Task<IActionResult> Save([FromBody] StatisticsModel statisticsData)
     {
+        if (statisticsData == null)
+        {
+            return BadRequest("Invalid data: statisticsData is null.");
+        }
+
         if (!ModelState.IsValid)
         {
             var errors = ModelState.Values.SelectMany(v => v.Errors) // LINQ
                 .Select(e => e.ErrorMessage) // LINQ
                 .ToList(); // LINQ
             return BadRequest(new { message = "Invalid data.", errors });
-        }
-
-        if (statisticsData == null)
-        {
-            return BadRequest("Invalid data: statisticsData is null.");
         }
 
         statisticsData.LocalStartTime = DateTime.SpecifyKind(statisticsData.LocalStartTime.Value, DateTimeKind.Utc);
@@ -54,16 +54,20 @@ public class StatisticsController : ControllerBase
             data.BeginningTimestampWord = DateTime.SpecifyKind(data.BeginningTimestampWord, DateTimeKind.Utc);
             data.EndingTimestampWord = DateTime.SpecifyKind(data.EndingTimestampWord, DateTimeKind.Utc);
         }
-        
+
         // initiating a game object with all the statistics data
         Game game = new Game(statisticsData);
-        using (_DbContext)
+        _context.Games.Add(game);
+
+        try
         {
-            _DbContext.Games.Add(game);
-            _DbContext.SaveChanges();
+            await _context.SaveChangesAsync();
         }
-        
+        catch (DbUpdateException ex)
+        {
+            return StatusCode(500, new { message = "An error occurred while saving the game data.", error = ex.Message });
+        }
+
         return Ok(new { message = "Statistics received and game information saved to database", gameId = game.GameId });
     }
-    
 }

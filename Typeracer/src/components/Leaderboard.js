@@ -24,10 +24,14 @@ function Leaderboard() {
                         bestAccuracy: bestAccuracyEntry ? bestAccuracyEntry.value : 0
                     };
                 });
-                
+
+                transformedData.sort((a, b) => b.bestWPM - a.bestWPM);
+
                 console.log(transformedData);
-                
-                setLeaderboardData(transformedData);
+
+                const limitedData = transformedData.slice(0, 10);
+
+                setLeaderboardData(limitedData);
             })
             .catch(error => console.error('Error when trying to get leaderboard:', error));
     }, []);
@@ -35,7 +39,7 @@ function Leaderboard() {
     return (
         <div className="leaderboard-container">
             <div className="leaderboard-title">
-                <p>Lyderių lentelė</p>
+                <p>TOP 10 geriausių žaidėjų</p>
             </div>
             {leaderboardData.length === 0 ? (
                 <p>Nėra duomenų.</p>

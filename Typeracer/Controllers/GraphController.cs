@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Typeracer.Context;
-using Typeracer.Models;
 using ControllerBase = Microsoft.AspNetCore.Mvc.ControllerBase;
 
 [ApiController]

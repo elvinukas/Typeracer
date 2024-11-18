@@ -1,6 +1,4 @@
 using Typeracer.Models;
-
-namespace Typeracer.Services;
 using System.Threading.Tasks;
 using System.IO;
 using OxyPlot;
@@ -8,6 +6,8 @@ using OxyPlot.Series;
 using OxyPlot.WindowsForms;
 using OxyPlot.SkiaSharp;
 using System.Runtime.InteropServices;
+
+namespace Typeracer.Services;
 
 public class GraphService : IGraphService
 {

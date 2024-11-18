@@ -60,8 +60,6 @@ public class Player : IComparable<Player>
         {
             BestAccuracyID = newAccuracy.AccuracyId;
         }
-        
-        
     }
 
     // comparing players by their best WPM

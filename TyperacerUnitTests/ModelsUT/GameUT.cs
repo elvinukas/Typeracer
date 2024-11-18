@@ -34,27 +34,6 @@ public class GameUT
         Assert.Equal(0, game.CompletionTime);
         Assert.Equal(Gamemode.Standard, game.Gamemode);
     }
-    
-    /*
-    [Fact]
-    public void ParameterizedConstructor_ShouldCalculateCompletionTime()
-    {
-        var statisticsModel = new StatisticsModel
-        {
-            LocalStartTime = DateTime.UtcNow,
-            LocalFinishTime = DateTime.UtcNow.AddSeconds(6.5),
-            TypedAmountOfWords = 10,
-            TypedAmountOfCharacters = 50,
-            NumberOfWrongfulCharacters = 5
-        };
-
-        var game = new Game(statisticsModel);
-        
-        Assert.NotEqual(0, game.CompletionTime);
-        Assert.NotEqual(0, game.Statistics.WordsPerMinute);
-        Assert.NotEqual(0, game.Statistics.Accuracy);
-    }
-    */
 
     [Theory]
     [InlineData(null, "2024-11-08T10:00:00Z", 0)]

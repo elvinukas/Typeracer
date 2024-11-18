@@ -75,3 +75,35 @@ public class PlayerUT
         Assert.Equal(result, expectedResult);
     }
 }
+
+public class WPMUT
+{
+    [Theory]
+    [InlineData(85.2, 78.9, 1)]
+    [InlineData(78.9, 85.2, -1)]
+    [InlineData(85.2, 85.2, 0)]
+    public void CompareTo_ShouldCalculateCorrectly(double FirstWPM, double SecondWPM, int expectedResult)
+    {
+        var wpm1 = new WPM { Value = FirstWPM };
+        var wpm2 = new WPM { Value = SecondWPM };
+
+        var result = wpm1.CompareTo(wpm2);
+        Assert.Equal(result, expectedResult);
+    }
+}
+
+public class AccuracyUT
+{
+    [Theory]
+    [InlineData(97, 80, 1)]
+    [InlineData(89, 89.9, -1)]
+    [InlineData(100, 100, 0)]
+    public void CompareTo_ShouldCalculateCorrectly(double FirstAccuracy, double SecondAccuracy, int expectedResult)
+    {
+        var Accuracy1 = new Accuracy { Value = FirstAccuracy };
+        var Accuracy2 = new Accuracy { Value = SecondAccuracy };
+
+        var result = Accuracy1.CompareTo(Accuracy2);
+        Assert.Equal(result, expectedResult);
+    }
+}

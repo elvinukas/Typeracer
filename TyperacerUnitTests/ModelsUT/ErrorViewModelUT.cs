@@ -1,5 +1,4 @@
 using Typeracer.Models;
-using Xunit;
 
 namespace TyperacerUnitTests.ModelsUT;
 

@@ -49,10 +49,12 @@ public class HomeController : Controller
         return View();
     }
 
+    /*
     public IActionResult Type()
     {
         return View();
     }
+    */
 
     public List<Paragraph> GetAllParagraphs(string paragraphName, List<Gamemode> allowedGamemodes) // optional arguments
     {   
@@ -129,10 +131,10 @@ public class HomeController : Controller
     }
     
 
-    public IActionResult GetParagraphText(Gamemode gamemode)
+    public IActionResult GetParagraphText(Gamemode gamemode = Gamemode.Short)
     {
         //Paragraph paragraph = GetRandomParagraph(gamemode: gamemode); // named arguments
-        Paragraph paragraph = GetRandomParagraph(gamemode: Gamemode.Short); 
+        Paragraph paragraph = GetRandomParagraph(gamemode: gamemode); 
         if (paragraph == null)
         {
             return NotFound(new { message = "No paragraphs found for specified gamemode." });

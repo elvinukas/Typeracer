@@ -9,13 +9,11 @@ namespace TyperacerIntegrationTests.ControllersIT;
 
 public class LeaderboardControllerIT : IClassFixture<CustomWebApplicationFactory<Program>>
 {
-    private readonly ITestOutputHelper _testOutputHelper;
     private readonly HttpClient _client;
     private readonly AppDbContext _context;
 
     public LeaderboardControllerIT(CustomWebApplicationFactory<Program> factory, ITestOutputHelper testOutputHelper)
     {
-        _testOutputHelper = testOutputHelper;
         _client = factory.CreateClient();
         var serviceProvider = factory.Services;
         _context = serviceProvider.GetRequiredService<AppDbContext>();

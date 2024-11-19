@@ -25,8 +25,6 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddControllersWithViews();
 
-
-
 // Configure the database provider based on the environment
 if (builder.Environment.IsEnvironment("Testing"))
 {
@@ -40,6 +38,7 @@ else
     builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 }
+
 
 // Add the GraphService
 builder.Services.AddScoped<IGraphService, GraphService>();

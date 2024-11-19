@@ -27,5 +27,7 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
             var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             context.Database.EnsureCreated();
         });
+        
+        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Testing");
     }
 }

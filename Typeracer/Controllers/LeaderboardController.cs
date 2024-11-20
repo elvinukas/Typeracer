@@ -72,7 +72,7 @@ namespace Typeracer.Controllers
         {
             if (string.IsNullOrEmpty(playerData.Username))
             {
-                return BadRequest("Vartotojo vardas būtinas");
+                return BadRequest("Username is necessary!");
             }
 
             // if (string.IsNullOrEmpty(playerData.PlayerID) || !Guid.TryParse(playerData.PlayerID, out Guid playerGuid))
@@ -150,8 +150,5 @@ namespace Typeracer.Controllers
             
             return Ok("Player added to game successfully!");
         }
-        
-        
-        
     }
 }

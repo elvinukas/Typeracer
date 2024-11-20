@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Typeracer.Models;
 
 namespace Typeracer.Context;
@@ -74,9 +75,15 @@ public class AppDbContext : DbContext
         //        
         modelBuilder.Entity<Paragraph>()
             .HasKey(p => p.Id);
-
-       
     }
     
-   
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Testing")
+        {
+            optionsBuilder
+                .UseInMemoryDatabase("TestDatabase")
+                .ConfigureWarnings(warnings => warnings.Ignore(InMemoryEventId.TransactionIgnoredWarning));
+        }
+    }
 }

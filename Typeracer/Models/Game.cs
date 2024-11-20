@@ -28,7 +28,6 @@ public class Game
         Gamemode = Gamemode.Standard;   // default gamemode
         CalculateCompletionTime();
         CalculateAdditionalStatistics();
-        
     }
 
     private void CalculateCompletionTime()
@@ -38,9 +37,15 @@ public class Game
         
         if (Statistics.LocalFinishTime.HasValue && Statistics.LocalStartTime.HasValue)
         {
-            this.CompletionTime = (Statistics.LocalFinishTime.Value - Statistics.LocalStartTime.Value).TotalSeconds;
+            if (Statistics.LocalFinishTime.Value > Statistics.LocalStartTime.Value)
+            {
+                this.CompletionTime = (Statistics.LocalFinishTime.Value - Statistics.LocalStartTime.Value).TotalSeconds;
+            }
+            else
+            {
+                this.CompletionTime = -1;
+            }
         }
-        
     }
 
     private void CalculateAdditionalStatistics()
@@ -111,7 +116,6 @@ public class Game
         return result;
     }
     
-    
     private double CalculateWPM(int typedAmountOfWords, double completionTime)
     {
         if (completionTime != 0)
@@ -136,7 +140,4 @@ public class Game
             return 0;
         }
     }
-    
-    
-    
 }

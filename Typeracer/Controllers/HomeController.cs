@@ -13,7 +13,7 @@ public class HomeController : Controller
     private readonly ILogger<HomeController> _logger;
     private readonly AppDbContext _dbContext;
 
-    public HomeController(ILogger<HomeController> logger, AppDbContext appDbContext)
+    public HomeController(ILogger<HomeController> logger, AppDbContext appDbContext, Dictionary<string, List<Gamemode>> paragraphs)
     {
         _logger = logger;
         _dbContext = appDbContext;
@@ -27,14 +27,18 @@ public class HomeController : Controller
         
         try
         {
-            InsertParagraphFileToDb("paragraph1.txt", simpleGamemodes);
-
-            InsertParagraphFileToDb("paragraph2.txt", shortGamemode);
+            foreach (var paragraph in paragraphs)
+            {
+                InsertParagraphFileToDb(paragraph.Key, paragraph.Value);
+            }
+            
+            //InsertParagraphFileToDb("paragraph1.txt", simpleGamemodes);
+            //InsertParagraphFileToDb("paragraph2.txt", shortGamemode);
             
         }
         catch (NoAddToDBException e)
         {
-            Console.WriteLine(e.Message, "Intentional? - " + e.Intentional);
+            _logger.LogError(0, e, "Intentional? {intentional}", e.Intentional);
         }
         
     }
@@ -49,10 +53,12 @@ public class HomeController : Controller
         return View();
     }
 
+    /*
     public IActionResult Type()
     {
         return View();
     }
+    */
 
     public void GetAllParagraphs(string paragraphName, List<Gamemode> allowedGamemodes, ConcurrentDictionary<int, Paragraph> paragraphDictionary) // optional arguments
     {   
@@ -144,11 +150,11 @@ public class HomeController : Controller
             transaction.Commit();
         }
     }
-    
-    public IActionResult GetParagraphText(Gamemode gamemode)
+
+    public IActionResult GetParagraphText(Gamemode gamemode = Gamemode.Short)
     {
         //Paragraph paragraph = GetRandomParagraph(gamemode: gamemode); // named arguments
-        Paragraph paragraph = GetRandomParagraph(gamemode: Gamemode.Short); 
+        Paragraph paragraph = GetRandomParagraph(gamemode: gamemode); 
         if (paragraph == null)
         {
             return NotFound(new { message = "No paragraphs found for specified gamemode." });

@@ -4,6 +4,7 @@ using Typeracer.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Typeracer.Context;
+using Typeracer.Controllers;
 using Typeracer.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,14 +24,32 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader());
 });
 
+var paragraphFiles = new Dictionary<string, List<Gamemode>>
+{
+    { "paragraph1.txt", new List<Gamemode> { Gamemode.Standard, Gamemode.Hardcore } },
+    { "paragraph2.txt", new List<Gamemode> { Gamemode.Short } }
+};
+
+builder.Services.AddSingleton(paragraphFiles);
+builder.Services.AddScoped<HomeController>();
+
+
 builder.Services.AddControllersWithViews();
 
+// Configure the database provider based on the environment
+if (builder.Environment.IsEnvironment("Testing"))
+{
+    // Use in-memory database for tests
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseInMemoryDatabase("IntegrationTestsDb"));
+}
+else
+{
+    // Use PostgreSQL for other environments
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+}
 
-
-// Register the Leaderboard as a singleton
-//builder.Services.AddSingleton<Leaderboard>();
-builder.Services.AddDbContext<AppDbContext>( options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add the GraphService
 builder.Services.AddScoped<IGraphService, GraphService>();
@@ -66,3 +85,7 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
+public partial class Program
+{
+}

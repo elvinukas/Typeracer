@@ -30,8 +30,8 @@ public class StatisticsController : ControllerBase
         return Ok(statisticsModel);
     }
 
-    [HttpPost("save")]
-    public async Task<IActionResult> Save([FromBody] StatisticsModel statisticsData)
+    [HttpPost]
+    public async Task<IActionResult> SaveStatistics([FromBody] StatisticsModel statisticsData)
     {
         if (statisticsData == null)
         {

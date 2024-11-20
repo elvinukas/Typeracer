@@ -335,7 +335,7 @@ function Type() {
         console.log('Data being sent:', JSON.stringify(dataToSend, null, 2));
 
         try {
-            const response = await fetch('/api/statistics/save', {
+            const response = await fetch('/api/statistics', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

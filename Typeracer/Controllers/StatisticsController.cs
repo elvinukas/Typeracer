@@ -30,8 +30,8 @@ public class StatisticsController : ControllerBase
         return Ok(statisticsModel);
     }
 
-    [HttpPost("save")]
-    public async Task<IActionResult> Save([FromBody] StatisticsModel statisticsData)
+    [HttpPost]
+    public async Task<IActionResult> SaveStatistics([FromBody] StatisticsModel statisticsData)
     {
         if (statisticsData == null)
         {
@@ -54,7 +54,7 @@ public class StatisticsController : ControllerBase
             data.BeginningTimestampWord = DateTime.SpecifyKind(data.BeginningTimestampWord, DateTimeKind.Utc);
             data.EndingTimestampWord = DateTime.SpecifyKind(data.EndingTimestampWord, DateTimeKind.Utc);
         }
-
+        
         // initiating a game object with all the statistics data
         Game game = new Game(statisticsData);
         _context.Games.Add(game);

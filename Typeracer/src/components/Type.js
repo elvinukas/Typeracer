@@ -61,7 +61,7 @@ function Type() {
             wordsInfoRef.current = tempWordsInfo;
         }
     };
-
+    
     const fetchParagraphText = async () => {
         let response = await fetch('/Home/GetParagraphText/');
         let jsonResponse = await response.json();
@@ -72,9 +72,7 @@ function Type() {
         setTypingText(paragraphText);
         setInitialText(paragraphText);
         buildWordsInfo(paragraphText);
-
-        // Calculating the total amount of words and characters
-        const totalWords = paragraphText.trim().split(/\s+/).length;
+        
         setStatisticsData(prevData => ({
             ...prevData,
             ParagraphId: paragraphId,
@@ -84,7 +82,7 @@ function Type() {
         // Creating wordsInfoRef
         if (paragraphText) {
             createWordsInfoRef(paragraphText);
-       }
+        }
     };
     
     const createWordsInfoRef = (paragraphText) => {
@@ -335,7 +333,7 @@ function Type() {
         console.log('Data being sent:', JSON.stringify(dataToSend, null, 2));
 
         try {
-            const response = await fetch('/api/statistics/save', {
+            const response = await fetch('/api/statistics', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -368,10 +366,14 @@ function Type() {
     };
 
     const resetStateForRestartButton = () => {
+        const prevParagraph = statisticsData.Paragraph;
+        const prevParagraphId = statisticsData.ParagraphId;
+        
         setStatisticsData({
             LocalStartTime: null,
             LocalFinishTime: null,
-            Paragraph: statisticsData.Paragraph,
+            ParagraphId: prevParagraphId,
+            Paragraph: prevParagraph,
             TypedAmountOfWords: 0,
             TypedAmountOfCharacters: 0,
             NumberOfWrongfulCharacters: 0,
@@ -388,6 +390,8 @@ function Type() {
     }
 
     const resetStateForNextTextButton = () => {
+        
+        
         setStatisticsData({
             LocalStartTime: null,
             LocalFinishTime: null,

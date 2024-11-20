@@ -4,7 +4,7 @@ using Typeracer.Models;
 using System.Text;
 using Typeracer.Context;
 using Typeracer.Exceptions;
-
+using System.Collections.Concurrent;
 
 namespace Typeracer.Controllers;
 
@@ -56,11 +56,8 @@ public class HomeController : Controller
     }
     */
 
-    public List<Paragraph> GetAllParagraphs(string paragraphName, List<Gamemode> allowedGamemodes) // optional arguments
+    public void GetAllParagraphs(string paragraphName, List<Gamemode> allowedGamemodes, ConcurrentDictionary<int, Paragraph> paragraphDictionary) // optional arguments
     {   
-        // creating empty list of paragraphs
-        List<Paragraph> paragraphList = new List<Paragraph>();
-        
         // getting the file path
         var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Paragraphs", paragraphName);
         
@@ -70,17 +67,19 @@ public class HomeController : Controller
             using (StreamReader reader = new StreamReader(filestream, Encoding.UTF8))
             {
                 string line;
+                int key = 0;
                 // reading the file line by line
                 while ((line = reader.ReadLine()) != null)
                 {
                     if(!string.IsNullOrWhiteSpace(line))
                     {
-                        paragraphList.Add(new Paragraph(line, allowedGamemodes));
+                        var paragraph = new Paragraph(line, allowedGamemodes);
+                        //Console.WriteLine("Paragraph:\n" + paragraph.Text);
+                        paragraphDictionary.TryAdd(key, paragraph);
+                        key++;
                     }
                 }
             }
-
-        return paragraphList;
     }
 
     public Paragraph GetRandomParagraph(Gamemode gamemode)
@@ -105,12 +104,30 @@ public class HomeController : Controller
 
     public void InsertParagraphFileToDb(string filename, List<Gamemode> gamemodes)
     {
-        List<Paragraph> paragraphs = GetAllParagraphs(filename, gamemodes);
+        var paragraphs = new ConcurrentDictionary<int, Paragraph>();
+        
+        // simulating multiple threads
+        //Console.WriteLine("Adding process:");
+        Task[] tasks = new Task[5];
+        for (int i = 0; i < tasks.Length; ++i)
+        {
+            tasks[i] = Task.Run(() => GetAllParagraphs(filename, gamemodes, paragraphs));
+        }
+
+        Task.WaitAll(tasks);
+        
+        /*
+        Console.WriteLine("Final paragraphs:");
+        foreach (var paragraph in paragraphs.Values)
+        {
+            Console.WriteLine("Paragraph:\n" + paragraph.Text);
+        }
+        */
 
         using (var transaction = _dbContext.Database.BeginTransaction())
         {
             int i = 0;
-            foreach (Paragraph paragraph in paragraphs)
+            foreach (Paragraph paragraph in paragraphs.Values)
             {
                 if (!_dbContext.Paragraphs.Any(p => p.Text == paragraph.Text))
                 {
@@ -129,7 +146,6 @@ public class HomeController : Controller
             transaction.Commit();
         }
     }
-    
 
     public IActionResult GetParagraphText(Gamemode gamemode = Gamemode.Short)
     {

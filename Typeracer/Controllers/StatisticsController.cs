@@ -54,7 +54,7 @@ public class StatisticsController : ControllerBase
             data.BeginningTimestampWord = DateTime.SpecifyKind(data.BeginningTimestampWord, DateTimeKind.Utc);
             data.EndingTimestampWord = DateTime.SpecifyKind(data.EndingTimestampWord, DateTimeKind.Utc);
         }
-
+        
         // initiating a game object with all the statistics data
         Game game = new Game(statisticsData);
         _context.Games.Add(game);

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Typeracer.Context;
+using Typeracer.Exceptions;
 using Typeracer.Models;
 using Typeracer.Services;
 
@@ -125,8 +126,12 @@ namespace Typeracer.Controllers
 
 
                     GameController gameController = new GameController(context);
-                    Game? game = gameController.GetGameById(Guid.Parse(playerData.GameId));
-                    if (game == null)
+                    Game? game;
+                    try
+                    {
+                        game = gameController.GetGameById(Guid.Parse(playerData.GameId));
+                    }
+                    catch (GameException ex)
                     {
                         return NotFound("Specified game not found.");
                     }

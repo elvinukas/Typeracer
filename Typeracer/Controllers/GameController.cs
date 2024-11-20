@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Typeracer.Context;
 using Typeracer.Models;
 using Microsoft.EntityFrameworkCore;
+using Typeracer.Exceptions;
 
 namespace Typeracer.Controllers
 {
@@ -20,21 +21,30 @@ namespace Typeracer.Controllers
         public IActionResult GetGameById(string gameId)
         {
             Guid gameIdGuid = Guid.Parse(gameId);
-            Game? game = GetGameById(gameIdGuid);
-            if (game == null)
+            try
             {
-                return NotFound(new { message = "Game not found" });
+                Game? game = GetGameById(gameIdGuid);
+                return Ok(game);
             }
-            return Ok(game);
+            catch (GameException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            
         }
 
 
-        public Game? GetGameById(Guid gameId)
+        public Game GetGameById(Guid gameId)
         {
             Game? game = _context.Games
                 .Include(g => g.Statistics)
                 .ThenInclude(s => s.TypingData)
                 .FirstOrDefault(g => g.GameId == gameId);
+
+            if (game == null)
+            {
+                throw new GameException("Game not found");
+            }
 
             return game;
         }

@@ -46,15 +46,15 @@ public class StatisticsControllerIT : IClassFixture<CustomWebApplicationFactory<
     }
     
     [Fact]
-    public async Task Save_ReturnsBadRequest_WhenStatisticsDataIsNull()
+    public async Task SaveStatistics_ReturnsBadRequest_WhenStatisticsDataIsNull()
     {
-        var response = await _client.PostAsJsonAsync("/api/Statistics/save", (StatisticsModel)null);
+        var response = await _client.PostAsJsonAsync("/api/Statistics", (StatisticsModel)null);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
     
     [Fact]
-    public async Task Save_ReturnsBadRequest_WhenModelStateIsInvalid()
+    public async Task SaveStatistics_ReturnsBadRequest_WhenModelStateIsInvalid()
     {
         var invalidStatistics = new StatisticsModel
         {
@@ -67,13 +67,13 @@ public class StatisticsControllerIT : IClassFixture<CustomWebApplicationFactory<
             }
         };
         
-        var response = await _client.PostAsJsonAsync("/api/Statistics/save", invalidStatistics);
+        var response = await _client.PostAsJsonAsync("/api/Statistics", invalidStatistics);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
     
     [Fact]
-    public async Task Save_ReturnsOk_WhenStatisticsDataIsValid()
+    public async Task SaveStatistics_ReturnsOk_WhenStatisticsDataIsValid()
     {
         var validStatistics = new StatisticsModel
         {
@@ -97,7 +97,7 @@ public class StatisticsControllerIT : IClassFixture<CustomWebApplicationFactory<
             }
         };
 
-        var response = await _client.PostAsJsonAsync("/api/Statistics/save", validStatistics);
+        var response = await _client.PostAsJsonAsync("/api/Statistics", validStatistics);
         var successResponse = await response.Content.ReadFromJsonAsync<Dictionary<string, object>>();
 
         response.EnsureSuccessStatusCode();

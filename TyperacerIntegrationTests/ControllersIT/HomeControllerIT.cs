@@ -16,6 +16,7 @@ public class HomeControllerIT : IClassFixture<CustomWebApplicationFactory<Progra
     private readonly HttpClient _client;
     private readonly AppDbContext _context;
     private readonly ILogger<HomeController> _logger;
+    private readonly Dictionary<string, List<Gamemode>> _paragraphFiles;
 
     public HomeControllerIT(CustomWebApplicationFactory<Program> factory)
     {
@@ -23,12 +24,13 @@ public class HomeControllerIT : IClassFixture<CustomWebApplicationFactory<Progra
         var serviceProvider = factory.Services;
         _context = serviceProvider.GetRequiredService<AppDbContext>();
         _logger = new LoggerFactory().CreateLogger<HomeController>();
+        _paragraphFiles = serviceProvider.GetRequiredService<Dictionary<string, List<Gamemode>>>();
     }
 
     [Fact]
     public void ParameterizedConstructor_ShouldInitializeProperties()
     {
-        var controller = new HomeController(_logger, _context);
+        var controller = new HomeController(_logger, _context, _paragraphFiles);
 
         Assert.NotNull(controller);
         var loggerField = controller.GetType().GetField("_logger", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
@@ -41,7 +43,7 @@ public class HomeControllerIT : IClassFixture<CustomWebApplicationFactory<Progra
     [Fact]
     public void HomeController_Constructor_ShouldInsertParagraphsToDb()
     {
-        var controller = new HomeController(_logger, _context);
+        var controller = new HomeController(_logger, _context, _paragraphFiles);
 
         var paragraphs = _context.Paragraphs.ToList();
         Assert.NotEmpty(paragraphs);
@@ -70,7 +72,7 @@ public class HomeControllerIT : IClassFixture<CustomWebApplicationFactory<Progra
     [Fact]
     public void GetRandomParagraph_ShouldReturnParagraph_ForValidGamemode()
     {
-        var controller = new HomeController(_logger, _context);
+        var controller = new HomeController(_logger, _context, _paragraphFiles);
         var gamemode = Gamemode.Standard;
         
         var paragraph = controller.GetRandomParagraph(gamemode);
@@ -82,7 +84,7 @@ public class HomeControllerIT : IClassFixture<CustomWebApplicationFactory<Progra
     [Fact]
     public void GetRandomParagraph_ShouldReturnNull_ForInvalidGamemode()
     {
-        var controller = new HomeController(_logger, _context);
+        var controller = new HomeController(_logger, _context, _paragraphFiles);
         var gamemode = (Gamemode)999;
 
         var paragraph = controller.GetRandomParagraph(gamemode);
@@ -93,7 +95,7 @@ public class HomeControllerIT : IClassFixture<CustomWebApplicationFactory<Progra
     [Fact]
     public void GetParagraphText_ShouldReturnJsonResult_ForValidGamemode()
     {
-        var controller = new HomeController(_logger, _context);
+        var controller = new HomeController(_logger, _context, _paragraphFiles);
         var gamemode = Gamemode.Short;
 
         var result = controller.GetParagraphText(gamemode) as JsonResult;
@@ -108,7 +110,7 @@ public class HomeControllerIT : IClassFixture<CustomWebApplicationFactory<Progra
     [Fact]
     public void GetParagraphText_ShouldReturnNotFound_ForInvalidGamemode()
     {
-        var controller = new HomeController(_logger, _context);
+        var controller = new HomeController(_logger, _context, _paragraphFiles);
         var gamemode = (Gamemode)999;
 
         var result = controller.GetParagraphText(gamemode);
@@ -122,7 +124,7 @@ public class HomeControllerIT : IClassFixture<CustomWebApplicationFactory<Progra
     [Fact]
     public void Error_ShouldReturnViewResult_WithErrorViewModel()
     {
-        var controller = new HomeController(_logger, _context);
+        var controller = new HomeController(_logger, _context, _paragraphFiles);
         controller.ControllerContext = new ControllerContext
         {
             HttpContext = new DefaultHttpContext()

@@ -4,6 +4,7 @@ using Typeracer.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Typeracer.Context;
+using Typeracer.Controllers;
 using Typeracer.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +23,16 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod()
             .AllowAnyHeader());
 });
+
+var paragraphFiles = new Dictionary<string, List<Gamemode>>
+{
+    { "paragraph1.txt", new List<Gamemode> { Gamemode.Standard, Gamemode.Hardcore } },
+    { "paragraph2.txt", new List<Gamemode> { Gamemode.Short } }
+};
+
+builder.Services.AddSingleton(paragraphFiles);
+builder.Services.AddScoped<HomeController>();
+
 
 builder.Services.AddControllersWithViews();
 

@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Typeracer.Context;
+using Typeracer.Controllers;
+using Typeracer.Models;
 
 namespace TyperacerIntegrationTests;
 
@@ -20,6 +22,17 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
             // Add a new in-memory database context
             services.AddDbContext<AppDbContext>(options =>
                 options.UseInMemoryDatabase("IntegrationTestsDb"));
+            
+            
+            
+            var paragraphFiles = new Dictionary<string, List<Gamemode>>
+            {
+                { "paragraph1.txt", new List<Gamemode> { Gamemode.Standard, Gamemode.Hardcore } },
+                { "paragraph2.txt", new List<Gamemode> { Gamemode.Short } }
+            };
+
+            services.AddSingleton(paragraphFiles);
+            services.AddScoped<HomeController>();
 
             // Build the service provider and retrieve the DbContext
             var serviceProvider = services.BuildServiceProvider();

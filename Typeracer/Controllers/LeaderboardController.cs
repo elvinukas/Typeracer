@@ -35,20 +35,21 @@ namespace Typeracer.Controllers
                 {
                     double averageWPM = 0;
                     double averageAccuracy = 0;
+                    double bestWPM = 0;
+                    double bestAccuracy = 0;
 
+                    // finding all statistical data with generic methods
                     if (player.WPMs != null && player.WPMs.Count > 0)
                     {
                         averageWPM = wpmAnalyzer.CalculateAverage(player.WPMs, wpm => wpm.Value);
+                        bestWPM = wpmAnalyzer.FindBestItem(player.WPMs).Value;
                     }
 
                     if (player.Accuracies != null && player.Accuracies.Count > 0)
                     {
                         averageAccuracy = accuracyAnalyzer.CalculateAverage(player.Accuracies, acc => acc.Value);
+                        bestAccuracy = accuracyAnalyzer.FindBestItem(player.Accuracies).Value;
                     }
-
-                    // find the best WPM and accuracy
-                    double bestWPM = player.WPMs.Any() ? player.WPMs.Max(w => w.Value) : 0;
-                    double bestAccuracy = player.Accuracies.Any() ? player.Accuracies.Max(a => a.Value) : 0;
 
                     return new
                     {

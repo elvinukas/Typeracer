@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import '../../wwwroot/css/GameData.css';
 import Leaderboard from './Leaderboard';
+import CustomAlert from './CustomAlert';
 function GameData( { gameId }) {
     const [gameData, setGameData] = useState(null);
     const [paragraphData, setParagraphData] = useState(null);
-    
     const [showLeaderboard, setShowLeaderboard] = useState(false);
-
     const [appID, setAppID] = useState(null);
+    const [showAlert, setShowAlert] = useState(false);
 
     useEffect(() => {
         // Fetch the application ID from the server
@@ -122,7 +122,7 @@ function GameData( { gameId }) {
                 throw new Error('Couldn\'t save player datato leaderboard');
             }
 
-            alert('Results saved!');
+            setShowAlert(true);
         } catch (error) {
             console.error(error);
         }
@@ -201,12 +201,19 @@ function GameData( { gameId }) {
                     </div>
                 </div>
             </div>
-            <div className="text-center">
-                <button className="btn btn-primary btn-lg mt-3" style={{ marginRight: '10px' }} onClick={saveStatistics}>Išsaugoti statistiką</button>
-                <button className="btn btn-primary btn-lg mt-3" onClick={() => setShowLeaderboard(true)}>
+            <div className="button-container">
+                <button className="save-statistics-button"
+                        onClick={saveStatistics}
+                >
+                    Išsaugoti statistiką
+                </button>
+                <button className="see-leaderboard-button"
+                        onClick={() => setShowLeaderboard(true)}
+                >
                     Peržiūrėti lyderių lentelę
                 </button>
             </div>
+            {showAlert && <CustomAlert message="Statistika išsaugota" borderColor="green" onClose={() => setShowAlert(false)} />}
         </div>
     );
 }

@@ -58,7 +58,7 @@ function GameStart({ onStart }) {
                     Pradėti žaidimą
                 </button>
             </div>
-            {showAlert && <CustomAlert message="Vartotojo vardas būtinas!" onClose={() => setShowAlert(false)} />}
+            {showAlert && <CustomAlert message="Vartotojo vardas būtinas!" borderColor="red" onClose={() => setShowAlert(false)} />}
         </div>
     );
 }

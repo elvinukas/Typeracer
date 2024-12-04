@@ -1,0 +1,45 @@
+.game-start-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: "Courier Prime";
+}
+
+.title-container {
+    margin-top: 70px;
+    font-size: 80px;
+    margin-bottom: 50px;
+}
+
+.game-start-title {
+    margin-bottom: 0;
+}
+
+.input-container {
+    margin-bottom: 50px;
+}
+
+.input-box {
+    width: auto;
+    padding: 5px;
+    font-size: 20px;
+    border-style: solid;
+    border-color: black;
+    border-radius: 5px;
+}
+
+.start-game-button {
+    font-size: 20px;
+    background-color: rgb(11, 94, 215);
+    opacity: 0.9;
+    color: white;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    transition: opacity 0.15s;
+}
+
+.start-game-button:hover{
+    opacity: 1;
+}

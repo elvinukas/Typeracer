@@ -1,4 +1,5 @@
 ﻿import React, {useState} from 'react';
+import '../../wwwroot/css/GameStart.css';
 
 function GameStart({ onStart }) {
     const [username, setUsername] = useState('');
@@ -32,18 +33,26 @@ function GameStart({ onStart }) {
     };
 
     return (
-        <div className="fullscreen-container">
-            <div className="text-center">
-                <h1 className="display-1" style={{fontFamily: 'Courier Prime, monospace'}}>
+        <div className="game-start-body">
+            <div className="title-container">
+                <p className="game-start-title">
                     RAŠYMO LENKTYNĖS
-                </h1>
-                <input
+                </p>
+            </div>
+            <div className="input-container">
+                <input className="input-box"
                     type="text"
                     placeholder="Įveskite savo vartotojo vardą"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
+                       size={29}
                 />
-                <button className="btn btn-primary btn-lg mt-3" onClick={startGame}>
+            </div>
+            <div className="button-container">
+                <button
+                    className="start-game-button"
+                    onClick={startGame}
+                >
                     Pradėti žaidimą
                 </button>
             </div>

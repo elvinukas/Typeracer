@@ -50,6 +50,7 @@
 .restart-button,
 .next-text-button {
     background-color: rgb(11, 94, 215);
+    opacity: 0.9;
     color: white;
     padding: 15px;
     border: none;
@@ -59,7 +60,7 @@
 
 .restart-button:hover,
 .next-text-button:hover {
-    opacity: 0.9;
+    opacity: 1;
 }
 
 .restart-button {

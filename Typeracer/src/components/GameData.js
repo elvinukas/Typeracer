@@ -207,7 +207,6 @@ function GameData( { gameId }) {
                     Peržiūrėti lyderių lentelę
                 </button>
             </div>
-
         </div>
     );
 }

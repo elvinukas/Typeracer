@@ -1,11 +1,13 @@
 ﻿import React, {useState} from 'react';
 import '../../wwwroot/css/GameStart.css';
+import CustomAlert from './CustomAlert';
 
 function GameStart({ onStart }) {
     const [username, setUsername] = useState('');
+    const [showAlert, setShowAlert] = useState(false);
     const startGame = async () => {
         if (!username) {
-            alert("Vartotojo vardas būtinas!");
+            setShowAlert(true);
             return;
         }
         
@@ -56,6 +58,7 @@ function GameStart({ onStart }) {
                     Pradėti žaidimą
                 </button>
             </div>
+            {showAlert && <CustomAlert message="Vartotojo vardas būtinas!" onClose={() => setShowAlert(false)} />}
         </div>
     );
 }

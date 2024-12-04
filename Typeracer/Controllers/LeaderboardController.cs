@@ -12,6 +12,7 @@ namespace Typeracer.Controllers
     public class LeaderboardController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private static string _username;
 
         public LeaderboardController(AppDbContext context)
         {
@@ -68,26 +69,33 @@ namespace Typeracer.Controllers
 
             return Ok(leaderboard);
         }
-
-        [HttpPost("save")]
-        public IActionResult SavePlayerData([FromBody] PlayerDataModel playerData, AppDbContext context)
+        
+        
+        [HttpPost("save-username")]
+        public IActionResult SaveUsername([FromBody] string username)
         {
-            if (string.IsNullOrEmpty(playerData.Username))
+            if (string.IsNullOrEmpty(username))
             {
                 return BadRequest("Username is necessary!");
             }
 
-            // if (string.IsNullOrEmpty(playerData.PlayerID) || !Guid.TryParse(playerData.PlayerID, out Guid playerGuid))
-            // {
-            //     return BadRequest("Neteisingas PlayerID formatas");
-            // }
+            _username = username;
+            return Ok("Username saved successfully!");
+        }
+        
+        [HttpPost("save")]
+        public IActionResult SavePlayerData([FromBody] PlayerDataModel playerData, AppDbContext context)
+        {
+            if (string.IsNullOrEmpty(_username))
+            {
+                return BadRequest("Username is not set!");
+            }
 
-            //Console.WriteLine($"Received PlayerID: {playerData.PlayerID}");
-            Console.WriteLine($"Received Username: {playerData.Username}");
+            Console.WriteLine($"Received Username: {_username}");
             Console.WriteLine($"GameID: {playerData.GameId}");
 
             var player = new Player(
-                playerData.Username,
+                _username,
                 playerData.BestWPM,
                 playerData.BestAccuracy
             );
@@ -96,7 +104,6 @@ namespace Typeracer.Controllers
             {
                 try
                 {
-                    //Player? existingPlayer = context.Players.Find(player.PlayerID);
                     Player? existingPlayer = context.Players
                         .Include(p => p.WPMs)
                         .Include(p => p.Accuracies)

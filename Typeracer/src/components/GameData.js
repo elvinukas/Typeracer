@@ -100,16 +100,8 @@ function GameData( { gameId }) {
     const accuracy = gameData.statistics.accuracy || "N/A";
     
     const saveStatistics = async () => {
-        const username = prompt("Įveskite savo vartotojo vardą:");
-        if (!username) {
-            alert("Vartotojo vardas būtinas!");
-            return;
-        }
-        
-        //console.log("Generated or retrieved PlayerID: ", playerID);
-
         const playerData = {
-            Username: username,
+            Username: null,
             BestWPM: gameData.statistics.wordsPerMinute,
             BestAccuracy: gameData.statistics.accuracy,
             GameId: gameId
@@ -127,12 +119,12 @@ function GameData( { gameId }) {
             });
 
             if (!response.ok) {
-                throw new Error('Nepavyko išsaugoti duomenų lyderių lentelėje');
+                throw new Error('Couldn\'t save player datato leaderboard');
             }
 
-            alert('Rezultatai išsaugoti!');
+            alert('Results saved!');
         } catch (error) {
-            console.error('Klaida:', error);
+            console.error(error);
         }
     };
     

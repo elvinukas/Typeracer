@@ -156,7 +156,8 @@ public class HomeController : Controller
         }
     }
 
-    public IActionResult GetParagraphText(Gamemode gamemode = Gamemode.Short)
+    [HttpPost]
+    public IActionResult GetParagraphText([FromBody] Gamemode gamemode)
     {
         //Paragraph paragraph = GetRandomParagraph(gamemode: gamemode); // named arguments
         Paragraph paragraph = GetRandomParagraph(gamemode: gamemode); 

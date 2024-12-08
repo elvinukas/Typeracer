@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import GameStart from './components/GameStart';
 import Type from './components/Type';
+import {GameProvider} from "./components/GameContext";
 
 function App() {
     const [isGameStarted, setIsGameStarted] = useState(false);
@@ -20,4 +21,8 @@ function App() {
 
 const container = document.getElementById('root');
 const root = ReactDOM.createRoot(container);
-root.render(<App />);
+root.render(
+    <GameProvider>
+        <App />
+    </GameProvider>
+);

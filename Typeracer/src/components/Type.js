@@ -3,6 +3,7 @@ import { Howl } from 'howler';
 import '../../wwwroot/css/Type.css';
 import wrongSound from '../../wwwroot/sounds/incorrect.mp3';
 import GameData from './GameData';
+import {useGame} from "./GameContext";
 
 function Type() {
     const [typingText, setTypingText] = useState('');
@@ -16,6 +17,7 @@ function Type() {
     const [isComplete, setIsComplete] = useState(false);
     const [showGameData, setShowGameData] = useState(false);
     const [gameId, setGameId] = useState(null);
+    const {gamemode, setGamemode} = useGame();
     
     // used for checking when was the last keypress recorded - text cursor blinker
     const [lastKeyPressTime, setLastKeyPressTime] = useState(Date.now());
@@ -42,6 +44,8 @@ function Type() {
     // Used for storing word information
     const wordsInfoRef = useRef([]);
     
+    
+    
     // used for creating info about words from the text
     const buildWordsInfo = (text) => {
         if (text) {
@@ -62,8 +66,15 @@ function Type() {
         }
     };
     
-    const fetchParagraphText = async () => {
-        let response = await fetch('/Home/GetParagraphText/');
+    const fetchParagraphText = async (gamemode) => {
+        console.log("This is the gamemode! " + gamemode);
+        let response = await fetch('/Home/GetParagraphText/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: gamemode
+        });
         let jsonResponse = await response.json();
         console.log("Json response: " + jsonResponse);
         
@@ -407,11 +418,11 @@ function Type() {
         setIncorrectChars({});
         setFirstErrorIndex(null);
         setConsecutiveRedCount(0);
-        fetchParagraphText();
+        fetchParagraphText(gamemode);
     }
 
     useEffect(() => {
-        fetchParagraphText();
+        fetchParagraphText(gamemode);
 
         // Initializing Howler sound
         wrongSoundRef.current = new Howl({

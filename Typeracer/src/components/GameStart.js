@@ -1,9 +1,11 @@
 ﻿import React, {useState} from 'react';
 import '../../wwwroot/css/GameStart.css';
 import CustomAlert from './CustomAlert';
+import {useGame} from "./GameContext";
 
 function GameStart({ onStart }) {
     const [username, setUsername] = useState('');
+    const {gamemode, setGamemode} = useGame();
     const [showAlert, setShowAlert] = useState(false);
     const startGame = async () => {
         if (!username) {
@@ -43,12 +45,25 @@ function GameStart({ onStart }) {
             </div>
             <div className="input-container">
                 <input className="input-box"
-                    type="text"
-                    placeholder="Įveskite savo vartotojo vardą"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                       type="text"
+                       placeholder="Įveskite savo vartotojo vardą"
+                       value={username}
+                       onChange={(e) => setUsername(e.target.value)}
                        size={29}
                 />
+            </div>
+            <div className="dropdown-container">
+                <label htmlFor="gamemode">Pasirinkite žaidimo tipą:</label>
+                <select
+                    id="gamemode"
+                    className="dropdown"
+                    value={gamemode}
+                    onChange={(e) => setGamemode(e.target.value)}
+                >
+                    <option value="0">Standartinis</option>
+                    <option value="1">Trumpas</option>
+                    <option value="2">Sunkus</option>
+                </select>
             </div>
             <div className="button-container">
                 <button
@@ -58,7 +73,8 @@ function GameStart({ onStart }) {
                     Pradėti žaidimą
                 </button>
             </div>
-            {showAlert && <CustomAlert message="Vartotojo vardas būtinas!" borderColor="red" onClose={() => setShowAlert(false)} />}
+            {showAlert && <CustomAlert message="Vartotojo vardas būtinas!" borderColor="red"
+                                       onClose={() => setShowAlert(false)}/>}
         </div>
     );
 }

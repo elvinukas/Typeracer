@@ -69,6 +69,12 @@ function GameData( { gameId }) {
             .catch(error => console.error("Error fetching paragraph data:", error));
     }
 
+    useEffect(() => {
+        if (gameData && paragraphData) {
+            saveStatistics();
+        }
+    }, [gameData, paragraphData]);
+
     if (showLeaderboard) {
         return <Leaderboard />;
     }
@@ -202,11 +208,6 @@ function GameData( { gameId }) {
                 </div>
             </div>
             <div className="button-container">
-                <button className="save-statistics-button"
-                        onClick={saveStatistics}
-                >
-                    Išsaugoti statistiką
-                </button>
                 <button className="see-leaderboard-button"
                         onClick={() => setShowLeaderboard(true)}
                 >

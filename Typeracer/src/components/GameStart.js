@@ -2,8 +2,10 @@
 import '../../wwwroot/css/GameStart.css';
 import CustomAlert from './CustomAlert';
 import { UsernameContext } from '../UsernameContext';
+import {useGame} from "./GameContext";
 
 function GameStart({ onStart }) {
+    const {gamemode, setGamemode} = useGame();
     const [showAlert, setShowAlert] = useState(false);
     const { setUsername } = useContext(UsernameContext);
     const [inputUsername, setInputUsername] = useState('');
@@ -38,6 +40,19 @@ function GameStart({ onStart }) {
                        size={29}
                 />
             </div>
+            <div className="dropdown-container">
+                <label htmlFor="gamemode">Pasirinkite žaidimo tipą:</label>
+                <select
+                    id="gamemode"
+                    className="dropdown"
+                    value={gamemode}
+                    onChange={(e) => setGamemode(e.target.value)}
+                >
+                    <option value="0">Standartinis</option>
+                    <option value="1">Trumpas</option>
+                    <option value="2">Sunkus</option>
+                </select>
+            </div>
             <div className="button-container">
                 <button
                     className="start-game-button"
@@ -46,7 +61,8 @@ function GameStart({ onStart }) {
                     Pradėti žaidimą
                 </button>
             </div>
-            {showAlert && <CustomAlert message="Vartotojo vardas būtinas!" borderColor="red" onClose={() => setShowAlert(false)} />}
+            {showAlert && <CustomAlert message="Vartotojo vardas būtinas!" borderColor="red"
+                                       onClose={() => setShowAlert(false)}/>}
         </div>
     );
 }

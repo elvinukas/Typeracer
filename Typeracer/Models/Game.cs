@@ -25,7 +25,8 @@ public class Game
         GameId = Guid.NewGuid();
         Statistics = statisticsModel;
         Player = null;
-        Gamemode = Gamemode.Standard;   // default gamemode
+        //Gamemode = (Gamemode)Enum.ToObject(typeof(Gamemode), statisticsModel.Gamemode);
+        Gamemode = statisticsModel.Gamemode;
         CalculateCompletionTime();
         CalculateAdditionalStatistics();
     }
@@ -43,7 +44,7 @@ public class Game
             }
             else
             {
-                this.CompletionTime = -1;
+                this.CompletionTime = 0;
             }
         }
     }
@@ -51,11 +52,13 @@ public class Game
     private void CalculateAdditionalStatistics()
     {
         
-        if (CompletionTime > 0)
-        {
-            Statistics.WordsPerMinute = CalculateWPM(Statistics.TypedAmountOfWords, (CompletionTime / 60.0));
-            Statistics.Accuracy = CalculateAccuracy(Statistics.TypedAmountOfCharacters, Statistics.NumberOfWrongfulCharacters);
-        }
+        Statistics.WordsPerMinute = CalculateWPM(Statistics.TypedAmountOfWords, (CompletionTime / 60.0));
+        Statistics.Accuracy = CalculateAccuracy(Statistics.TypedAmountOfCharacters, Statistics.NumberOfWrongfulCharacters);
+        // if (CompletionTime > 0)
+        // {
+        //     Statistics.WordsPerMinute = CalculateWPM(Statistics.TypedAmountOfWords, (CompletionTime / 60.0));
+        //     Statistics.Accuracy = CalculateAccuracy(Statistics.TypedAmountOfCharacters, Statistics.NumberOfWrongfulCharacters);
+        // }
         
         // | Calculating CurrentWordsPerMinute and CurrentAccuracy for each word
         
@@ -69,16 +72,25 @@ public class Game
         {
             if (typingData.Word.Length >= 4)
             {
-                double completionTime = (typingData.EndingTimestampWord - typingData.BeginningTimestampWord).TotalMinutes;
-                typingData.CurrentWordsPerMinute = CalculateWPM(typedAmountOfWords: 1, completionTime: completionTime); // named arguments
-                previousWPM = typingData.CurrentWordsPerMinute;
+                if (typingData.EndingTimestampWord != null && typingData.BeginningTimestampWord != null)
+                {
+                    double completionTime = (typingData.EndingTimestampWord - typingData.BeginningTimestampWord).Value.TotalMinutes;
+                    typingData.CurrentWordsPerMinute = CalculateWPM(typedAmountOfWords: 1, completionTime: completionTime); // named arguments
+                    previousWPM = typingData.CurrentWordsPerMinute;
+                }
+                else
+                {
+                    typingData.CurrentWordsPerMinute = 0;
+                    typingData.CurrentAccuracy = 0;
+                }
+                
             }
             else
             {
                 typingData.CurrentWordsPerMinute = previousWPM;
             }
             
-            typingData.CurrentAccuracy = CalculateAccuracy(totalCharacters: typingData.Word.Length, incorrectCharacters: typingData.AmountOfMistakesInWord); // named arguments
+            typingData.CurrentAccuracy = CalculateAccuracy(totalCharacters: typingData.Word.Length, incorrectCharacters: typingData.AmountOfMistakesInWord);
             
             wpmList.Add(typingData.CurrentWordsPerMinute);
             accuracyList.Add(typingData.CurrentAccuracy);
@@ -86,7 +98,7 @@ public class Game
         
         double[] smoothedWpmData = CalculateMovingAverage(data: wpmList.ToArray()); // LINQ // named and optional arguments
         double[] smoothedAccuracyData = CalculateMovingAverage(data: accuracyList.ToArray()); // LINQ // named and optional arguments
-
+        
         for (int i = 0; i < Statistics.TypingData.Count; i++)
         {
             Statistics.TypingData[i].CurrentWordsPerMinute = smoothedWpmData[i];
@@ -118,13 +130,17 @@ public class Game
     
     private double CalculateWPM(int typedAmountOfWords, double completionTime)
     {
+        if (typedAmountOfWords == 0)
+        {
+            return 0;
+        }
         if (completionTime != 0)
         {
             return typedAmountOfWords / completionTime;
         }
         else
         {
-            return -1;
+            return 0;
         }
     }
     

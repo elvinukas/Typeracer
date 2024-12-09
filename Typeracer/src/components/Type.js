@@ -2,7 +2,10 @@
 import { Howl } from 'howler';
 import '../../wwwroot/css/Type.css';
 import wrongSound from '../../wwwroot/sounds/incorrect.mp3';
+import wrongHardcoreSound from '../../wwwroot/sounds/incorrect_hardcore.mp3';
+import typingHardcoreSound from '../../wwwroot/sounds/typing_hardcore.mp3';
 import GameData from './GameData';
+import {useGame} from "./GameContext";
 import { UsernameContext } from '../UsernameContext';
 
 function Type() {
@@ -17,6 +20,8 @@ function Type() {
     const [isComplete, setIsComplete] = useState(false);
     const [showGameData, setShowGameData] = useState(false);
     const [gameId, setGameId] = useState(null);
+    const {gamemode, setGamemode} = useGame();
+    const [isGameOver, setIsGameOver] = useState(false); // used in hardcore mode
     const { username } = useContext(UsernameContext);
     
     // used for checking when was the last keypress recorded - text cursor blinker
@@ -32,17 +37,24 @@ function Type() {
         TypedAmountOfWords: 0,
         TypedAmountOfCharacters: 0,
         NumberOfWrongfulCharacters: 0,
+        Gamemode: gamemode,
         TypingData: []
     });
     
     const charRefs = useRef([]);
-    const wrongSoundRef = useRef(null);
     const intervalRef = useRef(null);
     const blinkTimeoutRef = useRef(null);
     const errorWordInfoRef = useRef(null);
     
     // Used for storing word information
     const wordsInfoRef = useRef([]);
+
+    const wrongSoundRef = useRef(null);
+    const wrongSoundHardcoreRef = useRef(null);
+    const typingSoundHardcoreRef = useRef(null);
+    
+    
+    
     
     // used for creating info about words from the text
     const buildWordsInfo = (text) => {
@@ -64,8 +76,15 @@ function Type() {
         }
     };
     
-    const fetchParagraphText = async () => {
-        let response = await fetch('/Home/GetParagraphText/');
+    const fetchParagraphText = async (gamemode) => {
+        console.log("This is the gamemode! " + gamemode);
+        let response = await fetch('/Home/GetParagraphText/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: gamemode // it's already string, no need to stringify it :) spent a lot of time debugging this
+        });
         let jsonResponse = await response.json();
         console.log("Json response: " + jsonResponse);
         
@@ -105,6 +124,8 @@ function Type() {
     }
 
     const handleKeyDown = async (event) => {
+        
+        
         const inputCharacter = event.key;
         const isCharacterKey = inputCharacter.length === 1 || inputCharacter === ' ';
 
@@ -150,6 +171,10 @@ function Type() {
                 wordInfo.startTime = Date.now();
             }
         }
+        
+        // if (gamemode === '2') {
+        //     typingSoundHardcoreRef.current.play();
+        // }
 
         if (inputCharacter === 'Backspace') {
             if (currentIndex > 0) {
@@ -191,8 +216,10 @@ function Type() {
 
                 if (firstErrorIndex !== null && currentIndex >= firstErrorIndex) {
                     setConsecutiveRedCount((prevCount) => prevCount + 1);
-                    if (wrongSoundRef.current) {
+                    if (wrongSoundRef.current && gamemode !== '2') {
                         wrongSoundRef.current.play();
+                    } else {
+                        wrongSoundHardcoreRef.current.play();
                     }
                 } else {
                     setConsecutiveRedCount(0);
@@ -217,6 +244,11 @@ function Type() {
                 }
 
             } else if (isCharacterKey && inputCharacter !== typingText[currentIndex]) {  // Incorrect character
+                
+                if (gamemode === '2') {
+                    setIsGameOver(true);
+                } 
+                
                 // Recalculating wordInfo if null
                 if (!wordInfo) {
                     const adjustedIndex = currentIndex > 0 ? currentIndex - 1 : 0;
@@ -234,7 +266,7 @@ function Type() {
                         console.log('wordInfo is still null after recalculation at currentIndex:', currentIndex);
                     }
                 }
-
+                
                 setIncorrectChars((prevIncorrectChars) => ({
                     ...prevIncorrectChars,
                     [currentIndex]: inputCharacter,
@@ -249,8 +281,10 @@ function Type() {
                 }
 
                 setConsecutiveRedCount((prevCount) => prevCount + 1);
-                if (wrongSoundRef.current) {
+                if (wrongSoundRef.current && gamemode !== '2') {
                     wrongSoundRef.current.play();
+                } else {
+                    wrongSoundHardcoreRef.current.play();
                 }
 
                 // Incrementing mistakes for the fixed word
@@ -273,58 +307,72 @@ function Type() {
         }
 
         // Using newCurrentIndex for completion check
-        if (!isComplete && newCurrentIndex >= typingText.length && consecutiveRedCount === 0 && inputCharacter === typingText[currentIndex]) {  // stops the timer when the text is finished and the last character is typed
-            clearInterval(intervalRef.current);
-            const finishTime = Date.now();
-
-            // Collecting updated values
-            const newLocalFinishTime = new Date(finishTime);
-
-            // Preparing the typingData array
-            const typingData = wordsInfoRef.current.map(wordInfo => ({
-                Word: wordInfo.word,
-                BeginningTimestampWord: wordInfo.startTime ? new Date(wordInfo.startTime).toISOString() : null,
-                EndingTimestampWord: wordInfo.endTime ? new Date(wordInfo.endTime).toISOString() : null,
-                AmountOfMistakesInWord: wordInfo.mistakes
-            }));
-
-            // Calculating the total number of wrongful characters
-            const totalMistakes = typingData.reduce((acc, word) => acc + word.AmountOfMistakesInWord, 0);
-
-            // Recalculating TypedAmountOfWords
-            const newTypedAmountOfWords = typingData.filter(td => td.EndingTimestampWord !== null).length;
-
-            // Collecting all updated statistics data
-            const updatedStatisticsData = {
-                ...statisticsData,
-                LocalFinishTime: newLocalFinishTime,
-                TypedAmountOfWords: newTypedAmountOfWords,
-                TypedAmountOfCharacters: currentIndex, // Using currentIndex as the total typed characters
-                NumberOfWrongfulCharacters: totalMistakes,
-                TypingData: typingData
-            };
-
-            // Updating the statisticsData state
-            setStatisticsData(updatedStatisticsData);
-
-            // Assembling the data to send
-            const dataToSend = {
-                LocalStartTime: updatedStatisticsData.LocalStartTime ? new Date(updatedStatisticsData.LocalStartTime).toISOString() : null,
-                LocalFinishTime: updatedStatisticsData.LocalFinishTime ? new Date(updatedStatisticsData.LocalFinishTime).toISOString() : null,
-                ParagraphId: updatedStatisticsData.ParagraphId,
-                TypedAmountOfWords: updatedStatisticsData.TypedAmountOfWords,
-                TypedAmountOfCharacters: updatedStatisticsData.TypedAmountOfCharacters,
-                NumberOfWrongfulCharacters: updatedStatisticsData.NumberOfWrongfulCharacters,
-                TypingData: updatedStatisticsData.TypingData
-            };
-            
-            // Sending the data
-            await sendStatisticsData(dataToSend);
-            
-            // Marking as completed to prevent duplicate requests
-            setIsComplete(true);
+        if ((!isComplete && newCurrentIndex >= typingText.length && consecutiveRedCount === 0 && inputCharacter === typingText[currentIndex]) || isGameOver) {  // stops the timer when the text is finished and the last character is typed
+            await finishGame();
         }
     };
+    
+    useEffect(() => {
+        if (gamemode === '2' && isGameOver) {
+            finishGame();
+        }
+    }, [isGameOver, gamemode])
+    
+    const finishGame = async () => {
+        clearInterval(intervalRef.current);
+        const finishTime = Date.now();
+
+        // Collecting updated values
+        const newLocalFinishTime = new Date(finishTime);
+
+        // Preparing the typingData array
+        // the filter is there to not send any entries that have startTime of 0 or null. they are invalid.
+        const typingData = wordsInfoRef.current.filter(wordInfo => wordInfo.startTime !== 0 && wordInfo.startTime !== null).map(wordInfo => ({
+            Word: wordInfo.word,
+            BeginningTimestampWord: wordInfo.startTime ? new Date(wordInfo.startTime).toISOString() : null,
+            EndingTimestampWord: wordInfo.endTime ? new Date(wordInfo.endTime).toISOString() : null,
+            AmountOfMistakesInWord: wordInfo.mistakes
+        }));
+
+        // Calculating the total number of wrongful characters
+        const totalMistakes = typingData.reduce((acc, word) => acc + word.AmountOfMistakesInWord, 0);
+
+        // Recalculating TypedAmountOfWords
+        const newTypedAmountOfWords = typingData.filter(td => td.EndingTimestampWord !== null).length;
+
+        // Collecting all updated statistics data
+        const updatedStatisticsData = {
+            ...statisticsData,
+            LocalFinishTime: newLocalFinishTime,
+            TypedAmountOfWords: newTypedAmountOfWords,
+            TypedAmountOfCharacters: currentIndex, // Using currentIndex as the total typed characters
+            NumberOfWrongfulCharacters: totalMistakes,
+            Gamemode: parseInt(gamemode, 10),
+            TypingData: typingData
+        };
+
+        // Updating the statisticsData state
+        setStatisticsData(updatedStatisticsData);
+
+        // Assembling the data to send
+        const dataToSend = {
+            LocalStartTime: updatedStatisticsData.LocalStartTime ? new Date(updatedStatisticsData.LocalStartTime).toISOString() : null,
+            LocalFinishTime: updatedStatisticsData.LocalFinishTime ? new Date(updatedStatisticsData.LocalFinishTime).toISOString() : null,
+            ParagraphId: updatedStatisticsData.ParagraphId,
+            TypedAmountOfWords: updatedStatisticsData.TypedAmountOfWords,
+            TypedAmountOfCharacters: updatedStatisticsData.TypedAmountOfCharacters,
+            NumberOfWrongfulCharacters: updatedStatisticsData.NumberOfWrongfulCharacters,
+            Gamemode: updatedStatisticsData.Gamemode,
+            TypingData: updatedStatisticsData.TypingData
+        };
+
+        // Sending the data
+        await sendStatisticsData(dataToSend);
+
+        // Marking as completed to prevent duplicate requests
+        setIsComplete(true);
+    }
+    
 
     const formatDateTime = (date) => {
         return date.toISOString().replace('Z', '');
@@ -409,17 +457,27 @@ function Type() {
         setIncorrectChars({});
         setFirstErrorIndex(null);
         setConsecutiveRedCount(0);
-        fetchParagraphText();
+        fetchParagraphText(gamemode);
     }
 
     useEffect(() => {
-        fetchParagraphText();
+        fetchParagraphText(gamemode);
 
         // Initializing Howler sound
         wrongSoundRef.current = new Howl({
             src: [wrongSound],
             preload: true,
         });
+        
+        wrongSoundHardcoreRef.current = new Howl({
+            src: [wrongHardcoreSound],
+            preload: true
+        });
+        
+        typingSoundHardcoreRef.current = new Howl({
+            src: [typingHardcoreSound],
+            preload: true
+        })
 
         return () => {
             clearInterval(intervalRef.current);

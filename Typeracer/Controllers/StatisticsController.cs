@@ -33,7 +33,7 @@ public class StatisticsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> SaveStatistics([FromBody] StatisticsModel statisticsData)
     {
-        if (statisticsData == null)
+       if (statisticsData == null)
         {
             return BadRequest("Invalid data: statisticsData is null.");
         }
@@ -51,8 +51,8 @@ public class StatisticsController : ControllerBase
 
         foreach (TypingData data in statisticsData.TypingData)
         {
-            data.BeginningTimestampWord = DateTime.SpecifyKind(data.BeginningTimestampWord, DateTimeKind.Utc);
-            data.EndingTimestampWord = DateTime.SpecifyKind(data.EndingTimestampWord, DateTimeKind.Utc);
+            data.BeginningTimestampWord = DateTime.SpecifyKind(data.BeginningTimestampWord ?? DateTime.MinValue, DateTimeKind.Utc);
+            data.EndingTimestampWord = DateTime.SpecifyKind(data.EndingTimestampWord ?? DateTime.MinValue, DateTimeKind.Utc);
         }
         
         // initiating a game object with all the statistics data

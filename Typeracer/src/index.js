@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import GameStart from './components/GameStart';
 import Type from './components/Type';
+import {GameProvider} from "./components/GameContext";
 import {UsernameContext, UsernameProvider} from "./UsernameContext";
 
 function App() {
@@ -22,7 +23,10 @@ function App() {
 const container = document.getElementById('root');
 const root = ReactDOM.createRoot(container);
 root.render(
-    <UsernameProvider>
-        <App />
-    </UsernameProvider>
+    <GameProvider>
+        <UsernameProvider>
+            <App />
+        </UsernameProvider>
+    </GameProvider>
+
 );

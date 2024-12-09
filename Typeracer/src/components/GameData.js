@@ -1,11 +1,10 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
 import '../../wwwroot/css/GameData.css';
 import Leaderboard from './Leaderboard';
 import CustomAlert from './CustomAlert';
 import { UsernameContext } from '../UsernameContext';
 function GameData( { gameId }) {
     const [gameData, setGameData] = useState(null);
-    const [paragraphData, setParagraphData] = useState(null);
     const [showLeaderboard, setShowLeaderboard] = useState(false);
     const [appID, setAppID] = useState(null);
     const [showAlert, setShowAlert] = useState(false);
@@ -33,8 +32,12 @@ function GameData( { gameId }) {
         }
     }
     
+    const isGameDataFetched = useRef(false);
 
     useEffect(() => {
+        console.log("Fetching game data...");
+        if (isGameDataFetched.current) return;
+        
         fetch(`api/Game/${gameId}`)
             .then(response => {
                 if (!response.ok) {
@@ -45,31 +48,19 @@ function GameData( { gameId }) {
             .then(data => {
                 console.log("Fetched game data:", data);
                 setGameData(data);
-
-                if (data.statistics.paragraphId) {
-                    fetchParagraphData(data.statistics.paragraphId);
-                }
+                isGameDataFetched.current = true;
                 
             })
             .catch(error => console.error("Error fetching game data:", error));
     }, [gameId]);
     
     
-    function fetchParagraphData(paragraphId) {
-        fetch(`/api/paragraphs/${paragraphId}`)
-        .then(response => {
-            if (!response.ok) {
-                console.log("Failed to retrieve paragraph data");
-                throw new Error("Paragraph data not found");
-            }
-            return response.json();
-        })
-            .then(data => {
-                console.log("Fetched paragraph data:", data);
-                setParagraphData(data); // Save the paragraph data
-            })
-            .catch(error => console.error("Error fetching paragraph data:", error));
-    }
+
+    useEffect(() => {
+        if (gameData) {
+            saveStatistics();
+        }
+    }, [gameData]);
 
     if (showLeaderboard) {
         return <Leaderboard />;
@@ -83,12 +74,10 @@ function GameData( { gameId }) {
         return <div>Loading game data...</div>; // loading screen for game data
     }
 
-    if (!paragraphData) {
-        return <div>Loading paragraph data...</div>; // loading screen for paragraph data
-    }
     
-    console.log("This is the localStartTime: ", gameData.statistics.localStartTime);
-    console.log("This is totalAmountOfWords: ", paragraphData.totalAmountOfWords);
+    
+    //console.log("This is the localStartTime: ", gameData.statistics.localStartTime);
+    //console.log("This is totalAmountOfWords: ", paragraphData.totalAmountOfWords);
     
     
     const startTime = new Date(gameData.statistics.localStartTime);
@@ -98,8 +87,8 @@ function GameData( { gameId }) {
     const formattedStartTime = startTime.toLocaleTimeString('en-GB', { hour12: false });
     const formattedFinishTime = finishTime.toLocaleTimeString('en-GB', { hour12: false });
     
-    const wordsPerMinute = gameData.statistics.wordsPerMinute|| "N/A";
-    const accuracy = gameData.statistics.accuracy || "N/A";
+    const wordsPerMinute = gameData.statistics.wordsPerMinute|| 0;
+    const accuracy = gameData.statistics.accuracy || 0;
     
     const saveStatistics = async () => {
         const playerData = {
@@ -183,7 +172,7 @@ function GameData( { gameId }) {
                             <p className="paragraph">ŽODŽIAI</p>
                         </div>
                         <div className="bottom-number">
-                            {paragraphData.totalAmountOfWords}
+                            {gameData.statistics.typingData.length}
                         </div>
                     </div>
                     <div className="characters">
@@ -191,7 +180,7 @@ function GameData( { gameId }) {
                             <p className="paragraph">IŠ VISO/KLAIDOS</p>
                         </div>
                         <div className="bottom-number">
-                            {paragraphData.totalAmountOfCharacters}/{gameData.statistics.numberOfWrongfulCharacters}
+                            {gameData.statistics.typedAmountOfCharacters}/{gameData.statistics.numberOfWrongfulCharacters}
                         </div>
                     </div>
                     <div className="startTime">
@@ -213,11 +202,6 @@ function GameData( { gameId }) {
                 </div>
             </div>
             <div className="button-container">
-                <button className="save-statistics-button"
-                        onClick={saveStatistics}
-                >
-                    Išsaugoti statistiką
-                </button>
                 <button className="see-leaderboard-button"
                         onClick={() => setShowLeaderboard(true)}
                 >

@@ -24,13 +24,16 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader());
 });
 
-var paragraphFiles = new Dictionary<string, List<Gamemode>>
-{
-    { "paragraph1.txt", new List<Gamemode> { Gamemode.Standard, Gamemode.Hardcore } },
-    { "paragraph2.txt", new List<Gamemode> { Gamemode.Short } }
-};
 
-builder.Services.AddSingleton(paragraphFiles);
+// | Comment out this text after adding the paragraphs, or the program will try to add these paragraphs constantly.
+// UUID needs to be created, so it is not optimal to create the paragraphs straight in the database.
+// var paragraphFiles = new Dictionary<string, List<Gamemode>>
+// {
+//     { "paragraph1.txt", new List<Gamemode> { Gamemode.Standard, Gamemode.Hardcore } },
+//     { "paragraph2.txt", new List<Gamemode> { Gamemode.Short } }
+// };
+//
+// builder.Services.AddSingleton(paragraphFiles);
 builder.Services.AddScoped<HomeController>();
 
 

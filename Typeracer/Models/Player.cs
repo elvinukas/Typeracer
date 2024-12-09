@@ -1,9 +1,11 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace Typeracer.Models;
 
 // values of a player can change, so struct is used instead of record
 // extension methods can be called to calculate the average WPM, average accuracy, best WPM and performance score
+[Index(nameof(Username), IsUnique = true)]
 public class Player : IComparable<Player>
 {
     [Key]

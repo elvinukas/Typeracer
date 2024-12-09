@@ -4,14 +4,14 @@
 
 .top-ribbon {
     position: relative;
+    margin-top: 30px;
+    margin-bottom: 30px;
 }
 
 .type-page-title {
-    margin-top: 30px;
     font-size: 40px;
     font-weight: bold;
     text-align: center;
-    margin-bottom: 30px;
 }
 
 .current-user {

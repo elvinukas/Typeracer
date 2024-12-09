@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import '../../wwwroot/css/GameData.css';
 import Leaderboard from './Leaderboard';
 import CustomAlert from './CustomAlert';
+import { UsernameContext } from '../UsernameContext';
 function GameData( { gameId }) {
     const [gameData, setGameData] = useState(null);
     const [paragraphData, setParagraphData] = useState(null);
     const [showLeaderboard, setShowLeaderboard] = useState(false);
     const [appID, setAppID] = useState(null);
     const [showAlert, setShowAlert] = useState(false);
+    const { username } = useContext(UsernameContext);
 
     useEffect(() => {
         // Fetch the application ID from the server
@@ -130,10 +132,19 @@ function GameData( { gameId }) {
     
     return (
         <div className="game-data-body">
-            <div className="game-data-title">
-                <p>Žaidimo duomenys</p>
+            <div className="top-ribbon">
+                <div className="game-data-title">
+                    <p>Žaidimo duomenys</p>
+                </div>
+                <div className="current-user">
+                    <div className="current-user-text">
+                        Dabar žaidžia:
+                    </div>
+                    <div className="username">
+                        {username}
+                    </div>
+                </div>
             </div>
-
             <div className="game-data-container">
                 <div className="wpm-acc-graph">
                     <div className="wpm-acc">

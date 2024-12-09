@@ -23,8 +23,9 @@ public class GraphController : ControllerBase
         {
             var game = await _dbContext.Games
                 .Include(g => g.Statistics)
-                .ThenInclude(s => s.TypingData)
+                .ThenInclude(s => s.TypingData.OrderBy(td => td.BeginningTimestampWord))
                 .FirstOrDefaultAsync(g => g.GameId == Guid.Parse(gameId));
+                
 
             if (game == null)
             {

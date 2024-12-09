@@ -18,6 +18,7 @@ function Type() {
     const [showGameData, setShowGameData] = useState(false);
     const [gameId, setGameId] = useState(null);
     const {gamemode, setGamemode} = useGame();
+    const [isGameOver, setIsGameOver] = useState(false); // used in hardcore mode
     
     // used for checking when was the last keypress recorded - text cursor blinker
     const [lastKeyPressTime, setLastKeyPressTime] = useState(Date.now());
@@ -32,6 +33,7 @@ function Type() {
         TypedAmountOfWords: 0,
         TypedAmountOfCharacters: 0,
         NumberOfWrongfulCharacters: 0,
+        Gamemode: gamemode,
         TypingData: []
     });
     
@@ -43,6 +45,7 @@ function Type() {
     
     // Used for storing word information
     const wordsInfoRef = useRef([]);
+    const wrongSoundHardcoreRef = useRef(null);
     
     
     
@@ -73,7 +76,7 @@ function Type() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: gamemode
+            body: gamemode // it's already string, no need to stringify it :) spent a lot of time debugging this
         });
         let jsonResponse = await response.json();
         console.log("Json response: " + jsonResponse);
@@ -114,6 +117,12 @@ function Type() {
     }
 
     const handleKeyDown = async (event) => {
+        
+        // if (gamemode === '2' && isGameOver) {
+        //     event.preventDefault();
+        //     setIsComplete(true);
+        // }
+        
         const inputCharacter = event.key;
         const isCharacterKey = inputCharacter.length === 1 || inputCharacter === ' ';
 
@@ -226,6 +235,11 @@ function Type() {
                 }
 
             } else if (isCharacterKey && inputCharacter !== typingText[currentIndex]) {  // Incorrect character
+                
+                if (gamemode === '2') {
+                    setIsGameOver(true);
+                }
+                
                 // Recalculating wordInfo if null
                 if (!wordInfo) {
                     const adjustedIndex = currentIndex > 0 ? currentIndex - 1 : 0;
@@ -243,7 +257,7 @@ function Type() {
                         console.log('wordInfo is still null after recalculation at currentIndex:', currentIndex);
                     }
                 }
-
+                
                 setIncorrectChars((prevIncorrectChars) => ({
                     ...prevIncorrectChars,
                     [currentIndex]: inputCharacter,
@@ -282,7 +296,7 @@ function Type() {
         }
 
         // Using newCurrentIndex for completion check
-        if (!isComplete && newCurrentIndex >= typingText.length && consecutiveRedCount === 0 && inputCharacter === typingText[currentIndex]) {  // stops the timer when the text is finished and the last character is typed
+        if ((!isComplete && newCurrentIndex >= typingText.length && consecutiveRedCount === 0 && inputCharacter === typingText[currentIndex]) || isGameOver) {  // stops the timer when the text is finished and the last character is typed
             clearInterval(intervalRef.current);
             const finishTime = Date.now();
 
@@ -290,7 +304,7 @@ function Type() {
             const newLocalFinishTime = new Date(finishTime);
 
             // Preparing the typingData array
-            const typingData = wordsInfoRef.current.map(wordInfo => ({
+            const typingData = wordsInfoRef.current.filter(wordInfo => wordInfo.startTime !== 0 && wordInfo.startTime !== null).map(wordInfo => ({
                 Word: wordInfo.word,
                 BeginningTimestampWord: wordInfo.startTime ? new Date(wordInfo.startTime).toISOString() : null,
                 EndingTimestampWord: wordInfo.endTime ? new Date(wordInfo.endTime).toISOString() : null,
@@ -310,6 +324,7 @@ function Type() {
                 TypedAmountOfWords: newTypedAmountOfWords,
                 TypedAmountOfCharacters: currentIndex, // Using currentIndex as the total typed characters
                 NumberOfWrongfulCharacters: totalMistakes,
+                Gamemode: parseInt(gamemode, 10),
                 TypingData: typingData
             };
 
@@ -324,6 +339,7 @@ function Type() {
                 TypedAmountOfWords: updatedStatisticsData.TypedAmountOfWords,
                 TypedAmountOfCharacters: updatedStatisticsData.TypedAmountOfCharacters,
                 NumberOfWrongfulCharacters: updatedStatisticsData.NumberOfWrongfulCharacters,
+                Gamemode: updatedStatisticsData.Gamemode,
                 TypingData: updatedStatisticsData.TypingData
             };
             

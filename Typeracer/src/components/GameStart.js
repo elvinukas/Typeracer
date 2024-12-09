@@ -1,12 +1,14 @@
-﻿import React, {useState} from 'react';
+﻿import React, {useContext, useState} from 'react';
 import '../../wwwroot/css/GameStart.css';
 import CustomAlert from './CustomAlert';
+import { UsernameContext } from '../UsernameContext';
 
 function GameStart({ onStart }) {
-    const [username, setUsername] = useState('');
     const [showAlert, setShowAlert] = useState(false);
+    const { setUsername } = useContext(UsernameContext);
+    const [inputUsername, setInputUsername] = useState('');
     const startGame = async () => {
-        if (!username) {
+        if (!inputUsername) {
             setShowAlert(true);
             return;
         }
@@ -17,12 +19,14 @@ function GameStart({ onStart }) {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(username)
+                body: JSON.stringify(inputUsername)
             });
             
             if (!response.ok) {
                 throw new Error('Failed to save username');
             }
+            
+            setUsername(inputUsername);
 
             const audio = new Audio('/sounds/click.mp3');
             audio.play();
@@ -45,8 +49,8 @@ function GameStart({ onStart }) {
                 <input className="input-box"
                     type="text"
                     placeholder="Įveskite savo vartotojo vardą"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    value={inputUsername}
+                    onChange={(e) => setInputUsername(e.target.value)}
                        size={29}
                 />
             </div>

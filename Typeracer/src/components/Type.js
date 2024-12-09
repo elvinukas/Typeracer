@@ -1,8 +1,9 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Howl } from 'howler';
 import '../../wwwroot/css/Type.css';
 import wrongSound from '../../wwwroot/sounds/incorrect.mp3';
 import GameData from './GameData';
+import { UsernameContext } from '../UsernameContext';
 
 function Type() {
     const [typingText, setTypingText] = useState('');
@@ -16,6 +17,7 @@ function Type() {
     const [isComplete, setIsComplete] = useState(false);
     const [showGameData, setShowGameData] = useState(false);
     const [gameId, setGameId] = useState(null);
+    const { username } = useContext(UsernameContext);
     
     // used for checking when was the last keypress recorded - text cursor blinker
     const [lastKeyPressTime, setLastKeyPressTime] = useState(Date.now());
@@ -482,9 +484,20 @@ function Type() {
 
     return (
         <div className="type-page-body">
-            <div className="type-page-title">
-                <p>Galima pradėti rašyti</p>
+            <div className="top-ribbon">
+                <div className="type-page-title">
+                    <p>Galima pradėti rašyti</p>
+                </div>
+                <div className="current-user">
+                    <div className="current-user-text">
+                        Dabar žaidžia:
+                    </div>
+                    <div className="username">
+                        {username}
+                    </div>
+                </div>
             </div>
+
 
             <div className="chronometer">
                 <p>{formatTime(elapsedTime)}</p>

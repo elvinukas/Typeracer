@@ -1,18 +1,34 @@
 .type-page-body {
-    
+    font-family: 'Courier Prime';
+}
+
+.top-ribbon {
+    position: relative;
 }
 
 .type-page-title {
     margin-top: 30px;
-    font-family: 'Courier Prime';
     font-size: 40px;
     font-weight: bold;
     text-align: center;
     margin-bottom: 30px;
 }
 
+.current-user {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-size: 20px;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.current-user-text {
+    color: grey;
+}
+
 .chronometer {
-    font-family: 'Courier Prime';
     font-size: 35px;
     text-align: center;
 }
@@ -32,7 +48,6 @@
 }
 
 .typing-text {
-    font-family: 'Courier Prime';
     font-size: 40px;
     color: grey;
     margin: 0;
@@ -43,7 +58,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: 'Courier Prime';
     font-size: 20px;
 }
 

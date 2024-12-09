@@ -12,30 +12,14 @@ function GameStart({ onStart }) {
             setShowAlert(true);
             return;
         }
-        
-        try {
-            const response = await fetch('/api/leaderboard/save-username', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(inputUsername)
-            });
-            
-            if (!response.ok) {
-                throw new Error('Failed to save username');
-            }
-            
-            setUsername(inputUsername);
 
-            const audio = new Audio('/sounds/click.mp3');
-            audio.play();
-            audio.onended = () => {
-                onStart();  // Making the transition to the Type component
-            };
-        } catch (error) {
-            console.error('Error saving username:', error);
-        }
+        setUsername(inputUsername);
+
+        const audio = new Audio('/sounds/click.mp3');
+        audio.play();
+        audio.onended = () => {
+            onStart();  // Making the transition to the Type component
+        };
     };
 
     return (

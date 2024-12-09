@@ -103,7 +103,7 @@ function GameData( { gameId }) {
     
     const saveStatistics = async () => {
         const playerData = {
-            Username: null,
+            Username: username,
             BestWPM: gameData.statistics.wordsPerMinute,
             BestAccuracy: gameData.statistics.accuracy,
             GameId: gameId
@@ -121,7 +121,7 @@ function GameData( { gameId }) {
             });
 
             if (!response.ok) {
-                throw new Error('Couldn\'t save player datato leaderboard');
+                throw new Error('Couldn\'t save player data to leaderboard');
             }
 
             setShowAlert(true);

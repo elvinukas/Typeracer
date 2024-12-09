@@ -118,10 +118,6 @@ function Type() {
 
     const handleKeyDown = async (event) => {
         
-        // if (gamemode === '2' && isGameOver) {
-        //     event.preventDefault();
-        //     setIsComplete(true);
-        // }
         
         const inputCharacter = event.key;
         const isCharacterKey = inputCharacter.length === 1 || inputCharacter === ' ';
@@ -238,7 +234,7 @@ function Type() {
                 
                 if (gamemode === '2') {
                     setIsGameOver(true);
-                }
+                } 
                 
                 // Recalculating wordInfo if null
                 if (!wordInfo) {
@@ -297,60 +293,71 @@ function Type() {
 
         // Using newCurrentIndex for completion check
         if ((!isComplete && newCurrentIndex >= typingText.length && consecutiveRedCount === 0 && inputCharacter === typingText[currentIndex]) || isGameOver) {  // stops the timer when the text is finished and the last character is typed
-            clearInterval(intervalRef.current);
-            const finishTime = Date.now();
-
-            // Collecting updated values
-            const newLocalFinishTime = new Date(finishTime);
-
-            // Preparing the typingData array
-            // the filter is there to not send any entries that have startTime of 0 or null. they are invalid.
-            const typingData = wordsInfoRef.current.filter(wordInfo => wordInfo.startTime !== 0 && wordInfo.startTime !== null).map(wordInfo => ({
-                Word: wordInfo.word,
-                BeginningTimestampWord: wordInfo.startTime ? new Date(wordInfo.startTime).toISOString() : null,
-                EndingTimestampWord: wordInfo.endTime ? new Date(wordInfo.endTime).toISOString() : null,
-                AmountOfMistakesInWord: wordInfo.mistakes
-            }));
-
-            // Calculating the total number of wrongful characters
-            const totalMistakes = typingData.reduce((acc, word) => acc + word.AmountOfMistakesInWord, 0);
-
-            // Recalculating TypedAmountOfWords
-            const newTypedAmountOfWords = typingData.filter(td => td.EndingTimestampWord !== null).length;
-
-            // Collecting all updated statistics data
-            const updatedStatisticsData = {
-                ...statisticsData,
-                LocalFinishTime: newLocalFinishTime,
-                TypedAmountOfWords: newTypedAmountOfWords,
-                TypedAmountOfCharacters: currentIndex, // Using currentIndex as the total typed characters
-                NumberOfWrongfulCharacters: totalMistakes,
-                Gamemode: parseInt(gamemode, 10),
-                TypingData: typingData
-            };
-
-            // Updating the statisticsData state
-            setStatisticsData(updatedStatisticsData);
-
-            // Assembling the data to send
-            const dataToSend = {
-                LocalStartTime: updatedStatisticsData.LocalStartTime ? new Date(updatedStatisticsData.LocalStartTime).toISOString() : null,
-                LocalFinishTime: updatedStatisticsData.LocalFinishTime ? new Date(updatedStatisticsData.LocalFinishTime).toISOString() : null,
-                ParagraphId: updatedStatisticsData.ParagraphId,
-                TypedAmountOfWords: updatedStatisticsData.TypedAmountOfWords,
-                TypedAmountOfCharacters: updatedStatisticsData.TypedAmountOfCharacters,
-                NumberOfWrongfulCharacters: updatedStatisticsData.NumberOfWrongfulCharacters,
-                Gamemode: updatedStatisticsData.Gamemode,
-                TypingData: updatedStatisticsData.TypingData
-            };
-            
-            // Sending the data
-            await sendStatisticsData(dataToSend);
-            
-            // Marking as completed to prevent duplicate requests
-            setIsComplete(true);
+            await finishGame();
         }
     };
+    
+    useEffect(() => {
+        if (gamemode === '2' && isGameOver) {
+            finishGame();
+        }
+    }, [isGameOver, gamemode])
+    
+    const finishGame = async () => {
+        clearInterval(intervalRef.current);
+        const finishTime = Date.now();
+
+        // Collecting updated values
+        const newLocalFinishTime = new Date(finishTime);
+
+        // Preparing the typingData array
+        // the filter is there to not send any entries that have startTime of 0 or null. they are invalid.
+        const typingData = wordsInfoRef.current.filter(wordInfo => wordInfo.startTime !== 0 && wordInfo.startTime !== null).map(wordInfo => ({
+            Word: wordInfo.word,
+            BeginningTimestampWord: wordInfo.startTime ? new Date(wordInfo.startTime).toISOString() : null,
+            EndingTimestampWord: wordInfo.endTime ? new Date(wordInfo.endTime).toISOString() : null,
+            AmountOfMistakesInWord: wordInfo.mistakes
+        }));
+
+        // Calculating the total number of wrongful characters
+        const totalMistakes = typingData.reduce((acc, word) => acc + word.AmountOfMistakesInWord, 0);
+
+        // Recalculating TypedAmountOfWords
+        const newTypedAmountOfWords = typingData.filter(td => td.EndingTimestampWord !== null).length;
+
+        // Collecting all updated statistics data
+        const updatedStatisticsData = {
+            ...statisticsData,
+            LocalFinishTime: newLocalFinishTime,
+            TypedAmountOfWords: newTypedAmountOfWords,
+            TypedAmountOfCharacters: currentIndex, // Using currentIndex as the total typed characters
+            NumberOfWrongfulCharacters: totalMistakes,
+            Gamemode: parseInt(gamemode, 10),
+            TypingData: typingData
+        };
+
+        // Updating the statisticsData state
+        setStatisticsData(updatedStatisticsData);
+
+        // Assembling the data to send
+        const dataToSend = {
+            LocalStartTime: updatedStatisticsData.LocalStartTime ? new Date(updatedStatisticsData.LocalStartTime).toISOString() : null,
+            LocalFinishTime: updatedStatisticsData.LocalFinishTime ? new Date(updatedStatisticsData.LocalFinishTime).toISOString() : null,
+            ParagraphId: updatedStatisticsData.ParagraphId,
+            TypedAmountOfWords: updatedStatisticsData.TypedAmountOfWords,
+            TypedAmountOfCharacters: updatedStatisticsData.TypedAmountOfCharacters,
+            NumberOfWrongfulCharacters: updatedStatisticsData.NumberOfWrongfulCharacters,
+            Gamemode: updatedStatisticsData.Gamemode,
+            TypingData: updatedStatisticsData.TypingData
+        };
+
+        // Sending the data
+        await sendStatisticsData(dataToSend);
+
+        // Marking as completed to prevent duplicate requests
+        setIsComplete(true);
+    }
+    
 
     const formatDateTime = (date) => {
         return date.toISOString().replace('Z', '');

@@ -4,7 +4,6 @@ import Leaderboard from './Leaderboard';
 import CustomAlert from './CustomAlert';
 function GameData( { gameId }) {
     const [gameData, setGameData] = useState(null);
-    const [paragraphData, setParagraphData] = useState(null);
     const [showLeaderboard, setShowLeaderboard] = useState(false);
     const [appID, setAppID] = useState(null);
     const [showAlert, setShowAlert] = useState(false);
@@ -48,37 +47,18 @@ function GameData( { gameId }) {
                 console.log("Fetched game data:", data);
                 setGameData(data);
                 isGameDataFetched.current = true;
-
-                if (data.statistics.paragraphId) {
-                    fetchParagraphData(data.statistics.paragraphId);
-                }
                 
             })
             .catch(error => console.error("Error fetching game data:", error));
     }, [gameId]);
     
     
-    function fetchParagraphData(paragraphId) {
-        fetch(`/api/paragraphs/${paragraphId}`)
-        .then(response => {
-            if (!response.ok) {
-                console.log("Failed to retrieve paragraph data");
-                throw new Error("Paragraph data not found");
-            }
-            return response.json();
-        })
-            .then(data => {
-                console.log("Fetched paragraph data:", data);
-                setParagraphData(data); // Save the paragraph data
-            })
-            .catch(error => console.error("Error fetching paragraph data:", error));
-    }
 
     useEffect(() => {
-        if (gameData && paragraphData) {
+        if (gameData) {
             saveStatistics();
         }
-    }, [gameData, paragraphData]);
+    }, [gameData]);
 
     if (showLeaderboard) {
         return <Leaderboard />;
@@ -92,12 +72,10 @@ function GameData( { gameId }) {
         return <div>Loading game data...</div>; // loading screen for game data
     }
 
-    if (!paragraphData) {
-        return <div>Loading paragraph data...</div>; // loading screen for paragraph data
-    }
     
-    console.log("This is the localStartTime: ", gameData.statistics.localStartTime);
-    console.log("This is totalAmountOfWords: ", paragraphData.totalAmountOfWords);
+    
+    //console.log("This is the localStartTime: ", gameData.statistics.localStartTime);
+    //console.log("This is totalAmountOfWords: ", paragraphData.totalAmountOfWords);
     
     
     const startTime = new Date(gameData.statistics.localStartTime);

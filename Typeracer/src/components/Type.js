@@ -3,6 +3,7 @@ import { Howl } from 'howler';
 import '../../wwwroot/css/Type.css';
 import wrongSound from '../../wwwroot/sounds/incorrect.mp3';
 import wrongHardcoreSound from '../../wwwroot/sounds/incorrect_hardcore.mp3';
+import typingHardcoreSound from '../../wwwroot/sounds/typing_hardcore.mp3';
 import GameData from './GameData';
 import {useGame} from "./GameContext";
 
@@ -39,14 +40,17 @@ function Type() {
     });
     
     const charRefs = useRef([]);
-    const wrongSoundRef = useRef(null);
     const intervalRef = useRef(null);
     const blinkTimeoutRef = useRef(null);
     const errorWordInfoRef = useRef(null);
     
     // Used for storing word information
     const wordsInfoRef = useRef([]);
+
+    const wrongSoundRef = useRef(null);
     const wrongSoundHardcoreRef = useRef(null);
+    const typingSoundHardcoreRef = useRef(null);
+    
     
     
     
@@ -164,6 +168,10 @@ function Type() {
             if (!wordInfo.startTime) {
                 wordInfo.startTime = Date.now();
             }
+        }
+        
+        if (gamemode === '2') {
+            typingSoundHardcoreRef.current.play();
         }
 
         if (inputCharacter === 'Backspace') {
@@ -463,6 +471,11 @@ function Type() {
             src: [wrongHardcoreSound],
             preload: true
         });
+        
+        typingSoundHardcoreRef.current = new Howl({
+            src: [typingHardcoreSound],
+            preload: true
+        })
 
         return () => {
             clearInterval(intervalRef.current);

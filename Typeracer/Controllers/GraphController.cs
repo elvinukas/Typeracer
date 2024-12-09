@@ -31,17 +31,11 @@ public class GraphController : ControllerBase
             {
                 return NotFound(new { message = "Game not found" });
             }
-
-            var paragraph = await _dbContext.Paragraphs
-                .FirstOrDefaultAsync(p => p.Id == game.Statistics.ParagraphId);
-
-            if (paragraph == null)
-            {
-                return NotFound(new { message = "Paragraph not found" });
-            }
-
+            
             // generate graph with paragraph which is received through the database
-            await _graphService.GenerateGraphAsync(game, paragraph.TotalAmountOfWords, "red");
+            // generating graph based on not the total amount of words in the paragraph, but on total amount of words written!
+            // that is why paragraph is not needed to be retrieved to generated the graph
+            await _graphService.GenerateGraphAsync(game, game.Statistics.TypingData.Count, "red");
 
             return Ok(new { message = "Graph generated successfully" });
         }

@@ -94,14 +94,14 @@ public class Game
             accuracyList.Add(typingData.CurrentAccuracy);
         }
         
-        // double[] smoothedWpmData = CalculateMovingAverage(data: wpmList.ToArray()); // LINQ // named and optional arguments
-        // double[] smoothedAccuracyData = CalculateMovingAverage(data: accuracyList.ToArray()); // LINQ // named and optional arguments
-        //
-        // for (int i = 0; i < Statistics.TypingData.Count; i++)
-        // {
-        //     Statistics.TypingData[i].CurrentWordsPerMinute = smoothedWpmData[i];
-        //     Statistics.TypingData[i].CurrentAccuracy = smoothedAccuracyData[i];
-        // }
+        double[] smoothedWpmData = CalculateMovingAverage(data: wpmList.ToArray()); // LINQ // named and optional arguments
+        double[] smoothedAccuracyData = CalculateMovingAverage(data: accuracyList.ToArray()); // LINQ // named and optional arguments
+        
+        for (int i = 0; i < Statistics.TypingData.Count; i++)
+        {
+            Statistics.TypingData[i].CurrentWordsPerMinute = smoothedWpmData[i];
+            Statistics.TypingData[i].CurrentAccuracy = smoothedAccuracyData[i];
+        }
 
     }
     

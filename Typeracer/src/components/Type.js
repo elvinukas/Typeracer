@@ -304,6 +304,7 @@ function Type() {
             const newLocalFinishTime = new Date(finishTime);
 
             // Preparing the typingData array
+            // the filter is there to not send any entries that have startTime of 0 or null. they are invalid.
             const typingData = wordsInfoRef.current.filter(wordInfo => wordInfo.startTime !== 0 && wordInfo.startTime !== null).map(wordInfo => ({
                 Word: wordInfo.word,
                 BeginningTimestampWord: wordInfo.startTime ? new Date(wordInfo.startTime).toISOString() : null,

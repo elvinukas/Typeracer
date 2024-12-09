@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import '../../wwwroot/css/GameData.css';
 import Leaderboard from './Leaderboard';
 import CustomAlert from './CustomAlert';
@@ -31,8 +31,12 @@ function GameData( { gameId }) {
         }
     }
     
+    const isGameDataFetched = useRef(false);
 
     useEffect(() => {
+        console.log("Fetching game data...");
+        if (isGameDataFetched.current) return;
+        
         fetch(`api/Game/${gameId}`)
             .then(response => {
                 if (!response.ok) {
@@ -43,6 +47,7 @@ function GameData( { gameId }) {
             .then(data => {
                 console.log("Fetched game data:", data);
                 setGameData(data);
+                isGameDataFetched.current = true;
 
                 if (data.statistics.paragraphId) {
                     fetchParagraphData(data.statistics.paragraphId);
@@ -148,7 +153,7 @@ function GameData( { gameId }) {
                                 <p className="paragraph">ŽPM</p>
                             </div>
                             <div className="top-number">
-                                {wordsPerMinute.toFixed()}
+                                {(wordsPerMinute || 0).toFixed()}
                             </div>
                         </div>
                         <div className="acc">
@@ -178,7 +183,7 @@ function GameData( { gameId }) {
                             <p className="paragraph">ŽODŽIAI</p>
                         </div>
                         <div className="bottom-number">
-                            {paragraphData.totalAmountOfWords}
+                            {gameData.statistics.typingData.length}
                         </div>
                     </div>
                     <div className="characters">
@@ -186,7 +191,7 @@ function GameData( { gameId }) {
                             <p className="paragraph">IŠ VISO/KLAIDOS</p>
                         </div>
                         <div className="bottom-number">
-                            {paragraphData.totalAmountOfCharacters}/{gameData.statistics.numberOfWrongfulCharacters}
+                            {gameData.statistics.typedAmountOfCharacters}/{gameData.statistics.numberOfWrongfulCharacters}
                         </div>
                     </div>
                     <div className="startTime">

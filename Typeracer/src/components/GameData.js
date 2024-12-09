@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import '../../wwwroot/css/GameData.css';
 import Leaderboard from './Leaderboard';
+import CustomAlert from './CustomAlert';
+import { UsernameContext } from '../UsernameContext';
 function GameData( { gameId }) {
     const [gameData, setGameData] = useState(null);
     const [paragraphData, setParagraphData] = useState(null);
-    
     const [showLeaderboard, setShowLeaderboard] = useState(false);
-
     const [appID, setAppID] = useState(null);
+    const [showAlert, setShowAlert] = useState(false);
+    const { username } = useContext(UsernameContext);
 
     useEffect(() => {
         // Fetch the application ID from the server
@@ -100,14 +102,6 @@ function GameData( { gameId }) {
     const accuracy = gameData.statistics.accuracy || "N/A";
     
     const saveStatistics = async () => {
-        const username = prompt("Įveskite savo vartotojo vardą:");
-        if (!username) {
-            alert("Vartotojo vardas būtinas!");
-            return;
-        }
-        
-        //console.log("Generated or retrieved PlayerID: ", playerID);
-
         const playerData = {
             Username: username,
             BestWPM: gameData.statistics.wordsPerMinute,
@@ -127,21 +121,30 @@ function GameData( { gameId }) {
             });
 
             if (!response.ok) {
-                throw new Error('Nepavyko išsaugoti duomenų lyderių lentelėje');
+                throw new Error('Couldn\'t save player data to leaderboard');
             }
 
-            alert('Rezultatai išsaugoti!');
+            setShowAlert(true);
         } catch (error) {
-            console.error('Klaida:', error);
+            console.error(error);
         }
     };
     
     return (
         <div className="game-data-body">
-            <div className="game-data-title">
-                <p>Žaidimo duomenys</p>
+            <div className="top-ribbon">
+                <div className="game-data-title">
+                    <p>Žaidimo duomenys</p>
+                </div>
+                <div className="current-user">
+                    <div className="current-user-text">
+                        Dabar žaidžia:
+                    </div>
+                    <div className="username">
+                        {username}
+                    </div>
+                </div>
             </div>
-
             <div className="game-data-container">
                 <div className="wpm-acc-graph">
                     <div className="wpm-acc">
@@ -209,13 +212,19 @@ function GameData( { gameId }) {
                     </div>
                 </div>
             </div>
-            <div className="text-center">
-                <button className="btn btn-primary btn-lg mt-3" style={{ marginRight: '10px' }} onClick={saveStatistics}>Išsaugoti statistiką</button>
-                <button className="btn btn-primary btn-lg mt-3" onClick={() => setShowLeaderboard(true)}>
+            <div className="button-container">
+                <button className="save-statistics-button"
+                        onClick={saveStatistics}
+                >
+                    Išsaugoti statistiką
+                </button>
+                <button className="see-leaderboard-button"
+                        onClick={() => setShowLeaderboard(true)}
+                >
                     Peržiūrėti lyderių lentelę
                 </button>
             </div>
-
+            {showAlert && <CustomAlert message="Statistika išsaugota" borderColor="green" onClose={() => setShowAlert(false)} />}
         </div>
     );
 }

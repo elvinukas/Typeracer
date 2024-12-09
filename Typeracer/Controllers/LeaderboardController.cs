@@ -68,21 +68,15 @@ namespace Typeracer.Controllers
 
             return Ok(leaderboard);
         }
-
+        
         [HttpPost("save")]
         public IActionResult SavePlayerData([FromBody] PlayerDataModel playerData, AppDbContext context)
         {
             if (string.IsNullOrEmpty(playerData.Username))
             {
-                return BadRequest("Username is necessary!");
+                return BadRequest("Username is not set!");
             }
 
-            // if (string.IsNullOrEmpty(playerData.PlayerID) || !Guid.TryParse(playerData.PlayerID, out Guid playerGuid))
-            // {
-            //     return BadRequest("Neteisingas PlayerID formatas");
-            // }
-
-            //Console.WriteLine($"Received PlayerID: {playerData.PlayerID}");
             Console.WriteLine($"Received Username: {playerData.Username}");
             Console.WriteLine($"GameID: {playerData.GameId}");
 
@@ -96,7 +90,6 @@ namespace Typeracer.Controllers
             {
                 try
                 {
-                    //Player? existingPlayer = context.Players.Find(player.PlayerID);
                     Player? existingPlayer = context.Players
                         .Include(p => p.WPMs)
                         .Include(p => p.Accuracies)

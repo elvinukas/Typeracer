@@ -44,7 +44,7 @@ public class Game
             }
             else
             {
-                this.CompletionTime = -1;
+                this.CompletionTime = 0;
             }
         }
     }
@@ -52,11 +52,13 @@ public class Game
     private void CalculateAdditionalStatistics()
     {
         
-        if (CompletionTime > 0)
-        {
-            Statistics.WordsPerMinute = CalculateWPM(Statistics.TypedAmountOfWords, (CompletionTime / 60.0));
-            Statistics.Accuracy = CalculateAccuracy(Statistics.TypedAmountOfCharacters, Statistics.NumberOfWrongfulCharacters);
-        }
+        Statistics.WordsPerMinute = CalculateWPM(Statistics.TypedAmountOfWords, (CompletionTime / 60.0));
+        Statistics.Accuracy = CalculateAccuracy(Statistics.TypedAmountOfCharacters, Statistics.NumberOfWrongfulCharacters);
+        // if (CompletionTime > 0)
+        // {
+        //     Statistics.WordsPerMinute = CalculateWPM(Statistics.TypedAmountOfWords, (CompletionTime / 60.0));
+        //     Statistics.Accuracy = CalculateAccuracy(Statistics.TypedAmountOfCharacters, Statistics.NumberOfWrongfulCharacters);
+        // }
         
         // | Calculating CurrentWordsPerMinute and CurrentAccuracy for each word
         

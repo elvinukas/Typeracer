@@ -85,8 +85,8 @@ function GameData( { gameId }) {
     const formattedStartTime = startTime.toLocaleTimeString('en-GB', { hour12: false });
     const formattedFinishTime = finishTime.toLocaleTimeString('en-GB', { hour12: false });
     
-    const wordsPerMinute = gameData.statistics.wordsPerMinute|| "N/A";
-    const accuracy = gameData.statistics.accuracy || "N/A";
+    const wordsPerMinute = gameData.statistics.wordsPerMinute|| 0;
+    const accuracy = gameData.statistics.accuracy || 0;
     
     const saveStatistics = async () => {
         const playerData = {
@@ -131,7 +131,7 @@ function GameData( { gameId }) {
                                 <p className="paragraph">ŽPM</p>
                             </div>
                             <div className="top-number">
-                                {(wordsPerMinute || 0).toFixed()}
+                                {wordsPerMinute.toFixed()}
                             </div>
                         </div>
                         <div className="acc">

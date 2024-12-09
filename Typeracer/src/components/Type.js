@@ -170,9 +170,9 @@ function Type() {
             }
         }
         
-        if (gamemode === '2') {
-            typingSoundHardcoreRef.current.play();
-        }
+        // if (gamemode === '2') {
+        //     typingSoundHardcoreRef.current.play();
+        // }
 
         if (inputCharacter === 'Backspace') {
             if (currentIndex > 0) {

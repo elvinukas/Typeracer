@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Howl } from 'howler';
 import '../../wwwroot/css/Type.css';
 import wrongSound from '../../wwwroot/sounds/incorrect.mp3';
@@ -6,6 +6,7 @@ import wrongHardcoreSound from '../../wwwroot/sounds/incorrect_hardcore.mp3';
 import typingHardcoreSound from '../../wwwroot/sounds/typing_hardcore.mp3';
 import GameData from './GameData';
 import {useGame} from "./GameContext";
+import { UsernameContext } from '../UsernameContext';
 
 function Type() {
     const [typingText, setTypingText] = useState('');
@@ -21,6 +22,7 @@ function Type() {
     const [gameId, setGameId] = useState(null);
     const {gamemode, setGamemode} = useGame();
     const [isGameOver, setIsGameOver] = useState(false); // used in hardcore mode
+    const { username } = useContext(UsernameContext);
     
     // used for checking when was the last keypress recorded - text cursor blinker
     const [lastKeyPressTime, setLastKeyPressTime] = useState(Date.now());
@@ -540,9 +542,20 @@ function Type() {
 
     return (
         <div className="type-page-body">
-            <div className="type-page-title">
-                <p>Galima pradėti rašyti</p>
+            <div className="top-ribbon">
+                <div className="type-page-title">
+                    <p>Galima pradėti rašyti</p>
+                </div>
+                <div className="current-user">
+                    <div className="current-user-text">
+                        Dabar žaidžia:
+                    </div>
+                    <div className="username">
+                        {username}
+                    </div>
+                </div>
             </div>
+
 
             <div className="chronometer">
                 <p>{formatTime(elapsedTime)}</p>

@@ -1,39 +1,27 @@
-﻿import React, {useState} from 'react';
+﻿import React, {useContext, useState} from 'react';
 import '../../wwwroot/css/GameStart.css';
 import CustomAlert from './CustomAlert';
+import { UsernameContext } from '../UsernameContext';
 import {useGame} from "./GameContext";
 
 function GameStart({ onStart }) {
-    const [username, setUsername] = useState('');
     const {gamemode, setGamemode} = useGame();
     const [showAlert, setShowAlert] = useState(false);
+    const { setUsername } = useContext(UsernameContext);
+    const [inputUsername, setInputUsername] = useState('');
     const startGame = async () => {
-        if (!username) {
+        if (!inputUsername) {
             setShowAlert(true);
             return;
         }
-        
-        try {
-            const response = await fetch('/api/leaderboard/save-username', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(username)
-            });
-            
-            if (!response.ok) {
-                throw new Error('Failed to save username');
-            }
 
-            const audio = new Audio('/sounds/click.mp3');
-            audio.play();
-            audio.onended = () => {
-                onStart();  // Making the transition to the Type component
-            };
-        } catch (error) {
-            console.error('Error saving username:', error);
-        }
+        setUsername(inputUsername);
+
+        const audio = new Audio('/sounds/click.mp3');
+        audio.play();
+        audio.onended = () => {
+            onStart();  // Making the transition to the Type component
+        };
     };
 
     return (
@@ -45,10 +33,10 @@ function GameStart({ onStart }) {
             </div>
             <div className="input-container">
                 <input className="input-box"
-                       type="text"
-                       placeholder="Įveskite savo vartotojo vardą"
-                       value={username}
-                       onChange={(e) => setUsername(e.target.value)}
+                    type="text"
+                    placeholder="Įveskite savo vartotojo vardą"
+                    value={inputUsername}
+                    onChange={(e) => setInputUsername(e.target.value)}
                        size={29}
                 />
             </div>

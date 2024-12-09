@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import '../../wwwroot/css/Leaderboard.css';
+import { UsernameContext } from '../UsernameContext';
 
 function Leaderboard() {
     const [leaderboardData, setLeaderboardData] = useState([]);
     const [selectedPlayer, setSelectedPlayer] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const { username } = useContext(UsernameContext);
 
     useEffect(() => {
         fetch('/api/leaderboard')
@@ -26,8 +28,18 @@ function Leaderboard() {
 
     return (
         <div className="leaderboard-container">
-            <div className="leaderboard-title">
-                <p>TOP 10 geriausių žaidėjų</p>
+            <div className="top-ribbon">
+                <div className="leaderboard-title">
+                    <p>TOP 10 geriausių žaidėjų</p>
+                </div>
+                <div className="current-user">
+                    <div className="current-user-text">
+                        Dabar žaidžia:
+                    </div>
+                    <div className="username">
+                        {username}
+                    </div>
+                </div>
             </div>
             {leaderboardData.length === 0 ? (
                 <p>Nėra duomenų.</p>
@@ -36,7 +48,7 @@ function Leaderboard() {
                     <table className="leaderboard-table">
                         <thead>
                         <tr>
-                            <th>Nr</th>
+                        <th>Nr</th>
                             <th>Vartotojo vardas</th>
                             <th>Geriausias ŽPM</th>
                             <th>Tikslumas</th>

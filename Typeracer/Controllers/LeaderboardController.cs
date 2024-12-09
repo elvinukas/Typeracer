@@ -12,7 +12,6 @@ namespace Typeracer.Controllers
     public class LeaderboardController : ControllerBase
     {
         private readonly AppDbContext _context;
-        private static string _username;
 
         public LeaderboardController(AppDbContext context)
         {
@@ -70,32 +69,19 @@ namespace Typeracer.Controllers
             return Ok(leaderboard);
         }
         
-        
-        [HttpPost("save-username")]
-        public IActionResult SaveUsername([FromBody] string username)
-        {
-            if (string.IsNullOrEmpty(username))
-            {
-                return BadRequest("Username is necessary!");
-            }
-
-            _username = username;
-            return Ok("Username saved successfully!");
-        }
-        
         [HttpPost("save")]
         public IActionResult SavePlayerData([FromBody] PlayerDataModel playerData, AppDbContext context)
         {
-            if (string.IsNullOrEmpty(_username))
+            if (string.IsNullOrEmpty(playerData.Username))
             {
                 return BadRequest("Username is not set!");
             }
 
-            Console.WriteLine($"Received Username: {_username}");
+            Console.WriteLine($"Received Username: {playerData.Username}");
             Console.WriteLine($"GameID: {playerData.GameId}");
 
             var player = new Player(
-                _username,
+                playerData.Username,
                 playerData.BestWPM,
                 playerData.BestAccuracy
             );

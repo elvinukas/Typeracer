@@ -2,6 +2,7 @@
 import { Howl } from 'howler';
 import '../../wwwroot/css/Type.css';
 import wrongSound from '../../wwwroot/sounds/incorrect.mp3';
+import wrongHardcoreSound from '../../wwwroot/sounds/incorrect_hardcore.mp3';
 import GameData from './GameData';
 import {useGame} from "./GameContext";
 
@@ -205,8 +206,10 @@ function Type() {
 
                 if (firstErrorIndex !== null && currentIndex >= firstErrorIndex) {
                     setConsecutiveRedCount((prevCount) => prevCount + 1);
-                    if (wrongSoundRef.current) {
+                    if (wrongSoundRef.current && gamemode !== '2') {
                         wrongSoundRef.current.play();
+                    } else {
+                        wrongSoundHardcoreRef.current.play();
                     }
                 } else {
                     setConsecutiveRedCount(0);
@@ -268,8 +271,10 @@ function Type() {
                 }
 
                 setConsecutiveRedCount((prevCount) => prevCount + 1);
-                if (wrongSoundRef.current) {
+                if (wrongSoundRef.current && gamemode !== '2') {
                     wrongSoundRef.current.play();
+                } else {
+                    wrongSoundHardcoreRef.current.play();
                 }
 
                 // Incrementing mistakes for the fixed word
@@ -452,6 +457,11 @@ function Type() {
         wrongSoundRef.current = new Howl({
             src: [wrongSound],
             preload: true,
+        });
+        
+        wrongSoundHardcoreRef.current = new Howl({
+            src: [wrongHardcoreSound],
+            preload: true
         });
 
         return () => {

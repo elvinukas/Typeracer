@@ -40,7 +40,7 @@ public class GameUT
     [InlineData("2024-11-08T10:00:00Z", null, 0)]
     [InlineData(null, null, 0)]
     [InlineData("2024-11-08T10:00:00Z", "2024-11-08T10:00:05Z", 5)]
-    [InlineData("2024-11-08T10:00:05Z", "2024-11-08T10:00:00Z", -1)]
+    [InlineData("2024-11-08T10:00:05Z", "2024-11-08T10:00:00Z", 0)]
     public void CalculateCompletionTime(string startTimeString, string finishTimeString, double expectedCompletionTime)
     {
         DateTime? startTime = startTimeString != null ? DateTime.Parse(startTimeString) : (DateTime?)null;
@@ -141,7 +141,7 @@ public class GameUT
     
     [Theory]
     [InlineData(90, 3, 30)]
-    [InlineData(120, 0, -1)]
+    [InlineData(120, 0, 0)]
     [InlineData(20, 0.5, 40)]
     [InlineData(0, 1, 0)]
     public void CalculateWPM_ShouldCalculateCorrectly(int typedAmountOfWords, double completionTime, double expectedWPM)

@@ -68,7 +68,12 @@ public class HomeController : Controller
     public void GetAllParagraphs(string paragraphName, List<Gamemode> allowedGamemodes, ConcurrentDictionary<int, Paragraph> paragraphDictionary) // optional arguments
     {   
         // getting the file path
-        var filePath = Path.Combine(Directory.GetCurrentDirectory(), "Paragraphs", paragraphName);
+        var filePath = Path.Combine(AppContext.BaseDirectory, "Paragraphs", paragraphName);
+
+        if (!System.IO.File.Exists(filePath))
+        {
+            throw new FileNotFoundException($"The file {filePath} does not exist.");
+        }
         
         // using Filestream to open file as a stream
         using (FileStream filestream = new FileStream(filePath, FileMode.Open, FileAccess.Read))

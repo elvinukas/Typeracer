@@ -27,6 +27,12 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Content Include="Paragraphs\**\*">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
         <None Update="..\Typeracer\Paragraphs\paragraph1.txt">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>

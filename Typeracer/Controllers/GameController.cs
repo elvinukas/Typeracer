@@ -38,7 +38,7 @@ namespace Typeracer.Controllers
         {
             Game? game = _context.Games
                 .Include(g => g.Statistics)
-                .ThenInclude(s => s.TypingData)
+                .ThenInclude(s => s.TypingData.OrderBy(td => td.BeginningTimestampWord))
                 .FirstOrDefault(g => g.GameId == gameId);
 
             if (game == null)

@@ -1,8 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace Typeracer.Models;
 
+[Index(nameof(Text), IsUnique = true)]
 public record Paragraph
 {
     [Key]

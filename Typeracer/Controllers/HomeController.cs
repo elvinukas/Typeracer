@@ -13,7 +13,7 @@ public class HomeController : Controller
     private readonly ILogger<HomeController> _logger;
     private readonly AppDbContext _dbContext;
 
-    public HomeController(ILogger<HomeController> logger, AppDbContext appDbContext, Dictionary<string, List<Gamemode>> paragraphs)
+    public HomeController(ILogger<HomeController> logger, AppDbContext appDbContext, Dictionary<string, List<Gamemode>>? paragraphs = null)
     {
         _logger = logger;
         _dbContext = appDbContext;
@@ -24,22 +24,27 @@ public class HomeController : Controller
 
         List<Gamemode> shortGamemode = new List<Gamemode>();
         shortGamemode.Add(Gamemode.Short);
-        
-        try
+
+        // if admin needs to add more paragraphs, use Program.cs to append them, then comment out the text
+        if (paragraphs != null)
         {
-            foreach (var paragraph in paragraphs)
+            try
             {
-                InsertParagraphFileToDb(paragraph.Key, paragraph.Value);
+                foreach (var paragraph in paragraphs)
+                {
+                    InsertParagraphFileToDb(paragraph.Key, paragraph.Value);
+                }
+            
+                //InsertParagraphFileToDb("paragraph1.txt", simpleGamemodes);
+                //InsertParagraphFileToDb("paragraph2.txt", shortGamemode);
+            
             }
-            
-            //InsertParagraphFileToDb("paragraph1.txt", simpleGamemodes);
-            //InsertParagraphFileToDb("paragraph2.txt", shortGamemode);
-            
+            catch (NoAddToDBException e)
+            {
+                _logger.LogError(0, e, "Intentional? {intentional}", e.Intentional);
+            } 
         }
-        catch (NoAddToDBException e)
-        {
-            _logger.LogError(0, e, "Intentional? {intentional}", e.Intentional);
-        }
+        
         
     }
 
@@ -151,7 +156,8 @@ public class HomeController : Controller
         }
     }
 
-    public IActionResult GetParagraphText(Gamemode gamemode = Gamemode.Short)
+    [HttpPost]
+    public IActionResult GetParagraphText([FromBody] Gamemode gamemode)
     {
         //Paragraph paragraph = GetRandomParagraph(gamemode: gamemode); // named arguments
         Paragraph paragraph = GetRandomParagraph(gamemode: gamemode); 

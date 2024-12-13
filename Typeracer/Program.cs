@@ -51,7 +51,7 @@ foreach (var env in Environment.GetEnvironmentVariables().Keys)
 
 builder.Services.AddControllersWithViews();
 
-Console.WriteLine("Connection String: " + builder.Configuration.GetConnectionString("DefaultConnection"));
+Console.WriteLine("Connection String: " + builder.Configuration.GetConnectionString("POSTGRESQLCONNSTR_ConnectionStrings__DefaultConnection"));
 
 // Configure the database provider based on the environment
 if (builder.Environment.IsEnvironment("Testing"))

@@ -7,6 +7,8 @@ using Typeracer.Context;
 using Typeracer.Controllers;
 using Typeracer.Services;
 
+Console.WriteLine("DEBUG: Program started");
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Generate an application ID (used for the leaderboard)

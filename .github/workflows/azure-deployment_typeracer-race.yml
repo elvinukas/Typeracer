@@ -19,10 +19,18 @@ jobs:
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.x'
+          dotnet-version: '9.x'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: install frontend dependencies
+      - run: npm install
 
       - name: Build with dotnet
-        run: dotnet build --configuration Release ./Typeracer/Typeracer.csproj
+        run: npx webpack -- mode development
 
       - name: dotnet publish
         run: dotnet publish ./Typeracer/Typeracer.csproj -c Release -r win-x86 --self-contained false -o ./myapp

@@ -53,6 +53,10 @@ builder.Services.AddControllersWithViews();
 
 Console.WriteLine("Connection String: " + builder.Configuration.GetConnectionString("POSTGRESQLCONNSTR_ConnectionStrings__DefaultConnection"));
 
+// Retrieve connection string from environment variables or configuration
+var connectionString = Environment.GetEnvironmentVariable("POSTGRESQLCONNSTR_ConnectionStrings__DefaultConnection")
+                       ?? builder.Configuration.GetConnectionString("DefaultConnection");
+
 // Configure the database provider based on the environment
 if (builder.Environment.IsEnvironment("Testing"))
 {
@@ -64,7 +68,7 @@ else
 {
     // Use PostgreSQL for other environments
     builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+        options.UseNpgsql(connectionString));
 }
 
 

@@ -61,5 +61,5 @@ jobs:
         with:
           app-name: 'typeracer-race'
           slot-name: 'Production'
-          package: .
+          package: ./myapp
           

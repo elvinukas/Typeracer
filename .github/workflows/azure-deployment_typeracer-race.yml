@@ -25,7 +25,7 @@ jobs:
         run: dotnet build --configuration Release ./Typeracer/Typeracer.csproj
 
       - name: dotnet publish
-        run: dotnet publish ./Typeracer/Typeracer.csproj -c Release -r win-x86 --self-contained true -o ./myapp
+        run: dotnet publish ./Typeracer/Typeracer.csproj -c Release -r win-x86 --self-contained false -o ./myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4

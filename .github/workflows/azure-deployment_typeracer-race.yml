@@ -25,9 +25,11 @@ jobs:
 
       - name: Install frontend dependencies
         run: npm install
+        working-directory: ./Typeracer
 
       - name: Build frontend with Webpack
         run: npx webpack --mode development
+        working-directory: ./Typeracer
 
       - name: dotnet publish
         run: dotnet publish ./Typeracer/Typeracer.csproj -c Release -r win-x86 --self-contained false -o ./myapp

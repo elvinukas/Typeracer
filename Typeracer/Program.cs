@@ -39,6 +39,8 @@ builder.Services.AddScoped<HomeController>();
 
 builder.Services.AddControllersWithViews();
 
+Console.WriteLine("Connection String: " + builder.Configuration.GetConnectionString("DefaultConnection"));
+
 // Configure the database provider based on the environment
 if (builder.Environment.IsEnvironment("Testing"))
 {

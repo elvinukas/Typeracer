@@ -9,6 +9,11 @@ using Typeracer.Services;
 
 Console.WriteLine("DEBUG: Program started");
 
+foreach (var key in Environment.GetEnvironmentVariables().Keys)
+{
+    Console.WriteLine($"{key}: {Environment.GetEnvironmentVariables()[key]}");
+}
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Generate an application ID (used for the leaderboard)

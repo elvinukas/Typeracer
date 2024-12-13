@@ -36,12 +36,9 @@ builder.Services.AddCors(options =>
 // builder.Services.AddSingleton(paragraphFiles);
 builder.Services.AddScoped<HomeController>();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-Console.WriteLine($"Connection String: {connectionString ?? "Not Found"}");
-if (string.IsNullOrEmpty(connectionString))
+foreach (var env in Environment.GetEnvironmentVariables().Keys)
 {
-    Console.WriteLine("ERROR: Connection String is empty or not set!");
-    throw new InvalidOperationException("Connection String is not configured.");
+    Console.WriteLine($"{env}: {Environment.GetEnvironmentVariable(env.ToString())}");
 }
 
 

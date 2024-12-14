@@ -45,9 +45,11 @@ builder.Services.AddScoped<HomeController>();
 
 builder.Services.AddControllersWithViews();
 
-var connectionString = Environment.GetEnvironmentVariable("POSTGRESQLCONNSTR_ConnectionStrings__DefaultConnection")
-                       ?? builder.Configuration.GetConnectionString("DefaultConnection");
-
+var connectionString = Environment.GetEnvironmentVariable("POSTGRESQLCONNSTR_ConnectionStrings__DefaultConnection");
+if (string.IsNullOrEmpty(connectionString))
+{
+    connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+}
 Console.WriteLine($"DEBUG: Final Connection String: {connectionString}");
 
 // Configure the database provider based on the environment

@@ -48,9 +48,12 @@ builder.Services.AddControllersWithViews();
 var connectionString = Environment.GetEnvironmentVariable("POSTGRESQLCONNSTR_ConnectionStrings__DefaultConnection");
 if (string.IsNullOrEmpty(connectionString))
 {
-    connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    Console.WriteLine("DEBUG: Connection string is null or empty!");
 }
-Console.WriteLine($"DEBUG: Final Connection String: {connectionString}");
+else
+{
+    Console.WriteLine($"DEBUG: Retrieved connection string: {connectionString}");
+}
 
 // Configure the database provider based on the environment
 if (builder.Environment.IsEnvironment("Testing"))

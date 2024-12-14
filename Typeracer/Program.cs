@@ -43,19 +43,12 @@ builder.Services.AddCors(options =>
 // builder.Services.AddSingleton(paragraphFiles);
 builder.Services.AddScoped<HomeController>();
 
-foreach (var env in Environment.GetEnvironmentVariables().Keys)
-{
-    Console.WriteLine($"{env}: {Environment.GetEnvironmentVariable(env.ToString())}");
-}
-
-
 builder.Services.AddControllersWithViews();
 
-Console.WriteLine("Connection String: " + builder.Configuration.GetConnectionString("POSTGRESQLCONNSTR_ConnectionStrings__DefaultConnection"));
-
-// Retrieve connection string from environment variables or configuration
 var connectionString = Environment.GetEnvironmentVariable("POSTGRESQLCONNSTR_ConnectionStrings__DefaultConnection")
                        ?? builder.Configuration.GetConnectionString("DefaultConnection");
+
+Console.WriteLine($"DEBUG: Final Connection String: {connectionString}");
 
 // Configure the database provider based on the environment
 if (builder.Environment.IsEnvironment("Testing"))

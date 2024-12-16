@@ -29,6 +29,57 @@
     border-radius: 5px;
 }
 
+.dropdown-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 50px;
+    font-size: 20px;
+}
+
+.custom-dropdown {
+    position: relative;
+    width: 170px;
+    cursor: pointer;
+    font-family: "Courier Prime";
+}
+
+.selected-option {
+    padding: 3px;
+    background-color: #E9E9ED;
+    font-size: 20px;
+    border: 1px solid black;
+    border-radius: 5px;
+}
+
+.selected-option:hover {
+    background-color: #D0D0D7;
+}
+
+.dropdown-options {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 5px;
+    z-index: 1000;
+    font-family: "Courier Prime";
+}
+
+.dropdown-options li {
+    padding: 3px;
+    cursor: pointer;
+}
+
+.dropdown-options li:hover {
+    background-color: #E9E9ED;
+    border-radius: 5px;
+}
+
 .start-game-button {
     font-size: 20px;
     background-color: rgb(11, 94, 215);

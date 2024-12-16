@@ -9,6 +9,14 @@ function GameStart({ onStart }) {
     const [showAlert, setShowAlert] = useState(false);
     const { setUsername } = useContext(UsernameContext);
     const [inputUsername, setInputUsername] = useState('');
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+
+    const gamemodeOptions = [
+        { value: "0", label: "Standartinis" },
+        { value: "1", label: "Trumpas" },
+        { value: "2", label: "Sunkus" },
+    ];
+    
     const startGame = async () => {
         if (!inputUsername) {
             setShowAlert(true);
@@ -22,6 +30,11 @@ function GameStart({ onStart }) {
         audio.onended = () => {
             onStart();  // Making the transition to the Type component
         };
+    };
+
+    const handleGamemodeChange = (value) => {
+        setGamemode(value);
+        setDropdownOpen(false); // Close dropdown after selection
     };
 
     return (
@@ -41,17 +54,28 @@ function GameStart({ onStart }) {
                 />
             </div>
             <div className="dropdown-container">
-                <label htmlFor="gamemode">Pasirinkite žaidimo tipą:</label>
-                <select
-                    id="gamemode"
-                    className="dropdown"
-                    value={gamemode}
-                    onChange={(e) => setGamemode(e.target.value)}
-                >
-                    <option value="0">Standartinis</option>
-                    <option value="1">Trumpas</option>
-                    <option value="2">Sunkus</option>
-                </select>
+                <label htmlFor="gamemode">Pasirinkite žaidimo tipą:&nbsp;</label>
+                <div className="custom-dropdown">
+                    <div
+                        className="selected-option"
+                        onClick={() => setDropdownOpen(!dropdownOpen)}
+                    >
+                        {gamemodeOptions.find(option => option.value === gamemode)?.label || "Pasirinkti"}
+                    </div>
+                    {dropdownOpen && (
+                        <ul className="dropdown-options">
+                            {gamemodeOptions.map(option => (
+                                <li
+                                    key={option.value}
+                                    onClick={() => handleGamemodeChange(option.value)}
+                                    className={option.value === gamemode ? "selected" : ""}
+                                >
+                                    {option.label}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
             </div>
             <div className="button-container">
                 <button

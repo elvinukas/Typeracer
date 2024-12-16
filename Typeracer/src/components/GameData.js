@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import '../../wwwroot/css/GameData.css';
 import Leaderboard from './Leaderboard';
 import CustomAlert from './CustomAlert';
@@ -9,6 +10,7 @@ function GameData( { gameId }) {
     const [appID, setAppID] = useState(null);
     const [showAlert, setShowAlert] = useState(false);
     const { username } = useContext(UsernameContext);
+    const navigate = useNavigate();
 
     useEffect(() => {
         // Fetch the application ID from the server
@@ -66,9 +68,9 @@ function GameData( { gameId }) {
         return <Leaderboard />;
     }
 
-    if (!gameData) {
-        return <div>Loading...</div>; //loading screen
-    }
+    //if (!gameData) {
+    //    return <div>Loading...</div>; //loading screen
+    //}
 
     if (!gameData) {
         return <div>Loading game data...</div>; // loading screen for game data
@@ -117,6 +119,11 @@ function GameData( { gameId }) {
         } catch (error) {
             console.error(error);
         }
+    };
+    
+    const handleBackToStart = () => {
+        console.log('Navigating to GameStart...');
+        window.location.reload();
     };
     
     return (
@@ -207,8 +214,14 @@ function GameData( { gameId }) {
                 >
                     Peržiūrėti lyderių lentelę
                 </button>
+                <button className="back-to-start-button"
+                        onClick={handleBackToStart}
+                >
+                    Į pradžią
+                </button>
             </div>
-            {showAlert && <CustomAlert message="Statistika išsaugota" borderColor="green" onClose={() => setShowAlert(false)} />}
+            {showAlert &&
+                <CustomAlert message="Statistika išsaugota" borderColor="green" onClose={() => setShowAlert(false)} />}
         </div>
     );
 }

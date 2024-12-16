@@ -33,33 +33,27 @@ public class Game
 
     private void CalculateCompletionTime()
     {
-        this.CompletionTime = 0;
-        
-        
         if (Statistics.LocalFinishTime.HasValue && Statistics.LocalStartTime.HasValue)
         {
             if (Statistics.LocalFinishTime.Value > Statistics.LocalStartTime.Value)
             {
-                this.CompletionTime = (Statistics.LocalFinishTime.Value - Statistics.LocalStartTime.Value).TotalSeconds;
+                CompletionTime = (Statistics.LocalFinishTime.Value - Statistics.LocalStartTime.Value).TotalSeconds;
             }
             else
             {
-                this.CompletionTime = 0;
+                CompletionTime = 0;
             }
         }
     }
 
     private void CalculateAdditionalStatistics()
     {
-        
-        Statistics.WordsPerMinute = CalculateWPM(Statistics.TypedAmountOfWords, (CompletionTime / 60.0));
-        Statistics.Accuracy = CalculateAccuracy(Statistics.TypedAmountOfCharacters, Statistics.NumberOfWrongfulCharacters);
-        // if (CompletionTime > 0)
-        // {
-        //     Statistics.WordsPerMinute = CalculateWPM(Statistics.TypedAmountOfWords, (CompletionTime / 60.0));
-        //     Statistics.Accuracy = CalculateAccuracy(Statistics.TypedAmountOfCharacters, Statistics.NumberOfWrongfulCharacters);
-        // }
-        
+        if (CompletionTime > 0)
+        {
+            Statistics.WordsPerMinute = CalculateWPM(Statistics.TypedAmountOfWords, (CompletionTime / 60.0));
+            Statistics.Accuracy = CalculateAccuracy(Statistics.TypedAmountOfCharacters, Statistics.NumberOfWrongfulCharacters);
+        }
+
         // | Calculating CurrentWordsPerMinute and CurrentAccuracy for each word
         
         // this data has to be appended to the typingData inside statistics
@@ -138,10 +132,8 @@ public class Game
         {
             return typedAmountOfWords / completionTime;
         }
-        else
-        {
-            return 0;
-        }
+
+        return 0;
     }
     
     private double CalculateAccuracy(int totalCharacters, int incorrectCharacters)
@@ -151,9 +143,7 @@ public class Game
         {
             return (double)correctCharacters / totalCharacters * 100;
         }
-        else
-        {
-            return 0;
-        }
+
+        return 0;
     }
 }

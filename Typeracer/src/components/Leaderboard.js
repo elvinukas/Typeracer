@@ -26,6 +26,11 @@ function Leaderboard() {
             .catch(error => console.error('Error when trying to get leaderboard:', error));
     }, []);
 
+    const handleBackToStart = () => {
+        console.log('Navigating to GameStart...');
+        window.location.reload();
+    };
+
     return (
         <div className="leaderboard-container">
             <div className="top-ribbon">
@@ -48,7 +53,7 @@ function Leaderboard() {
                     <table className="leaderboard-table">
                         <thead>
                         <tr>
-                        <th>Nr</th>
+                            <th>Nr</th>
                             <th>Vartotojo vardas</th>
                             <th>Geriausias ŽPM</th>
                             <th>Tikslumas</th>
@@ -63,7 +68,7 @@ function Leaderboard() {
                                         setSelectedPlayer(player);
                                         setIsModalOpen(true);
                                     }}
-                                    style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
+                                    style={{cursor: 'pointer', color: 'blue', textDecoration: 'underline'}}
                                 >
                                     {player.username ? player.username : 'N/A'}
                                 </td>
@@ -81,12 +86,24 @@ function Leaderboard() {
                 <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                         <h2>Žaidėjo {selectedPlayer.username} statistika</h2>
-                        <p><b>Vidutinis ŽPM:</b> {typeof selectedPlayer.averageWPM === 'number' ? selectedPlayer.averageWPM.toFixed(2) : 'N/A'}</p>
-                        <p><b>Vidutinis tikslumas:</b> {typeof selectedPlayer.averageAccuracy === 'number' ? selectedPlayer.averageAccuracy.toFixed(2) : 'N/A'}%</p>
+                        <p><b>Vidutinis
+                            ŽPM:</b> {typeof selectedPlayer.averageWPM === 'number' ? selectedPlayer.averageWPM.toFixed(2) : 'N/A'}
+                        </p>
+                        <p><b>Vidutinis
+                            tikslumas:</b> {typeof selectedPlayer.averageAccuracy === 'number' ? selectedPlayer.averageAccuracy.toFixed(2) : 'N/A'}%
+                        </p>
                         <button onClick={() => setIsModalOpen(false)}>Uždaryti</button>
                     </div>
                 </div>
             )}
+
+            <div className="button-container">
+                <button className="back-to-start-button"
+                        onClick={handleBackToStart}
+                >
+                    Į pradžią
+                </button>
+            </div>
         </div>
     );
 }

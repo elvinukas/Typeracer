@@ -111,6 +111,7 @@ public class GraphService : IGraphService
             Layer = OxyPlot.Axes.AxisLayer.AboveSeries
         });
 
+        // creating a direcotory if it doesn't exist
         var imagesPath = Path.Combine(_webHostEnvironment.WebRootPath, "images");
         if (!Directory.Exists(imagesPath))
         {

@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - azure-deployment
+      - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:

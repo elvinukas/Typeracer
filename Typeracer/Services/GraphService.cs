@@ -6,11 +6,19 @@ using OxyPlot.Series;
 using OxyPlot.WindowsForms;
 using OxyPlot.SkiaSharp;
 using System.Runtime.InteropServices;
+using Microsoft.Extensions.Hosting;
 
 namespace Typeracer.Services;
 
 public class GraphService : IGraphService
 {
+    private readonly IWebHostEnvironment _webHostEnvironment;
+
+    public GraphService(IWebHostEnvironment webHostEnvironment)
+    {
+        _webHostEnvironment = webHostEnvironment;
+    }
+
     public async Task GenerateGraphAsync (Game game, int totalWords, string WPMColor = "blue") // optional arguments
     {
         var typingData = game.Statistics.TypingData;
@@ -102,20 +110,21 @@ public class GraphService : IGraphService
             Key = "RightAxis",
             Layer = OxyPlot.Axes.AxisLayer.AboveSeries
         });
-        
+
         // creating a direcotory if it doesn't exist
-        string directoryPath = Path.Combine(AppContext.BaseDirectory, "wwwroot/images");
-        if (!Directory.Exists(directoryPath))
+        var imagesPath = Path.Combine(_webHostEnvironment.WebRootPath, "images");
+        if (!Directory.Exists(imagesPath))
         {
-            Directory.CreateDirectory(directoryPath);
+            Directory.CreateDirectory(imagesPath);
         }
 
-        string filePath = Path.Combine(directoryPath, "wpm-graph.png");
+        var filePath = Path.Combine(imagesPath, "wpm-graph.png");
 
+        
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             var pngExporter = new OxyPlot.WindowsForms.PngExporter { Width = 1100, Height = 300 }; // saves the plot as an image
-            using (var stream = File.Create(filePath))
+            using (var stream = System.IO.File.Create(filePath))
             {
                 pngExporter.Export(plotModel, stream);
             }
@@ -123,7 +132,7 @@ public class GraphService : IGraphService
         else
         {
             var pngExporter = new OxyPlot.SkiaSharp.PngExporter { Width = 1100, Height = 300 }; // saves the plot as an image
-            using (var stream = File.Create(filePath))
+            using (var stream = System.IO.File.Create(filePath))
             {
                 pngExporter.Export(plotModel, stream);
             }

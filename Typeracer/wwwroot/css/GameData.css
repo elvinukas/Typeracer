@@ -89,7 +89,7 @@
     font-size: 20px;
 }
 
-.save-statistics-button,
+.back-to-start-button,
 .see-leaderboard-button {
     background-color: rgb(11, 94, 215);
     opacity: 0.9;
@@ -103,11 +103,11 @@
     transition: opacity 0.15s;
 }
 
-.save-statistics-button:hover,
+.back-to-start-button:hover,
 .see-leaderboard-button:hover {
     opacity: 1;
 }
 
-.save-statistics-button {
+.see-leaderboard-button {
     margin-right: 10px;
 }

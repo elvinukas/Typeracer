@@ -18,9 +18,7 @@ function Leaderboard() {
             })
             .then(data => {
                 console.log("Got data from server:", data);
-
                 data.sort((a, b) => b.bestWPM - a.bestWPM);
-
                 setLeaderboardData(data);
             })
             .catch(error => console.error('Error when trying to get leaderboard:', error));

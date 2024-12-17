@@ -138,7 +138,6 @@ public class GameUT
         Assert.Equal(expected, result);
     }
     
-    
     [Theory]
     [InlineData(90, 3, 30)]
     [InlineData(120, 0, 0)]
@@ -167,27 +166,3 @@ public class GameUT
         Assert.Equal(expectedAccuracy, result);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

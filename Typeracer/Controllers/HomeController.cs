@@ -25,7 +25,6 @@ public class HomeController : Controller
         List<Gamemode> shortGamemode = new List<Gamemode>();
         shortGamemode.Add(Gamemode.Short);
 
-        // if admin needs to add more paragraphs, use Program.cs to append them, then comment out the text
         if (paragraphs != null)
         {
             try
@@ -34,10 +33,6 @@ public class HomeController : Controller
                 {
                     InsertParagraphFileToDb(paragraph.Key, paragraph.Value);
                 }
-            
-                //InsertParagraphFileToDb("paragraph1.txt", simpleGamemodes);
-                //InsertParagraphFileToDb("paragraph2.txt", shortGamemode);
-            
             }
             catch (NoAddToDBException e)
             {
@@ -57,13 +52,6 @@ public class HomeController : Controller
     {
         return View();
     }
-
-    /*
-    public IActionResult Type()
-    {
-        return View();
-    }
-    */
 
     public void GetAllParagraphs(string paragraphName, List<Gamemode> allowedGamemodes, ConcurrentDictionary<int, Paragraph> paragraphDictionary) // optional arguments
     {   
@@ -88,7 +76,6 @@ public class HomeController : Controller
                     if(!string.IsNullOrWhiteSpace(line))
                     {
                         var paragraph = new Paragraph(line, allowedGamemodes);
-                        //Console.WriteLine("Paragraph:\n" + paragraph.Text);
                         paragraphDictionary.TryAdd(key, paragraph);
                         key++;
                     }
@@ -110,9 +97,7 @@ public class HomeController : Controller
         
         var random = new Random();
         
-        // explanation
-        // return a random paragraph by generating a random number between 0 and the length of the list
-        
+        // explanation: return a random paragraph by generating a random number between 0 and the length of the list
         return filteredParagraphs[random.Next(filteredParagraphs.Count)];
     }
 
@@ -121,7 +106,6 @@ public class HomeController : Controller
         var paragraphs = new ConcurrentDictionary<int, Paragraph>();
         
         // simulating multiple threads
-        //Console.WriteLine("Adding process:");
         Task[] tasks = new Task[5];
         for (int i = 0; i < tasks.Length; ++i)
         {
@@ -129,14 +113,6 @@ public class HomeController : Controller
         }
 
         Task.WaitAll(tasks);
-        
-        /*
-        Console.WriteLine("Final paragraphs:");
-        foreach (var paragraph in paragraphs.Values)
-        {
-            Console.WriteLine("Paragraph:\n" + paragraph.Text);
-        }
-        */
 
         using (var transaction = _dbContext.Database.BeginTransaction())
         {
@@ -164,8 +140,7 @@ public class HomeController : Controller
     [HttpPost]
     public IActionResult GetParagraphText([FromBody] Gamemode gamemode)
     {
-        //Paragraph paragraph = GetRandomParagraph(gamemode: gamemode); // named arguments
-        Paragraph paragraph = GetRandomParagraph(gamemode: gamemode); 
+        Paragraph paragraph = GetRandomParagraph(gamemode: gamemode); // named arguments
         if (paragraph == null)
         {
             return NotFound(new { message = "No paragraphs found for specified gamemode." });

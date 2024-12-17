@@ -64,9 +64,13 @@ if (builder.Environment.IsEnvironment("Testing"))
 }
 else
 {
-    // Use PostgreSQL for other environments
+    // Uses connection string from the environment variable (Azure)
     builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseNpgsql(connectionString));
+    
+    // Uses connection string from appsettings.json
+    //builder.Services.AddDbContext<AppDbContext>(options =>
+        //options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 }
 
 

@@ -70,9 +70,6 @@ public class AppDbContext : DbContext
             .HasForeignKey(s => s.ParagraphId)        // Points to the ParagraphId as the foreign key
             .OnDelete(DeleteBehavior.SetNull);  
         
-        //  .HasIndex(s => s.ParagraphId)
-        //            .IsUnique(false);
-        //        
         modelBuilder.Entity<Paragraph>()
             .HasKey(p => p.Id);
     }

@@ -5,7 +5,6 @@ namespace Typeracer.Models;
 public record StatisticsModel
 {
     public Guid StatisticsId { get; set; } = Guid.NewGuid();
-    
     public DateTime? LocalStartTime { get; set; } // start date and time of the game
     public DateTime? LocalFinishTime { get; set; } // end date and time of the game
     
@@ -18,9 +17,6 @@ public record StatisticsModel
     public double Accuracy { get; set; }
     public Gamemode Gamemode { get; set; }
     public List<TypingData> TypingData { get; set; } = new List<TypingData>(); // storing all data about the typed characters
-    
-    
-    
 }
 
 public record TypingData

@@ -16,7 +16,4 @@ public class NoAddToDBException : Exception
         Intentional = intentional;
         Message = message;
     }
-    
-    
-    
 }

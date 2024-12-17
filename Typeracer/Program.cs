@@ -7,6 +7,13 @@ using Typeracer.Context;
 using Typeracer.Controllers;
 using Typeracer.Services;
 
+Console.WriteLine("DEBUG: Program started");
+
+foreach (var key in Environment.GetEnvironmentVariables().Keys)
+{
+    Console.WriteLine($"{key}: {Environment.GetEnvironmentVariables()[key]}");
+}
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Generate an application ID (used for the leaderboard)
@@ -36,8 +43,17 @@ builder.Services.AddCors(options =>
 // builder.Services.AddSingleton(paragraphFiles);
 builder.Services.AddScoped<HomeController>();
 
-
 builder.Services.AddControllersWithViews();
+
+var connectionString = Environment.GetEnvironmentVariable("POSTGRESQLCONNSTR_ConnectionStrings__DefaultConnection");
+if (string.IsNullOrEmpty(connectionString))
+{
+    Console.WriteLine("DEBUG: Connection string is null or empty!");
+}
+else
+{
+    Console.WriteLine($"DEBUG: Retrieved connection string: {connectionString}");
+}
 
 // Configure the database provider based on the environment
 if (builder.Environment.IsEnvironment("Testing"))
@@ -50,7 +66,7 @@ else
 {
     // Use PostgreSQL for other environments
     builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+        options.UseNpgsql(connectionString));
 }
 
 

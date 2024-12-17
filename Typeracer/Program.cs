@@ -1,6 +1,5 @@
 // Program.cs
 
-using Typeracer.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Typeracer.Context;
@@ -30,7 +29,6 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod()
             .AllowAnyHeader());
 });
-
 
 // | Comment out this text after adding the paragraphs, or the program will try to add these paragraphs constantly.
 // UUID needs to be created, so it is not optimal to create the paragraphs straight in the database.
@@ -72,7 +70,6 @@ else
     //builder.Services.AddDbContext<AppDbContext>(options =>
         //options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 }
-
 
 // Add the GraphService
 builder.Services.AddScoped<IGraphService, GraphService>();

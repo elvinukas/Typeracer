@@ -49,6 +49,8 @@ var connectionString = Environment.GetEnvironmentVariable("POSTGRESQLCONNSTR_Con
 if (string.IsNullOrEmpty(connectionString))
 {
     Console.WriteLine("DEBUG: Connection string is null or empty!");
+    Console.WriteLine("Running connection string locally");
+    connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 }
 else
 {

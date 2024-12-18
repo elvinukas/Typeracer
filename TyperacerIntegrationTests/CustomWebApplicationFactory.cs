@@ -23,8 +23,6 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
             services.AddDbContext<AppDbContext>(options =>
                 options.UseInMemoryDatabase("IntegrationTestsDb"));
             
-            
-            
             var paragraphFiles = new Dictionary<string, List<Gamemode>>
             {
                 { "paragraph1.txt", new List<Gamemode> { Gamemode.Standard, Gamemode.Hardcore } },

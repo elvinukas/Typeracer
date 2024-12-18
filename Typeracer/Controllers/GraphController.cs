@@ -32,6 +32,12 @@ public class GraphController : ControllerBase
                 return NotFound(new { message = "Game not found" });
             }
             
+            // checking if there is any typing data for this game and if list is not empty
+            if (game?.Statistics?.TypingData == null || !game.Statistics.TypingData.Any())
+            {
+                return NotFound(new { message = "No typing data found for this game." });
+            }
+            
             // generate graph with paragraph which is received through the database
             // generating graph based on not the total amount of words in the paragraph, but on total amount of words written!
             // that is why paragraph is not needed to be retrieved to generated the graph

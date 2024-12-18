@@ -1,7 +1,7 @@
 ﻿import '../wwwroot/css/site.css';
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
 import GameStart from './components/GameStart';
 import Type from './components/Type';
 import {GameProvider} from "./components/GameContext";

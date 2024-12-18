@@ -13,11 +13,10 @@ public record Paragraph
     [Required]
     public string Text { get; init; }
 
-    [NotMapped] // these two properties should be calculated each time and not stored in the database
+    [NotMapped]
     public int TotalAmountOfWords => Text.Split(' ').Length;
 
     [NotMapped] public int TotalAmountOfCharacters => Text.Length;
-    
     
     public List<Gamemode> AllowedGamemodes { get; set; } // in which gamemodes is this paragraph allowed in
 
@@ -27,5 +26,4 @@ public record Paragraph
         Text = text;
         AllowedGamemodes = allowedGamemodes;
     }
-    
 }

@@ -5,6 +5,7 @@ on:
     branches:
       - azure-deployment
       - main
+      - small-fixes
   pull_request:
     branches:
       - main

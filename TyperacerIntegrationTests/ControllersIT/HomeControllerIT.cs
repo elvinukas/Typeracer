@@ -106,7 +106,6 @@ public class HomeControllerIT : IClassFixture<CustomWebApplicationFactory<Progra
         Assert.Contains(gamemode, paragraph.AllowedGamemodes);
     }
     
-    
     [Fact]
     public void GetParagraphText_ShouldReturnNotFound_ForInvalidGamemode()
     {

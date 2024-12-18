@@ -29,5 +29,4 @@ public class ParagraphsController : ControllerBase
 
         return Ok(paragraph);
     }
-    
 }

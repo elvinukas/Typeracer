@@ -53,9 +53,6 @@ function Type() {
     const wrongSoundHardcoreRef = useRef(null);
     const typingSoundHardcoreRef = useRef(null);
     
-    
-    
-    
     // used for creating info about words from the text
     const buildWordsInfo = (text) => {
         if (text) {
@@ -83,7 +80,7 @@ function Type() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: gamemode // it's already string, no need to stringify it :) spent a lot of time debugging this
+            body: gamemode
         });
         let jsonResponse = await response.json();
         console.log("Json response: " + jsonResponse);
@@ -124,8 +121,6 @@ function Type() {
     }
 
     const handleKeyDown = async (event) => {
-        
-        
         const inputCharacter = event.key;
         const isCharacterKey = inputCharacter.length === 1 || inputCharacter === ' ';
 
@@ -152,13 +147,12 @@ function Type() {
             }, 1000);
         }
 
-        let newCurrentIndex = currentIndex; // Initializing newCurrentIndex
+        let newCurrentIndex = currentIndex;
 
         const adjustedIndex = currentIndex;
         const wordIndex = wordsInfoRef.current.findIndex(
             wordInfo => adjustedIndex >= wordInfo.startIndex && adjustedIndex <= wordInfo.endIndex
         );
-        
         
         let wordInfo = null;
         if (firstErrorIndex !== null && errorWordInfoRef.current) {
@@ -171,10 +165,6 @@ function Type() {
                 wordInfo.startTime = Date.now();
             }
         }
-        
-        // if (gamemode === '2') {
-        //     typingSoundHardcoreRef.current.play();
-        // }
 
         if (inputCharacter === 'Backspace') {
             if (currentIndex > 0) {
@@ -326,7 +316,7 @@ function Type() {
         const newLocalFinishTime = new Date(finishTime);
 
         // Preparing the typingData array
-        // the filter is there to not send any entries that have startTime of 0 or null. they are invalid.
+        // the filter is there to not send any entries that have startTime of 0 or null. They are invalid.
         const typingData = wordsInfoRef.current.filter(wordInfo => wordInfo.startTime !== 0 && wordInfo.startTime !== null).map(wordInfo => ({
             Word: wordInfo.word,
             BeginningTimestampWord: wordInfo.startTime ? new Date(wordInfo.startTime).toISOString() : null,
@@ -440,8 +430,6 @@ function Type() {
     }
 
     const resetStateForNextTextButton = () => {
-        
-        
         setStatisticsData({
             LocalStartTime: null,
             LocalFinishTime: null,
@@ -555,12 +543,9 @@ function Type() {
                     </div>
                 </div>
             </div>
-
-
             <div className="chronometer">
                 <p>{formatTime(elapsedTime)}</p>
             </div>
-
             <div className="typing-container">
                 <p className="typing-text">
                     {typingText.split('').map((char, index) => (
@@ -582,7 +567,6 @@ function Type() {
                     ))}
                 </p>
             </div>
-
             <div className="button-container">
                 <button className="restart-button" onClick={() => {
                     resetStateForRestartButton();

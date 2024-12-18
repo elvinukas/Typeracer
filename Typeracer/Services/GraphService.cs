@@ -137,6 +137,5 @@ public class GraphService : IGraphService
                 pngExporter.Export(plotModel, stream);
             }
         }
-        
     }
 }

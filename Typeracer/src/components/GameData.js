@@ -56,8 +56,6 @@ function GameData( { gameId }) {
             .catch(error => console.error("Error fetching game data:", error));
     }, [gameId]);
     
-    
-
     useEffect(() => {
         if (gameData) {
             saveStatistics();
@@ -68,19 +66,9 @@ function GameData( { gameId }) {
         return <Leaderboard />;
     }
 
-    //if (!gameData) {
-    //    return <div>Loading...</div>; //loading screen
-    //}
-
     if (!gameData) {
         return <div>Loading game data...</div>; // loading screen for game data
     }
-
-    
-    
-    //console.log("This is the localStartTime: ", gameData.statistics.localStartTime);
-    //console.log("This is totalAmountOfWords: ", paragraphData.totalAmountOfWords);
-    
     
     const startTime = new Date(gameData.statistics.localStartTime);
     const finishTime = new Date(gameData.statistics.localFinishTime);

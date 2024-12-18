@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Typeracer.Models;
 
-// values of a player can change, so struct is used instead of record
-// extension methods can be called to calculate the average WPM, average accuracy, best WPM and performance score
 [Index(nameof(Username), IsUnique = true)]
 public class Player : IComparable<Player>
 {
@@ -19,14 +17,12 @@ public class Player : IComparable<Player>
     public Guid? BestWPMID { get; set; }
     public Guid? BestAccuracyID { get; set; }
     
-    
     // parameterless constructor for deserialization
     public Player()
     {
         WPMs = new List<WPM>();
         Accuracies = new List<Accuracy>();
     }
-
 
     public Player(string username, double initialWPM, double initialAccuracy)
     {
@@ -72,7 +68,6 @@ public class Player : IComparable<Player>
     }
 }
 
-
 public class WPM: IComparable<WPM>
 {
     [Key]
@@ -86,7 +81,6 @@ public class WPM: IComparable<WPM>
         return Value.CompareTo(other.Value);
     }
 }
-
 
 public class Accuracy: IComparable<Accuracy>
 {

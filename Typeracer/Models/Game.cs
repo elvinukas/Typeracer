@@ -25,7 +25,6 @@ public class Game
         GameId = Guid.NewGuid();
         Statistics = statisticsModel;
         Player = null;
-        //Gamemode = (Gamemode)Enum.ToObject(typeof(Gamemode), statisticsModel.Gamemode);
         Gamemode = statisticsModel.Gamemode;
         CalculateCompletionTime();
         CalculateAdditionalStatistics();
@@ -54,10 +53,7 @@ public class Game
             Statistics.Accuracy = CalculateAccuracy(Statistics.TypedAmountOfCharacters, Statistics.NumberOfWrongfulCharacters);
         }
 
-        // | Calculating CurrentWordsPerMinute and CurrentAccuracy for each word
-        
-        // this data has to be appended to the typingData inside statistics
-
+        // Calculating CurrentWordsPerMinute and CurrentAccuracy for each word
         double previousWPM = 0;
         List<double> wpmList = new List<double>();
         List<double> accuracyList = new List<double>();
@@ -98,7 +94,6 @@ public class Game
             Statistics.TypingData[i].CurrentWordsPerMinute = smoothedWpmData[i];
             Statistics.TypingData[i].CurrentAccuracy = smoothedAccuracyData[i];
         }
-
     }
     
     private double[] CalculateMovingAverage(double[] data, int windowSize = 7)
